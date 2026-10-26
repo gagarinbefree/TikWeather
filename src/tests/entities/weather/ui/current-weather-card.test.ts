@@ -28,6 +28,7 @@ describe('CurrentWeatherCard', () => {
         hourCycle: 'h23',
       }).format(weather.observedAt),
     );
+    expect(wrapper.get('[data-updated-icon]').attributes('aria-hidden')).toBe('true');
     const metricIcons = wrapper.findAll('.current-weather-card__metric-icon');
     expect(metricIcons.map((icon) => icon.attributes('data-metric-icon'))).toEqual([
       'temperature_20_regular',

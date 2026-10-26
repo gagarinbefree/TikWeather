@@ -26,6 +26,7 @@ describe('ForecastWeatherCard', () => {
       },
     });
     expect(wrapper.get('h2').text()).toBe('Завтра');
+    expect(wrapper.get('article').attributes('style')).toContain('--card-background: #F1F5F8');
     expect(wrapper.text()).toContain('10°C');
     expect(wrapper.text()).toContain('5°C');
     expect(wrapper.text()).toContain('Пасмурно');

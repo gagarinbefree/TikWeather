@@ -18,6 +18,13 @@ describe('weather localization', () => {
     expect(conditionLabel(800, true, 'ru', 'ясно')).toBe('Ясно');
     expect(conditionLabel(500, true, 'en', 'light rain')).toBe('Light rain');
     expect(conditionLabel(9999, true, 'ru')).toBe(messages.ru.unknownCondition);
+    expect(messages.ru.uv).toBe('УФ-индекс');
+    expect(messages.ru.rainChance).toBe('Осадки');
+    expect(messages.en.uv).toBe('UV Index');
+    expect(messages.ru.loadingWeather).toBe('Загружаем погоду...');
+    expect(messages.en.loadingWeather).toBe('Loading weather...');
+    expect(messages.ru.locating).toBe('Определяем местоположение...');
+    expect(messages.en.locating).toBe('Detecting location...');
     expect(Object.keys(messages.ru).sort()).toEqual(Object.keys(messages.en).sort());
   });
 });

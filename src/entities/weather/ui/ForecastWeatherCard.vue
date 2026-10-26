@@ -28,7 +28,7 @@ const directions = computed<Readonly<Record<string, string>>>(() => text.value.d
 const daily = computed(() => ('date' in props.forecast ? props.forecast : null));
 const hourly = computed(() => ('timestamp' in props.forecast ? props.forecast : null));
 const presentation = computed(() =>
-  weatherPresentation(props.forecast.conditionCode, hourly.value?.isDay ?? true),
+  weatherPresentation(props.forecast.conditionCode, hourly.value?.isDay ?? true, 'forecast'),
 );
 const condition = computed(() =>
   conditionLabel(
@@ -243,7 +243,7 @@ const measurements = computed(() => {
   .forecast-weather-card__temperature {
     font-size: clamp(2.5rem, 8dvh, 4.5rem);
     line-height: 1.2;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: -0.04em;
     font-variant-numeric: tabular-nums;
   }

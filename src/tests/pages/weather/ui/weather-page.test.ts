@@ -35,7 +35,7 @@ describe('WeatherPage', () => {
 
     expect(wrapper.find('main').exists()).toBe(true);
     expect(wrapper.find('h1').text()).toBe('TikWeather');
-    expect(wrapper.find('[role="status"]').text()).toContain('Finding your location');
+    expect(wrapper.find('[role="status"]').text()).toContain('Detecting location...');
     expect(wrapper.find('.spinner-border').exists()).toBe(true);
     wrapper.unmount();
   });

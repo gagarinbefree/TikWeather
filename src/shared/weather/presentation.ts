@@ -12,11 +12,13 @@ const colors: Readonly<Record<string, string>> = theme.colors;
  * weatherPresentation
  * @param code The observed provider condition code.
  * @param isDay Whether the location is in daylight.
+ * @param card The current or forecast card palette.
  * @returns The original AvaWeather icon and named pastel theme tokens.
  */
 export function weatherPresentation(
   code: number,
   isDay: boolean,
+  card: 'current' | 'forecast',
 ): {
   readonly icon: string;
   readonly iconUrl: string;
@@ -31,7 +33,10 @@ export function weatherPresentation(
     iconUrl: icons[`/src/shared/assets/icons/${icon}.svg`] ?? '',
     style: {
       '--card-background':
-        colors[`Weather.${kind}.Current`] ?? theme.colors['Weather.Cloudy.Current'],
+        colors[`Weather.${kind}.${card === 'current' ? 'Current' : 'Forecast'}`] ??
+        (card === 'current'
+          ? theme.colors['Weather.Cloudy.Current']
+          : theme.colors['Weather.Cloudy.Forecast']),
       '--card-accent': colors[`Weather.${kind}.Accent`] ?? theme.colors['Weather.Cloudy.Accent'],
       '--card-header-start':
         colors[`Weather.${kind}.HeaderStart`] ?? theme.colors['Weather.Cloudy.HeaderStart'],

@@ -36,6 +36,7 @@ test('shows device weather directly with local icons and translated measurements
     'WeatherCloudy',
   );
   await expect(card.locator('[data-weather-icon]')).not.toHaveCSS('mask-image', 'none');
+  await expect(card.locator('.current-weather-card__temperature')).toHaveCSS('font-weight', '300');
   expect(ipRequests).toBe(0);
   const currentCalls = apiCalls.filter((url) => new URL(url).pathname === '/v1/current.json');
   expect(currentCalls).toHaveLength(1);

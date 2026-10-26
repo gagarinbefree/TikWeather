@@ -36,7 +36,7 @@ export async function verifyApplicationShell(page: Page): Promise<void> {
   await page.goto('./');
 
   await expect(page.getByRole('heading', { name: 'TikWeather' })).toBeVisible();
-  await expect(page.getByRole('status')).toHaveAccessibleName('Загрузка погоды');
+  await expect(page.getByRole('status')).toHaveAccessibleName('Загружаем погоду...');
   await expect(page.getByRole('status')).toBeVisible();
   await expect(page.getByRole('main')).toBeVisible();
   await expect(page.locator('.spinner-border')).toHaveCSS('animation-name', 'spinner-border');

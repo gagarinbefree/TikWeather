@@ -7,13 +7,14 @@ import windIcon from '@/shared/assets/icons/weather_squalls_20_regular.svg?url';
 import uvIcon from '@/shared/assets/icons/weather_sunny_high_20_regular.svg?url';
 import pressureIcon from '@/shared/assets/icons/gauge_20_regular.svg?url';
 import visibilityIcon from '@/shared/assets/icons/eye_20_regular.svg?url';
+import clockIcon from '@/shared/assets/icons/clock_20_regular.svg?url';
 import { conditionLabel, countryLabel, messages, type Locale } from '@/shared/locales';
 import { weatherPresentation } from '@/shared/weather';
 
 const props = defineProps<{ readonly weather: CurrentWeather; readonly locale: Locale }>();
 const text = computed(() => messages[props.locale]);
 const presentation = computed(() =>
-  weatherPresentation(props.weather.conditionCode, props.weather.isDay),
+  weatherPresentation(props.weather.conditionCode, props.weather.isDay, 'current'),
 );
 const number = computed(
   () => new Intl.NumberFormat(props.locale, { maximumFractionDigits: 1, useGrouping: false }),
@@ -89,6 +90,12 @@ const measurements = computed(() => [
       <h2>{{ weather.city }}</h2>
       <p>{{ countryLabel(weather.country, locale) }}</p>
       <p class="current-weather-card__updated">
+        <span
+          class="current-weather-card__updated-icon"
+          data-updated-icon
+          :style="{ maskImage: `url(${JSON.stringify(clockIcon)})` }"
+          aria-hidden="true"
+        />
         {{ text.updated }}
         <time :datetime="new Date(weather.observedAt).toISOString()">{{ time }}</time>
       </p>
@@ -148,8 +155,18 @@ const measurements = computed(() => [
   }
   .current-weather-card__updated {
     margin-block-start: var(--spacer-2);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
     font-size: 0.85rem;
     color: var(--weather-muted);
+  }
+  .current-weather-card__updated-icon {
+    flex: none;
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+    background: currentColor;
+    mask: center / contain no-repeat;
   }
   .current-weather-card__summary {
     flex: 1;
@@ -167,7 +184,7 @@ const measurements = computed(() => [
   .current-weather-card__temperature {
     font-size: clamp(2.5rem, 8dvh, 4.5rem);
     line-height: 1.2;
-    font-weight: 600;
+    font-weight: 300;
     letter-spacing: -0.04em;
     font-variant-numeric: tabular-nums;
   }
@@ -182,6 +199,12 @@ const measurements = computed(() => [
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(0.75rem, 2dvh, 1.5rem) var(--spacer);
+  }
+  .current-weather-card__details::before {
+    content: '';
+    grid-column: 1 / -1;
+    block-size: 1px;
+    background: var(--weather-divider-current);
   }
   dt {
     display: flex;
