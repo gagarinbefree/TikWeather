@@ -1,8 +1,9 @@
 import { mount } from '@vue/test-utils';
 import { createPinia } from 'pinia';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { WeatherPage } from '@/pages/weather';
+import { currentWeatherServicesKey } from '@/features/current-weather';
 import {
   installBrowserEnvironment,
   type BrowserTestEnvironment,
@@ -18,12 +19,23 @@ afterEach(() => {
 
 describe('WeatherPage', () => {
   it('renders a semantic page and a named loading indicator', async () => {
-    const wrapper = mount(WeatherPage, { global: { plugins: [createPinia()] } });
+    const wrapper = mount(WeatherPage, {
+      global: {
+        plugins: [createPinia()],
+        provide: {
+          [currentWeatherServicesKey as symbol]: {
+            locate: () => new Promise(() => undefined),
+            current: vi.fn(),
+            now: Date.now,
+          },
+        },
+      },
+    });
     await nextTick();
 
     expect(wrapper.find('main').exists()).toBe(true);
     expect(wrapper.find('h1').text()).toBe('TikWeather');
-    expect(wrapper.find('[role="status"]').text()).toContain('Загрузка погоды');
+    expect(wrapper.find('[role="status"]').text()).toContain('Finding your location');
     expect(wrapper.find('.spinner-border').exists()).toBe(true);
     wrapper.unmount();
   });

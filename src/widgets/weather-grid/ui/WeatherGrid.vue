@@ -66,6 +66,8 @@ const activeId = computed(() => props.grid[position.value.row]?.[position.value.
   place-items: center;
   inline-size: 100%;
   block-size: 100%;
+  overflow-y: auto;
+  touch-action: none;
   padding-block: max(var(--spacer), env(safe-area-inset-top))
     max(var(--spacer), env(safe-area-inset-bottom));
   padding-inline: max(var(--spacer), env(safe-area-inset-left))

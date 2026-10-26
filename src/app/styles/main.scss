@@ -1,8 +1,23 @@
 @use 'bootstrap/scss/root';
 @use 'bootstrap/scss/content/reboot';
 @use 'bootstrap/scss/spinner';
+@use 'bootstrap/scss/buttons/button';
 @use 'bootstrap/scss/helpers/visually-hidden';
-@use '@/shared/themes/default';
+
+@font-face {
+  font-family: Inter;
+  src: url('@/shared/assets/fonts/Inter-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Inter;
+  src: url('@/shared/assets/fonts/Inter-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
 
 // Bootstrap root declarations are unlayered and require an unlayered override.
 :root {
@@ -25,6 +40,7 @@
   }
 
   .weather-page {
+    font-family: Inter, system-ui, sans-serif;
     display: grid;
     place-items: center;
     min-block-size: 100dvh;

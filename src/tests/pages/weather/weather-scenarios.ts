@@ -1,6 +1,26 @@
 import { expect, type Page } from '@playwright/test';
 
 /**
+ * holdCurrentRequest
+ * @param page The isolated browser page for a stable loading screen.
+ * @returns A promise that resolves after installing deterministic location and network handlers.
+ */
+async function holdCurrentRequest(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: {
+        getCurrentPosition: (success: PositionCallback): void => {
+          success({ coords: { latitude: 58.0047, longitude: 56.2514 } } as GeolocationPosition);
+        },
+      },
+    });
+    Object.defineProperty(navigator, 'language', { configurable: true, value: 'ru' });
+  });
+  await page.route('https://api.weatherapi.com/v1/current.json?**', () => undefined);
+}
+
+/**
  * verifyApplicationShell
  * @param page The isolated browser page with the application base URL.
  * @returns A promise that resolves after checking the loading screen and browser errors.
@@ -12,6 +32,7 @@ export async function verifyApplicationShell(page: Page): Promise<void> {
     if (message.type() === 'error') errors.push(message.text());
   });
 
+  await holdCurrentRequest(page);
   await page.goto('./');
 
   await expect(page.getByRole('heading', { name: 'TikWeather' })).toBeVisible();
@@ -28,6 +49,7 @@ export async function verifyApplicationShell(page: Page): Promise<void> {
  * @returns A promise that resolves after checking the card geometry.
  */
 export async function verifyPortraitViewport(page: Page): Promise<void> {
+  await holdCurrentRequest(page);
   await page.goto('./');
   const card = page.locator('.weather-viewport');
   await expect(card).toBeVisible();

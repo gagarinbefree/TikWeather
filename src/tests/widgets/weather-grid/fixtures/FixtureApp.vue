@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { provide, ref, shallowRef } from 'vue';
 import { WeatherGrid } from '@/widgets/weather-grid';
+import { baseThemeStyle } from '@/shared/themes';
 import { fixtureGrid } from './grid';
 import ProbeCell from './ProbeCell.vue';
 
@@ -31,7 +32,7 @@ function removeForecast(): void {
 </script>
 
 <template>
-  <main class="weather-page">
+  <main class="weather-page" :style="baseThemeStyle">
     <WeatherGrid v-if="mounted" :grid="grid">
       <template #default="{ cell }">
         <div>
