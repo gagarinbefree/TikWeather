@@ -9,9 +9,9 @@ export interface CurrentWeather {
   readonly humidity: number;
   readonly windSpeed: number;
   readonly windDirection: string;
-  readonly uv: number;
+  readonly uv: number | null;
   readonly pressure: number;
-  readonly visibility: number;
+  readonly visibility: number | null;
   readonly conditionCode: number;
   readonly conditionText: string;
   readonly conditionLocale: 'ru' | 'en';

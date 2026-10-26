@@ -2,6 +2,14 @@ import { expect, test } from '@playwright/test';
 import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 
 test.use({ permissions: ['geolocation'], geolocation: { latitude: 58.0047, longitude: 56.2514 } });
+test.beforeEach(async ({ page }) => {
+  await page.route('https://api.open-meteo.com/**', async (route) => {
+    await route.fulfill({ status: 503, json: {} });
+  });
+  await page.route('https://api.openweathermap.org/**', async (route) => {
+    await route.fulfill({ status: 503, json: {} });
+  });
+});
 
 test('shows device weather directly with local icons and translated measurements', async ({
   page,

@@ -50,6 +50,25 @@ describe('current weather flow', () => {
     expect(store.state.status).toBe('ready');
   });
 
+  it('keeps the selected language when a keyless provider has no country name', async () => {
+    const store = useCurrentWeatherStore();
+    await store.load({
+      ...services(),
+      locate: (): Promise<LocationQuery> =>
+        Promise.resolve({
+          source: 'ip',
+          latitude: 58,
+          longitude: 56.25,
+          countryCode: 'RU',
+        }),
+      current: async (): Promise<CurrentWeather> => ({
+        ...(await services().current({ source: 'automatic' }, 'ru', new AbortController().signal)),
+        country: '',
+      }),
+    });
+    expect(store.locale).toBe('ru');
+  });
+
   it('ignores an old response after retry and cancellation', async () => {
     const store = useCurrentWeatherStore();
     const dependencies = services();

@@ -6,9 +6,9 @@ export interface ForecastHour {
   readonly windSpeed: number;
   readonly windDirection: string;
   readonly rainChance: number;
-  readonly uv: number;
+  readonly uv: number | null;
   readonly pressure: number;
-  readonly visibility: number;
+  readonly visibility: number | null;
   readonly conditionCode: number;
   readonly conditionText: string;
   readonly conditionLocale: 'ru' | 'en';
@@ -21,13 +21,13 @@ export interface ForecastDay {
   readonly minimum: number;
   readonly humidity: number;
   readonly windSpeed: number;
-  readonly rainChance: number;
-  readonly uv: number;
+  readonly rainChance: number | null;
+  readonly uv: number | null;
   readonly conditionCode: number;
   readonly conditionText: string;
   readonly conditionLocale: 'ru' | 'en';
-  readonly sunrise: string | null;
-  readonly sunset: string | null;
+  readonly sunrise: string | null | undefined;
+  readonly sunset: string | null | undefined;
   readonly hours: readonly ForecastHour[];
 }
 

@@ -21,7 +21,12 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
     base: '/TikWeather/',
     plugins: [vue()],
     ...(isBrowserTest
-      ? { define: { 'import.meta.env.VITE_WEATHER_API_KEY': JSON.stringify('browser-test-only') } }
+      ? {
+          define: {
+            'import.meta.env.VITE_WEATHER_API_KEY': JSON.stringify('browser-test-only'),
+            'import.meta.env.VITE_OPENWEATHERMAP_API_KEY': JSON.stringify('browser-test-only'),
+          },
+        }
       : {}),
     resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
     build: { outDir: isBrowserTest ? 'dist-e2e' : 'dist', rolldownOptions: { input } },

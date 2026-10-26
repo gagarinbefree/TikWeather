@@ -57,7 +57,7 @@ const measurements = computed(() => [
   },
   {
     name: text.value.uv,
-    value: number.value.format(props.weather.uv),
+    value: props.weather.uv === null ? text.value.noData : number.value.format(props.weather.uv),
     icon: 'weather_sunny_high_20_regular',
     iconUrl: uvIcon,
   },
@@ -69,7 +69,10 @@ const measurements = computed(() => [
   },
   {
     name: text.value.visibility,
-    value: `${number.value.format(props.weather.visibility)} ${text.value.kilometers}`,
+    value:
+      props.weather.visibility === null
+        ? text.value.noData
+        : `${number.value.format(props.weather.visibility)} ${text.value.kilometers}`,
     icon: 'eye_20_regular',
     iconUrl: visibilityIcon,
   },

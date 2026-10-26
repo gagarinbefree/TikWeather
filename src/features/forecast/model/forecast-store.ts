@@ -76,17 +76,29 @@ export const useForecastStore = defineStore('forecast', () => {
           context.locale,
           context.timeZone,
           depth,
+          context.now,
           current.controller.signal,
         );
         if (token !== revision || attempt !== current) return;
         if (forecast.days.length < depth) throw new ApiError('invalidResponse');
         const expected = createForecastSlots(context.now, context.timeZone, 3);
-        for (let index = 0; index < depth; index++) {
+        for (let index = 0; index < Math.min(forecast.days.length, 3); index++) {
           if (forecast.days[index]?.date !== expected[index]?.date)
             throw new ApiError('invalidResponse');
         }
-        days.value = forecast.days.slice(0, depth);
-        if (depth < 3) nextDepth = (depth + 1) as 2 | 3;
+        days.value = forecast.days.slice(0, 3);
+        if (forecast.intervalHours === 3) {
+          grid.update({
+            now: context.now,
+            timeZone: context.timeZone,
+            intervalHours: 3,
+            days: forecast.days.slice(0, 3).map((day) => ({
+              date: day.date,
+              hours: day.hours.map((hour) => hour.timestamp),
+            })),
+          });
+        }
+        if (days.value.length < 3) nextDepth = (depth + 1) as 2 | 3;
       } catch (error) {
         if (token !== revision || attempt !== current) return;
         failure.value = error instanceof ApiError ? error.kind : 'connection';

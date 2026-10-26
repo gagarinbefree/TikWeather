@@ -8,6 +8,7 @@ export interface ForecastServices {
     locale: 'ru' | 'en',
     timeZone: string,
     days: 1 | 2 | 3,
+    now: number,
     signal: AbortSignal,
   ) => Promise<Forecast>;
 }

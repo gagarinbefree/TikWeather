@@ -36,7 +36,7 @@ describe('forecast loading', () => {
     const store = useForecastStore();
     let cancelledFirst = false;
     const request = vi.fn<ForecastServices['forecast']>(
-      (_location, _locale, _timeZone, depth, signal) => {
+      (_location, _locale, _timeZone, depth, _now, signal) => {
         if (depth === 1)
           return new Promise<Forecast>((_resolve, reject) => {
             signal.addEventListener('abort', () => {
@@ -60,6 +60,7 @@ describe('forecast loading', () => {
       'ru',
       'Asia/Yekaterinburg',
       1,
+      now,
       expect.any(AbortSignal),
     );
 
@@ -73,6 +74,7 @@ describe('forecast loading', () => {
       'ru',
       'Asia/Yekaterinburg',
       3,
+      now,
       expect.any(AbortSignal),
     );
     expect(store.day('2026-10-28')?.maximum).toBe(8);
@@ -107,6 +109,7 @@ describe('forecast loading', () => {
       'ru',
       'Asia/Yekaterinburg',
       2,
+      now,
       expect.any(AbortSignal),
     );
   });
@@ -136,5 +139,27 @@ describe('forecast loading', () => {
       expect(store.days).toHaveLength(3);
     });
     expect(store.failure).toBeNull();
+  });
+
+  it('uses actual three hour provider timestamps without repeating the full forecast request', async () => {
+    const forecast = await forecastFixture();
+    const store = useForecastStore();
+    const request = vi.fn<ForecastServices['forecast']>().mockResolvedValue({
+      days: forecast.days,
+      intervalHours: 3,
+    });
+    store.start(
+      { location, locale: 'ru', timeZone: 'Asia/Yekaterinburg', now },
+      { forecast: request },
+    );
+    await vi.waitFor(() => {
+      expect(store.days).toHaveLength(3);
+    });
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(
+      useWeatherGridStore()
+        .grid[1]?.slice(1)
+        .map((cell) => cell.timestamp),
+    ).toEqual([Date.UTC(2026, 9, 27, 7)]);
   });
 });

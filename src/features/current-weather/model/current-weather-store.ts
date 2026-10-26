@@ -54,7 +54,7 @@ export const useCurrentWeatherStore = defineStore('current-weather', () => {
       state.value = { status: 'loading', phase: 'weather' };
       const weather = await services.current(location, locale.value, active.signal);
       if (token !== revision) return;
-      locale.value = localeForCountry(weather.country);
+      if (weather.country.trim()) locale.value = localeForCountry(weather.country);
       const now = services.now();
       grid.update({ now, timeZone: weather.timeZone, days: [] });
       state.value = { status: 'ready', weather, location, now };

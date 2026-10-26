@@ -32,6 +32,7 @@ jobs:
       - run: npm run build
         env:
           VITE_WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          VITE_OPENWEATHERMAP_API_KEY: ${{ secrets.OPENWEATHERMAP_API_KEY }}
       - run: npx playwright install --with-deps chrome
       - run: npm run test:e2e
       - name: Upload browser reports

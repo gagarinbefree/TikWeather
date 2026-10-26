@@ -86,12 +86,26 @@ const measurements = computed(() => {
       },
       {
         name: text.value.rainChance,
-        value: `${number.value.format(day.rainChance)}%`,
+        value:
+          day.rainChance === null ? text.value.noData : `${number.value.format(day.rainChance)}%`,
         icon: rainIcon,
       },
-      { name: text.value.uv, value: number.value.format(day.uv), icon: uvIcon },
-      { name: text.value.sunrise, value: day.sunrise ?? text.value.noSunrise, icon: clockIcon },
-      { name: text.value.sunset, value: day.sunset ?? text.value.noSunset, icon: clockIcon },
+      {
+        name: text.value.uv,
+        value: day.uv === null ? text.value.noData : number.value.format(day.uv),
+        icon: uvIcon,
+      },
+      {
+        name: text.value.sunrise,
+        value:
+          day.sunrise === undefined ? text.value.noData : (day.sunrise ?? text.value.noSunrise),
+        icon: clockIcon,
+      },
+      {
+        name: text.value.sunset,
+        value: day.sunset === undefined ? text.value.noData : (day.sunset ?? text.value.noSunset),
+        icon: clockIcon,
+      },
     ];
   const hour = hourly.value;
   if (!hour) return [];
@@ -117,10 +131,17 @@ const measurements = computed(() => {
       value: `${number.value.format(hour.rainChance)}%`,
       icon: rainIcon,
     },
-    { name: text.value.uv, value: number.value.format(hour.uv), icon: uvIcon },
+    {
+      name: text.value.uv,
+      value: hour.uv === null ? text.value.noData : number.value.format(hour.uv),
+      icon: uvIcon,
+    },
     {
       name: text.value.visibility,
-      value: `${number.value.format(hour.visibility)} ${text.value.kilometers}`,
+      value:
+        hour.visibility === null
+          ? text.value.noData
+          : `${number.value.format(hour.visibility)} ${text.value.kilometers}`,
       icon: visibilityIcon,
     },
   ];

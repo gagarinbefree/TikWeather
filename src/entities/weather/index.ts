@@ -4,6 +4,7 @@ export { getCurrentWeather } from './api/get-current-weather';
 export { getForecast } from './api/get-forecast';
 export { withFallback } from './api/with-fallback';
 export { getOpenMeteoCurrent, getOpenMeteoForecast } from './api/open-meteo';
+export { getOpenWeatherMapCurrent, getOpenWeatherMapForecast } from './api/open-weather-map';
 export { createForecastSlots } from './model/create-forecast-slots';
 export type { Forecast, ForecastDay, ForecastHour } from './model/forecast';
 export type { CurrentWeather } from './model/current-weather';
