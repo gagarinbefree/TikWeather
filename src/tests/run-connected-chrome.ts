@@ -3,6 +3,11 @@ import {
   verifyApplicationShell,
   verifyPortraitViewport,
 } from './pages/weather/weather-scenarios.ts';
+import {
+  verifyCancelledTouch,
+  verifyForecastUpdates,
+  verifySwipeNavigation,
+} from './widgets/weather-grid/swipe-scenarios.ts';
 
 /**
  * runConnectedChrome
@@ -26,7 +31,7 @@ async function runConnectedChrome(): Promise<void> {
     for (const configuration of configurations) {
       const context = await browser.newContext({
         ...configuration.options,
-        baseURL: 'http://127.0.0.1:4173/TikWeather/',
+        baseURL: 'http://127.0.0.1:4183/TikWeather/',
       });
       try {
         const page = await context.newPage();
@@ -34,6 +39,14 @@ async function runConnectedChrome(): Promise<void> {
         console.log(`Passed application shell in ${configuration.name}`);
         await verifyPortraitViewport(page);
         console.log(`Passed viewport layout in ${configuration.name}`);
+        await verifySwipeNavigation(page);
+        console.log(`Passed swipe navigation in ${configuration.name}`);
+        await verifyForecastUpdates(page);
+        console.log(`Passed forecast updates in ${configuration.name}`);
+        if (configuration.options.isMobile) {
+          await verifyCancelledTouch(page);
+          console.log(`Passed touch cancellation in ${configuration.name}`);
+        }
       } finally {
         await context.close();
       }

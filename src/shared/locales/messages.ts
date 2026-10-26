@@ -3,6 +3,10 @@ export const messages = {
     appName: 'TikWeather',
     loadingWeather: 'Загрузка погоды',
     weather: 'Погода',
+    forecastNavigation: 'Навигация по прогнозу',
+    swipeInstructions:
+      'Свайп влево или вправо переключает часы. Свайп вверх или вниз переключает дни. Для клавиатуры используйте стрелки.',
+    navigationFailed: 'Не удалось открыть прогноз',
     invalidTimestamp: 'Некорректное время прогноза',
     invalidDate: 'Некорректная дата прогноза',
     duplicateDate: 'Даты прогноза не должны повторяться',
@@ -14,6 +18,10 @@ export const messages = {
     appName: 'TikWeather',
     loadingWeather: 'Loading weather',
     weather: 'Weather',
+    forecastNavigation: 'Forecast navigation',
+    swipeInstructions:
+      'Swipe left or right to change hours. Swipe up or down to change days. Use the arrow keys for keyboard navigation.',
+    navigationFailed: 'Unable to open the forecast',
     invalidTimestamp: 'Invalid forecast timestamp',
     invalidDate: 'Invalid forecast date',
     duplicateDate: 'Forecast dates must be unique',

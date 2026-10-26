@@ -9,14 +9,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "build:e2e": "vite build --mode e2e",
     "preview": "vite preview",
+    "preview:e2e": "vite preview --outDir dist-e2e",
     "typecheck": "vue-tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run --configLoader native",
     "test:watch": "vitest --configLoader native",
-    "test:e2e": "playwright test",
+    "test:e2e": "npm run build:e2e && playwright test",
     "test:e2e:connected": "node src/tests/run-connected-chrome.ts",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e"
   },

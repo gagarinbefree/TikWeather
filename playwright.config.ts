@@ -8,7 +8,7 @@ export default defineConfig({
   retries: process.env['CI'] ? 2 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://127.0.0.1:4173/TikWeather/',
+    baseURL: 'http://127.0.0.1:4183/TikWeather/',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
@@ -20,8 +20,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run preview -- --host 127.0.0.1 --port 4173 --strictPort',
-    url: 'http://127.0.0.1:4173/TikWeather/',
+    command: 'npm run preview:e2e -- --host 127.0.0.1 --port 4183 --strictPort',
+    url: 'http://127.0.0.1:4183/TikWeather/',
     reuseExistingServer: !process.env['CI'],
   },
 });
