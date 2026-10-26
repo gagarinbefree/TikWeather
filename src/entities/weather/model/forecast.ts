@@ -33,4 +33,5 @@ export interface ForecastDay {
 
 export interface Forecast {
   readonly days: readonly ForecastDay[];
+  readonly intervalHours?: 2 | 3;
 }

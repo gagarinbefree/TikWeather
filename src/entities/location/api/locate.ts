@@ -112,6 +112,12 @@ export async function locate(options: LocateOptions = {}): Promise<LocationQuery
       latitude: coordinate(payload['latitude'], 90),
       longitude: coordinate(payload['longitude'], 180),
       countryCode: typeof payload['country_code'] === 'string' ? payload['country_code'] : null,
+      ...(typeof payload['city'] === 'string' && payload['city'].trim()
+        ? { city: payload['city'].trim() }
+        : {}),
+      ...(typeof payload['region'] === 'string' && payload['region'].trim()
+        ? { region: payload['region'].trim() }
+        : {}),
     };
   } catch (error) {
     if (options.signal?.aborted || (error instanceof ApiError && error.kind === 'cancelled'))

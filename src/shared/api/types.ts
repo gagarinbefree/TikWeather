@@ -13,6 +13,8 @@ export type LocationQuery =
       readonly latitude: number;
       readonly longitude: number;
       readonly countryCode: string | null;
+      readonly city?: string;
+      readonly region?: string;
     }
   | { readonly source: 'automatic' };
 

@@ -36,6 +36,16 @@ describe('locate', () => {
     });
   });
 
+  it('retains GeoJS place names for keyless weather fallback', async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(Response.json({ ...ip, city: 'Perm', region: 'Perm Krai' }));
+    await expect(locate({ device: null, fetcher })).resolves.toMatchObject({
+      city: 'Perm',
+      region: 'Perm Krai',
+    });
+  });
+
   it('bounds a permission prompt that never completes and ignores its late answer', async () => {
     vi.useFakeTimers();
     const device: DeviceGeolocation = { getCurrentPosition: vi.fn() };

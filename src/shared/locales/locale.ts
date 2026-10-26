@@ -1,11 +1,13 @@
 import countries from './russian-countries.json';
 import englishConditions from './conditions.en.json';
 import russianConditions from './conditions.ru.json';
+import wmoConditions from './conditions.wmo.json';
 import { messages } from './messages';
 
 export type Locale = 'ru' | 'en';
 const russian: Readonly<Record<string, string | { readonly day: string; readonly night: string }>> =
   russianConditions;
+const wmo: Readonly<Record<string, { readonly ru: string; readonly en: string }>> = wmoConditions;
 
 /**
  * browserLocale
@@ -58,10 +60,14 @@ export function conditionLabel(
   fallback = '',
 ): string {
   if (locale === 'ru') {
+    const translatedWmo = wmo[String(code)];
+    if (translatedWmo) return translatedWmo.ru;
     const translated = russian[String(code)];
     if (typeof translated === 'string') return translated;
     if (translated) return isDay ? translated.day : translated.night;
   } else {
+    const translatedWmo = wmo[String(code)];
+    if (translatedWmo) return translatedWmo.en;
     const translated = englishConditions.find((condition) => condition.code === code);
     if (translated) return isDay ? translated.day : translated.night;
   }
