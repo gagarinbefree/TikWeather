@@ -28,6 +28,19 @@ describe('CurrentWeatherCard', () => {
         hourCycle: 'h23',
       }).format(weather.observedAt),
     );
+    const metricIcons = wrapper.findAll('.current-weather-card__metric-icon');
+    expect(metricIcons.map((icon) => icon.attributes('data-metric-icon'))).toEqual([
+      'temperature_20_regular',
+      'weather_humidity_20_regular',
+      'weather_squalls_20_regular',
+      'weather_sunny_high_20_regular',
+      'gauge_20_regular',
+      'eye_20_regular',
+    ]);
+    for (const icon of metricIcons) {
+      expect(icon.attributes('aria-hidden')).toBe('true');
+      expect(icon.attributes('style')).toContain('mask-image: url(');
+    }
     expect(wrapper.find('img').exists()).toBe(false);
     wrapper.unmount();
   });
