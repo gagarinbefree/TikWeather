@@ -26,8 +26,8 @@ export interface ForecastDay {
   readonly conditionCode: number;
   readonly conditionText: string;
   readonly conditionLocale: 'ru' | 'en';
-  readonly sunrise: string;
-  readonly sunset: string;
+  readonly sunrise: string | null;
+  readonly sunset: string | null;
   readonly hours: readonly ForecastHour[];
 }
 

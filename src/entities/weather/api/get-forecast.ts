@@ -36,10 +36,13 @@ function localDate(timestamp: number, formatter: Intl.DateTimeFormat): string {
 /**
  * clockTime
  * @param value The provider astronomy time with an AM or PM suffix.
- * @returns The same clock time in a stable twenty four hour format.
+ * @param absent The expected phrase for a polar day without this sun event.
+ * @returns The same clock time in twenty four hour format or null for no event.
  */
-function clockTime(value: unknown): string {
-  const match = /^(0?[1-9]|1[0-2]):([0-5]\d) (AM|PM)$/.exec(text(value));
+function clockTime(value: unknown, absent: 'No sunrise' | 'No sunset'): string | null {
+  const source = text(value);
+  if (source.toLowerCase() === absent.toLowerCase()) return null;
+  const match = /^(0?[1-9]|1[0-2]):([0-5]\d) (AM|PM)$/.exec(source);
   if (!match?.[1] || !match[2] || !match[3]) throw new ApiError('invalidResponse');
   const hour = (Number(match[1]) % 12) + (match[3] === 'PM' ? 12 : 0);
   return `${String(hour).padStart(2, '0')}:${match[2]}`;
@@ -119,8 +122,8 @@ function parseDay(
     conditionCode: numeric(condition['code'], 0),
     conditionText: text(condition['text']),
     conditionLocale: locale,
-    sunrise: clockTime(astro['sunrise']),
-    sunset: clockTime(astro['sunset']),
+    sunrise: clockTime(astro['sunrise'], 'No sunrise'),
+    sunset: clockTime(astro['sunset'], 'No sunset'),
     hours: hours.map((hour: unknown) => parseHour(hour, date, formatter, locale)),
   };
 }

@@ -23,4 +23,11 @@ describe('createForecastSlots', () => {
     expect(days[0]?.hours).toContain(Date.UTC(2026, 9, 25, 0));
     expect(days[0]?.hours).toContain(Date.UTC(2026, 9, 25, 1));
   });
+
+  it('aligns loading cells to local whole hours in a fractional offset timezone', () => {
+    const now = Date.UTC(2026, 9, 26, 5, 37);
+    const days = createForecastSlots(now, 'Asia/Kathmandu', 3);
+    const grid = createWeatherGrid({ now, timeZone: 'Asia/Kathmandu', days });
+    expect(grid[0]?.[1]).toMatchObject({ kind: 'hourly', timestamp: Date.UTC(2026, 9, 26, 7, 15) });
+  });
 });

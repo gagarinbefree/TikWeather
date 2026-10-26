@@ -59,4 +59,23 @@ describe('getForecast', () => {
       }),
     ).rejects.toMatchObject({ kind: 'invalidResponse' });
   });
+
+  it('keeps a polar day usable when the provider reports no sunrise or sunset', async () => {
+    const first = forecastResponse.forecast.forecastday[0];
+    const forecast = await getForecast({
+      apiKey: 'example-only',
+      location: { source: 'automatic' },
+      locale: 'en',
+      timeZone: 'Asia/Yekaterinburg',
+      days: 1,
+      fetcher: vi.fn<typeof fetch>().mockResolvedValue(
+        Response.json({
+          forecast: {
+            forecastday: [{ ...first, astro: { sunrise: 'No sunrise', sunset: 'No sunset' } }],
+          },
+        }),
+      ),
+    });
+    expect(forecast.days[0]).toMatchObject({ sunrise: null, sunset: null });
+  });
 });

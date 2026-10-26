@@ -2,7 +2,8 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import { currentWeatherServicesKey, type CurrentWeatherServices } from '@/features/current-weather';
 import { locate } from '@/entities/location';
-import { getCurrentWeather } from '@/entities/weather';
+import { getCurrentWeather, getForecast } from '@/entities/weather';
+import { forecastServicesKey, type ForecastServices } from '@/features/forecast';
 import { weatherApiKey } from '@/shared/config';
 import App from './App.vue';
 import './styles/main.scss';
@@ -13,4 +14,12 @@ const services: CurrentWeatherServices = {
     getCurrentWeather({ location, locale, signal, apiKey: weatherApiKey() }),
   now: Date.now,
 };
-createApp(App).use(createPinia()).provide(currentWeatherServicesKey, services).mount('#app');
+const forecastServices: ForecastServices = {
+  forecast: (location, locale, timeZone, days, signal) =>
+    getForecast({ location, locale, timeZone, days, signal, apiKey: weatherApiKey() }),
+};
+createApp(App)
+  .use(createPinia())
+  .provide(currentWeatherServicesKey, services)
+  .provide(forecastServicesKey, forecastServices)
+  .mount('#app');

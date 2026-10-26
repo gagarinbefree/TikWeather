@@ -18,9 +18,14 @@ export function createForecastSlots(
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
   });
   const days = new Map<string, number[]>();
-  const firstHour = Math.floor(now / 3_600_000) * 3_600_000;
+  const localMinute = formatter.formatToParts(now).find((part) => part.type === 'minute')?.value;
+  if (localMinute === undefined) throw new RangeError(messages.en.missingDatePart);
+  const firstHour = now - Number(localMinute) * 60_000 - (now % 60_000);
   for (let offset = 0; offset < 120; offset++) {
     const timestamp = firstHour + offset * 3_600_000;
     const parts = formatter.formatToParts(timestamp);

@@ -6,6 +6,7 @@ export { createForecastSlots } from './model/create-forecast-slots';
 export type { Forecast, ForecastDay, ForecastHour } from './model/forecast';
 export type { CurrentWeather } from './model/current-weather';
 export { default as CurrentWeatherCard } from './ui/CurrentWeatherCard.vue';
+export { default as ForecastWeatherCard } from './ui/ForecastWeatherCard.vue';
 export type {
   CurrentWeatherCell,
   DailyWeatherCell,

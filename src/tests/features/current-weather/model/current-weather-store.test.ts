@@ -33,6 +33,7 @@ describe('current weather flow', () => {
     await store.load(dependencies);
     expect(dependencies.locate).toHaveBeenCalledTimes(1);
     expect(store.state).toMatchObject({ status: 'ready', weather: { temperature: 8.9 } });
+    expect(store.state).toMatchObject({ location: { source: 'automatic' } });
     expect(store.locale).toBe('ru');
     expect(useWeatherGridStore().grid).toHaveLength(1);
     expect(useWeatherGridStore().grid[0]).toHaveLength(1);

@@ -1,13 +1,18 @@
 import { defineStore } from 'pinia';
 import { shallowRef } from 'vue';
 import { useWeatherGridStore, type CurrentWeather } from '@/entities/weather';
-import { ApiError, type FailureKind } from '@/shared/api';
+import { ApiError, type FailureKind, type LocationQuery } from '@/shared/api';
 import { localeForCountry, browserLocale } from '@/shared/locales';
 import type { CurrentWeatherServices } from './services';
 
 type CurrentWeatherState =
   | { readonly status: 'loading'; readonly phase: 'location' | 'weather' }
-  | { readonly status: 'ready'; readonly weather: CurrentWeather }
+  | {
+      readonly status: 'ready';
+      readonly weather: CurrentWeather;
+      readonly location: LocationQuery;
+      readonly now: number;
+    }
   | { readonly status: 'error'; readonly failure: FailureKind };
 
 /**
@@ -50,8 +55,9 @@ export const useCurrentWeatherStore = defineStore('current-weather', () => {
       const weather = await services.current(location, locale.value, active.signal);
       if (token !== revision) return;
       locale.value = localeForCountry(weather.country);
-      grid.update({ now: services.now(), timeZone: weather.timeZone, days: [] });
-      state.value = { status: 'ready', weather };
+      const now = services.now();
+      grid.update({ now, timeZone: weather.timeZone, days: [] });
+      state.value = { status: 'ready', weather, location, now };
     } catch (error) {
       if (token !== revision) return;
       state.value = {

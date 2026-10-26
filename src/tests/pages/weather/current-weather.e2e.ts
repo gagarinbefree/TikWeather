@@ -29,9 +29,9 @@ test('shows device weather directly with local icons and translated measurements
   );
   await expect(card.locator('[data-weather-icon]')).not.toHaveCSS('mask-image', 'none');
   expect(ipRequests).toBe(0);
-  expect(apiCalls).toHaveLength(1);
-  expect(new URL(apiCalls[0] ?? '').pathname).toBe('/v1/current.json');
-  expect(new URL(apiCalls[0] ?? '').searchParams.get('q')).toBe('58.0047,56.2514');
+  const currentCalls = apiCalls.filter((url) => new URL(url).pathname === '/v1/current.json');
+  expect(currentCalls).toHaveLength(1);
+  expect(new URL(currentCalls[0] ?? '').searchParams.get('q')).toBe('58.0047,56.2514');
   const dimensions = await card.evaluate((element) => ({
     width: element.getBoundingClientRect().width,
     contentWidth: element.scrollWidth,
