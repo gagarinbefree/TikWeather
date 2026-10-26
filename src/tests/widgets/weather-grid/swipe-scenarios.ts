@@ -39,7 +39,7 @@ async function settleViewport(page: Page): Promise<void> {
  * @param cancel Whether the touch gesture should be cancelled before release.
  * @returns A promise that resolves when the gesture has settled.
  */
-async function swipe(page: Page, direction: Direction, cancel = false): Promise<void> {
+export async function swipe(page: Page, direction: Direction, cancel = false): Promise<void> {
   const box = await page.locator('.weather-viewport').boundingBox();
   if (!box) throw new Error('The weather viewport must be visible');
   const x = box.x + box.width / 2;

@@ -34,6 +34,53 @@ function forecast(count: number): Forecast {
 }
 
 describe('longestForecast', () => {
+  it('keeps detailed hours on overlapping dates while adding later fallback days', async () => {
+    const detailed = forecast(3);
+    const shorterHours = forecast(6);
+    const first = detailed.days[0];
+    const fallbackFirst = shorterHours.days[0];
+    if (!first || !fallbackFirst) throw new Error('Missing fixture day');
+    const hour = {
+      timestamp: 1,
+      temperature: 9.5,
+      feelsLike: 8,
+      humidity: 70,
+      windSpeed: 10,
+      windDirection: 'SW',
+      rainChance: 20,
+      uv: 1,
+      pressure: 1010,
+      visibility: 10,
+      conditionCode: 1009,
+      conditionText: 'Overcast',
+      conditionLocale: 'en' as const,
+      isDay: true,
+    };
+    const richDay = {
+      ...first,
+      hours: [hour, { ...hour, timestamp: 2, temperature: 10 }],
+    };
+    const sparseDay = {
+      ...fallbackFirst,
+      hours: [{ ...hour, temperature: 8 }],
+    };
+    const sources = [
+      vi.fn().mockRejectedValue(new ApiError('timeout')),
+      vi.fn().mockResolvedValue({ days: [richDay, ...detailed.days.slice(1)] }),
+      vi
+        .fn()
+        .mockResolvedValue({ days: [sparseDay, ...shorterHours.days.slice(1)], intervalHours: 3 }),
+    ];
+
+    const result = await longestForecast(sources, new AbortController().signal, 16);
+
+    expect(result.days).toHaveLength(6);
+    expect(result.days[0]?.hours).toEqual(richDay.hours);
+    expect(result.days.map((item) => item.date)).toEqual(
+      shorterHours.days.map((item) => item.date),
+    );
+  });
+
   it('keeps the longest successful response when later providers fail', async () => {
     const sources = [
       vi.fn().mockResolvedValue(forecast(3)),

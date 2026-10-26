@@ -1,5 +1,5 @@
 import { messages } from '@/shared/locales';
-import type { WeatherCell, WeatherGrid, WeatherGridOptions } from './types';
+import type { ForecastDaySlots, WeatherCell, WeatherGrid, WeatherGridOptions } from './types';
 
 interface LocalTime {
   readonly date: string;
@@ -89,35 +89,37 @@ export function createWeatherGrid(options: WeatherGridOptions): WeatherGrid {
     hourCycle: 'h23',
   });
   const current = localTime(formatter, options.now);
-  const days = new Map<string, readonly number[]>();
+  const days = new Map<string, ForecastDaySlots>();
 
   for (const day of options.days) {
     validateDate(day.date);
     if (days.has(day.date)) throw new RangeError(messages.en.duplicateDate);
+    if (day.intervalHours !== undefined) validateInterval(day.intervalHours);
     for (const timestamp of day.hours) {
       if (localTime(formatter, timestamp).date !== day.date) {
         throw new RangeError(messages.en.wrongDay);
       }
     }
-    days.set(day.date, day.hours);
+    days.set(day.date, day);
   }
-  if (!days.has(current.date)) days.set(current.date, []);
+  if (!days.has(current.date)) days.set(current.date, { date: current.date, hours: [] });
 
   const rows: (readonly WeatherCell[])[] = [];
-  for (const [date, hours] of [...days].sort(([first], [second]) => first.localeCompare(second))) {
+  for (const [date, day] of [...days].sort(([first], [second]) => first.localeCompare(second))) {
     if (date < current.date) continue;
     const isToday = date === current.date;
+    const dayInterval = day.intervalHours ?? interval;
     const firstCell: WeatherCell = isToday
       ? { id: `${date}/current`, kind: 'current', date, timestamp: options.now }
       : { id: `${date}/daily`, kind: 'daily', date };
     const row: WeatherCell[] = [Object.freeze(firstCell)];
     const originHour = isToday ? current.hour : 0;
 
-    for (const timestamp of [...new Set(hours)].sort((first, second) => first - second)) {
+    for (const timestamp of [...new Set(day.hours)].sort((first, second) => first - second)) {
       const { hour } = localTime(formatter, timestamp);
-      if (isToday && interval === 3 ? timestamp <= options.now : hour < originHour + interval)
+      if (isToday && dayInterval === 3 ? timestamp <= options.now : hour < originHour + dayInterval)
         continue;
-      if (interval === 2 && (hour - originHour) % interval !== 0) continue;
+      if (dayInterval === 2 && (hour - originHour) % dayInterval !== 0) continue;
       row.push(
         Object.freeze({ id: `${date}/hour/${String(timestamp)}`, kind: 'hourly', date, timestamp }),
       );

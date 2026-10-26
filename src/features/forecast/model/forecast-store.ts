@@ -7,6 +7,7 @@ import {
   type ForecastHour,
 } from '@/entities/weather';
 import { ApiError, type FailureKind, type LocationQuery } from '@/shared/api';
+import { mergeForecast } from './longest-forecast';
 import type { ForecastServices } from './services';
 
 interface ForecastContext {
@@ -37,6 +38,8 @@ export const useForecastStore = defineStore('forecast', () => {
   let attempt: RequestAttempt | null = null;
   let selectedDepth: 1 | 3 | 16 = 1;
   let failedDepth: 1 | 3 | 16 | null = null;
+  let fulfilledDepth: 0 | 1 | 3 | 16 = 0;
+  let loadedInterval: 2 | 3 = 2;
   let revision = 0;
 
   /**
@@ -49,19 +52,22 @@ export const useForecastStore = defineStore('forecast', () => {
     session = null;
     services = null;
     loadingDepth.value = null;
+    fulfilledDepth = 0;
   }
 
   /**
    * loadThrough
    * @param depth The smallest provider horizon containing the requested day.
+   * @param force Whether an explicit retry may repeat a completed request.
    */
-  function loadThrough(depth: 1 | 3 | 16): void {
+  function loadThrough(depth: 1 | 3 | 16, force = false): void {
     const context = session;
     const dependencies = services;
     if (
       !context ||
       !dependencies ||
-      days.value.length >= depth ||
+      (!force &&
+        (days.value.length >= depth || fulfilledDepth >= depth || failedDepth === depth)) ||
       (attempt && attempt.depth >= depth)
     )
       return;
@@ -90,18 +96,27 @@ export const useForecastStore = defineStore('forecast', () => {
           if (forecast.days[index]?.date !== expected[index]?.date)
             throw new ApiError('invalidResponse');
         }
-        days.value = forecast.days.slice(0, maximumDays);
+        const combined =
+          depth === maximumDays && days.value.length
+            ? mergeForecast({ days: days.value, intervalHours: loadedInterval }, forecast)
+            : forecast;
+        days.value = combined.days.slice(0, maximumDays);
+        loadedInterval = combined.intervalHours ?? 2;
         grid.update({
           now: context.now,
           timeZone: context.timeZone,
-          intervalHours: forecast.intervalHours ?? 2,
+          intervalHours: loadedInterval,
           days: (depth === maximumDays ? expected.slice(0, days.value.length) : expected).map(
             (slot, index) => ({
               date: slot.date,
               hours: days.value[index]?.hours.map((hour) => hour.timestamp) ?? slot.hours,
+              ...(days.value[index]?.intervalHours
+                ? { intervalHours: days.value[index].intervalHours }
+                : {}),
             }),
           ),
         });
+        fulfilledDepth = depth;
         if (depth !== maximumDays && days.value.length < maximumDays)
           nextDepth = depth === 1 && days.value.length < 3 ? 3 : 16;
       } catch (error) {
@@ -129,6 +144,8 @@ export const useForecastStore = defineStore('forecast', () => {
     services = dependencies;
     selectedDepth = 1;
     failedDepth = null;
+    fulfilledDepth = 0;
+    loadedInterval = 2;
     days.value = [];
     failure.value = null;
     grid.update({
@@ -154,7 +171,7 @@ export const useForecastStore = defineStore('forecast', () => {
    */
   function retry(): void {
     const depth = failedDepth ?? (days.value.length < 3 ? 3 : 16);
-    loadThrough(depth);
+    loadThrough(depth, true);
   }
 
   /**

@@ -29,6 +29,7 @@ export interface ForecastDay {
   readonly sunrise: string | null | undefined;
   readonly sunset: string | null | undefined;
   readonly hours: readonly ForecastHour[];
+  readonly intervalHours?: 2 | 3;
 }
 
 export interface Forecast {

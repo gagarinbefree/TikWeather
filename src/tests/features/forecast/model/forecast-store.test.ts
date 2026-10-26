@@ -85,6 +85,51 @@ describe('forecast loading', () => {
     });
     expect(useWeatherGridStore().grid).toHaveLength(6);
     expect(useWeatherGridStore().grid.at(-1)?.[0]?.date).toBe('2026-10-31');
+    store.focus(4);
+    store.focus(5);
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    expect(request).toHaveBeenCalledTimes(3);
+  });
+
+  it('retains detailed loaded hours when a longer later response is sparse', async () => {
+    const fixture = await forecastFixture();
+    const first = fixture.days[0];
+    const firstHour = first?.hours[0];
+    if (!first || !firstHour) throw new Error('Missing forecast fixture');
+    const detailed = fixture.days.map((day) => ({
+      ...day,
+      hours: [
+        ...day.hours,
+        { ...firstHour, timestamp: (day.hours[0]?.timestamp ?? firstHour.timestamp) + 7_200_000 },
+      ],
+    }));
+    const sparse = Array.from({ length: 6 }, (_, index) => ({
+      ...first,
+      date: new Date(Date.UTC(2026, 9, 26 + index)).toISOString().slice(0, 10),
+      hours: [{ ...firstHour, timestamp: firstHour.timestamp + index * 86_400_000 }],
+    }));
+    const request = vi.fn<ForecastServices['forecast']>((_location, _locale, _timeZone, depth) =>
+      Promise.resolve(
+        depth === 16
+          ? { days: sparse, intervalHours: 3 }
+          : { days: detailed.slice(0, depth), intervalHours: 2 },
+      ),
+    );
+    const store = useForecastStore();
+    store.start(
+      { location, locale: 'ru', timeZone: 'Asia/Yekaterinburg', now },
+      { forecast: request },
+    );
+
+    await vi.waitFor(() => {
+      expect(store.days).toHaveLength(6);
+    });
+    expect(store.day('2026-10-26')?.hours).toHaveLength(2);
+    expect(
+      useWeatherGridStore()
+        .grid[0]?.slice(1)
+        .map((cell) => cell.timestamp),
+    ).toContain(firstHour.timestamp + 7_200_000);
   });
 
   it('opens the maximum loading horizon and prioritizes the selected day', async () => {
@@ -155,6 +200,7 @@ describe('forecast loading', () => {
     expect(store.days).toHaveLength(1);
     expect(store.day('2026-10-26')).toBeDefined();
     store.focus(1);
+    expect(request.mock.calls.filter((call) => call[3] === 3)).toHaveLength(1);
     store.retry();
     await vi.waitFor(() => {
       expect(store.days).toHaveLength(3);

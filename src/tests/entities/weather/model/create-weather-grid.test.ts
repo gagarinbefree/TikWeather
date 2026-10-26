@@ -160,6 +160,31 @@ describe('createWeatherGrid', () => {
     expect(grid[1]?.slice(1).map((cell) => cell.timestamp)).toEqual(hours.slice(1));
   });
 
+  it('uses each day provider interval when detailed and three hour sources are combined', () => {
+    const detailedHours = [0, 1, 2, 3, 4, 5, 6].map((hour) =>
+      timestamp(`2026-10-27T${String(hour).padStart(2, '0')}:00:00Z`),
+    );
+    const sparseHours = [0, 3, 6, 9].map((hour) =>
+      timestamp(`2026-10-28T${String(hour).padStart(2, '0')}:00:00Z`),
+    );
+    const grid = createWeatherGrid({
+      now,
+      timeZone: 'UTC',
+      intervalHours: 3,
+      days: [
+        { date: '2026-10-27', hours: detailedHours, intervalHours: 2 },
+        { date: '2026-10-28', hours: sparseHours, intervalHours: 3 },
+      ],
+    });
+
+    expect(grid[1]?.slice(1).map((cell) => cell.timestamp)).toEqual([
+      detailedHours[2],
+      detailedHours[4],
+      detailedHours[6],
+    ]);
+    expect(grid[2]?.slice(1).map((cell) => cell.timestamp)).toEqual(sparseHours.slice(1));
+  });
+
   it('keeps the next available three hour forecast in the current day', () => {
     const current = timestamp('2026-10-26T20:30:00Z');
     const next = timestamp('2026-10-26T21:00:00Z');

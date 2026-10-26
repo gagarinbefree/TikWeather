@@ -3,6 +3,7 @@ import type { Grid } from 'tikitaki';
 export interface ForecastDaySlots {
   readonly date: string;
   readonly hours: readonly number[];
+  readonly intervalHours?: 2 | 3;
 }
 
 export interface WeatherGridOptions {
