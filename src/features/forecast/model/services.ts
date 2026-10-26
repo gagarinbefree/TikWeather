@@ -7,7 +7,7 @@ export interface ForecastServices {
     location: LocationQuery,
     locale: 'ru' | 'en',
     timeZone: string,
-    days: 1 | 2 | 3,
+    days: 1 | 3 | 16,
     now: number,
     signal: AbortSignal,
   ) => Promise<Forecast>;

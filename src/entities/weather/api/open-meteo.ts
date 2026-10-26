@@ -43,7 +43,7 @@ interface MeteoOptions extends RequestOptions {
 
 interface MeteoForecastOptions extends MeteoOptions {
   readonly timeZone: string;
-  readonly days: 1 | 2 | 3;
+  readonly days: number;
 }
 
 /**
@@ -64,7 +64,7 @@ function coordinates(location: LocationQuery): { latitude: number; longitude: nu
  * @param days The number of forecast days when loading forecasts.
  * @returns An encoded Open Meteo URL without credentials.
  */
-function endpoint(location: LocationQuery, timeZone: string, days?: 1 | 2 | 3): string {
+function endpoint(location: LocationQuery, timeZone: string, days?: number): string {
   const point = coordinates(location);
   const url = new URL('https://api.open-meteo.com/v1/forecast');
   url.search = new URLSearchParams({
@@ -205,6 +205,8 @@ export async function getOpenMeteoCurrent(options: MeteoOptions): Promise<Curren
  * @returns Hourly and daily weather normalized for the shared forecast cards.
  */
 export async function getOpenMeteoForecast(options: MeteoForecastOptions): Promise<Forecast> {
+  if (!Number.isInteger(options.days) || options.days < 1 || options.days > 16)
+    throw new ApiError('invalidResponse');
   const payload = record(
     await requestJson(endpoint(options.location, options.timeZone, options.days), options),
   );
@@ -214,7 +216,7 @@ export async function getOpenMeteoForecast(options: MeteoForecastOptions): Promi
   const formatter = dateFormatter(options.timeZone);
   const times = hourly['time'];
   const dayTimes = daily['time'];
-  if (!Array.isArray(times) || !Array.isArray(dayTimes) || dayTimes.length < options.days)
+  if (!Array.isArray(times) || !Array.isArray(dayTimes) || dayTimes.length === 0)
     throw new ApiError('invalidResponse');
   const hours = new Map<string, ForecastHour[]>();
   for (let index = 0; index < times.length; index++) {
@@ -242,7 +244,7 @@ export async function getOpenMeteoForecast(options: MeteoForecastOptions): Promi
   }
   const offset = numeric(payload['utc_offset_seconds'], -50400, 50400);
   const days: ForecastDay[] = [];
-  for (let index = 0; index < options.days; index++) {
+  for (let index = 0; index < Math.min(options.days, dayTimes.length); index++) {
     const date = new Date(epoch(dayTimes[index]) + offset * 1000).toISOString().slice(0, 10);
     const code = arrayAt(daily, 'weather_code', index);
     const dayHours = hours.get(date);

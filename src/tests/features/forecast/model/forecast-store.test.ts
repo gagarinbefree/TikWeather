@@ -31,7 +31,63 @@ async function forecastFixture(): Promise<Forecast> {
 }
 
 describe('forecast loading', () => {
-  it('opens three loading days immediately and prioritizes the selected day', async () => {
+  it('expands through the available sixteen days and keeps their real hours', async () => {
+    const fixture = await forecastFixture();
+    const first = fixture.days[0];
+    const firstHour = first?.hours[0];
+    if (!first || !firstHour) throw new Error('Missing forecast fixture');
+    const longForecast = Array.from({ length: 16 }, (_, index) => ({
+      ...first,
+      date: new Date(Date.UTC(2026, 9, 26 + index)).toISOString().slice(0, 10),
+      hours: [{ ...firstHour, timestamp: firstHour.timestamp + index * 86_400_000 }],
+    }));
+    const request = vi.fn<ForecastServices['forecast']>((_location, _locale, _timeZone, depth) =>
+      Promise.resolve({ days: longForecast.slice(0, depth) }),
+    );
+    const store = useForecastStore();
+    store.start(
+      { location, locale: 'ru', timeZone: 'Asia/Yekaterinburg', now },
+      { forecast: request },
+    );
+
+    await vi.waitFor(() => {
+      expect(store.days).toHaveLength(16);
+    });
+    expect(request.mock.calls.map((call) => call[3])).toEqual([1, 3, 16]);
+    expect(useWeatherGridStore().grid).toHaveLength(16);
+    expect(store.hour('2026-11-10', firstHour.timestamp + 15 * 86_400_000)).toBeDefined();
+  });
+
+  it('removes loading rows beyond the shorter provider response', async () => {
+    const fixture = await forecastFixture();
+    const first = fixture.days[0];
+    if (!first) throw new Error('Missing forecast fixture');
+    const available = Array.from({ length: 6 }, (_, index) => ({
+      ...first,
+      date: new Date(Date.UTC(2026, 9, 26 + index)).toISOString().slice(0, 10),
+      hours: first.hours.map((hour) => ({
+        ...hour,
+        timestamp: hour.timestamp + index * 86_400_000,
+      })),
+    }));
+    const request = vi.fn<ForecastServices['forecast']>((_location, _locale, _timeZone, depth) =>
+      Promise.resolve({ days: available.slice(0, depth) }),
+    );
+    const store = useForecastStore();
+    store.start(
+      { location, locale: 'ru', timeZone: 'Asia/Yekaterinburg', now },
+      { forecast: request },
+    );
+
+    await vi.waitFor(() => {
+      expect(request).toHaveBeenCalledTimes(3);
+      expect(store.days).toHaveLength(6);
+    });
+    expect(useWeatherGridStore().grid).toHaveLength(6);
+    expect(useWeatherGridStore().grid.at(-1)?.[0]?.date).toBe('2026-10-31');
+  });
+
+  it('opens the maximum loading horizon and prioritizes the selected day', async () => {
     const forecast = await forecastFixture();
     const store = useForecastStore();
     let cancelledFirst = false;
@@ -51,7 +107,7 @@ describe('forecast loading', () => {
       { location, locale: 'ru', timeZone: 'Asia/Yekaterinburg', now },
       { forecast: request },
     );
-    expect(useWeatherGridStore().grid).toHaveLength(3);
+    expect(useWeatherGridStore().grid).toHaveLength(16);
     expect(useWeatherGridStore().grid[0]?.[1]?.kind).toBe('hourly');
     expect(useWeatherGridStore().grid[1]?.[0]?.kind).toBe('daily');
     expect(store.days).toHaveLength(0);
@@ -86,7 +142,7 @@ describe('forecast loading', () => {
     const store = useForecastStore();
     let attempts = 0;
     const request = vi.fn<ForecastServices['forecast']>((_location, _locale, _timeZone, depth) => {
-      if (depth === 2 && attempts++ === 0) return Promise.reject(new ApiError('timeout'));
+      if (depth === 3 && attempts++ === 0) return Promise.reject(new ApiError('timeout'));
       return Promise.resolve({ days: forecast.days.slice(0, depth) });
     });
     store.start(
@@ -108,7 +164,7 @@ describe('forecast loading', () => {
       location,
       'ru',
       'Asia/Yekaterinburg',
-      2,
+      3,
       now,
       expect.any(AbortSignal),
     );
@@ -141,7 +197,7 @@ describe('forecast loading', () => {
     expect(store.failure).toBeNull();
   });
 
-  it('uses actual three hour provider timestamps without repeating the full forecast request', async () => {
+  it('uses actual three hour provider timestamps after the horizon probe', async () => {
     const forecast = await forecastFixture();
     const store = useForecastStore();
     const request = vi.fn<ForecastServices['forecast']>().mockResolvedValue({
@@ -155,7 +211,9 @@ describe('forecast loading', () => {
     await vi.waitFor(() => {
       expect(store.days).toHaveLength(3);
     });
-    expect(request).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => {
+      expect(request).toHaveBeenCalledTimes(2);
+    });
     expect(
       useWeatherGridStore()
         .grid[1]?.slice(1)

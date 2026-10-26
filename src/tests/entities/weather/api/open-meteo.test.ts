@@ -54,6 +54,23 @@ const response = {
 };
 
 describe('Open Meteo adapter', () => {
+  it('uses the days actually returned for a sixteen day request', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(response));
+
+    const forecast = await getOpenMeteoForecast({
+      location,
+      locale: 'ru',
+      timeZone: 'Asia/Yekaterinburg',
+      days: 16,
+      fetcher,
+    });
+
+    expect(forecast.days).toHaveLength(1);
+    const requestUrl = fetcher.mock.calls[0]?.[0];
+    if (typeof requestUrl !== 'string') throw new Error('Expected a URL');
+    expect(new URL(requestUrl).searchParams.get('forecast_days')).toBe('16');
+  });
+
   it('maps the current response to the shared weather card model', async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(response));
     const current = await getOpenMeteoCurrent({ location, locale: 'ru', fetcher });

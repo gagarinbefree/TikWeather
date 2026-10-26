@@ -17,9 +17,11 @@ interface ForecastContext {
 }
 
 interface RequestAttempt {
-  readonly depth: 1 | 2 | 3;
+  readonly depth: 1 | 3 | 16;
   readonly controller: AbortController;
 }
+
+const maximumDays = 16;
 
 /**
  * useForecastStore
@@ -29,11 +31,12 @@ export const useForecastStore = defineStore('forecast', () => {
   const grid = useWeatherGridStore();
   const days = shallowRef<readonly ForecastDay[]>([]);
   const failure = shallowRef<FailureKind | null>(null);
-  const loadingDepth = shallowRef<1 | 2 | 3 | null>(null);
+  const loadingDepth = shallowRef<1 | 3 | 16 | null>(null);
   let session: ForecastContext | null = null;
   let services: ForecastServices | null = null;
   let attempt: RequestAttempt | null = null;
-  let selectedDepth: 1 | 2 | 3 = 1;
+  let selectedDepth: 1 | 3 | 16 = 1;
+  let failedDepth: 1 | 3 | 16 | null = null;
   let revision = 0;
 
   /**
@@ -52,7 +55,7 @@ export const useForecastStore = defineStore('forecast', () => {
    * loadThrough
    * @param depth The smallest provider horizon containing the requested day.
    */
-  function loadThrough(depth: 1 | 2 | 3): void {
+  function loadThrough(depth: 1 | 3 | 16): void {
     const context = session;
     const dependencies = services;
     if (
@@ -67,9 +70,10 @@ export const useForecastStore = defineStore('forecast', () => {
     attempt = current;
     loadingDepth.value = depth;
     failure.value = null;
+    failedDepth = null;
     const token = revision;
     void (async (): Promise<void> => {
-      let nextDepth: 2 | 3 | null = null;
+      let nextDepth: 3 | 16 | null = null;
       try {
         const forecast = await dependencies.forecast(
           context.location,
@@ -80,26 +84,30 @@ export const useForecastStore = defineStore('forecast', () => {
           current.controller.signal,
         );
         if (token !== revision || attempt !== current) return;
-        if (forecast.days.length < depth) throw new ApiError('invalidResponse');
-        const expected = createForecastSlots(context.now, context.timeZone, 3);
-        for (let index = 0; index < Math.min(forecast.days.length, 3); index++) {
+        if (forecast.days.length < Math.min(depth, 3)) throw new ApiError('invalidResponse');
+        const expected = createForecastSlots(context.now, context.timeZone, maximumDays);
+        for (let index = 0; index < Math.min(forecast.days.length, maximumDays); index++) {
           if (forecast.days[index]?.date !== expected[index]?.date)
             throw new ApiError('invalidResponse');
         }
-        days.value = forecast.days.slice(0, 3);
+        days.value = forecast.days.slice(0, maximumDays);
         grid.update({
           now: context.now,
           timeZone: context.timeZone,
           intervalHours: forecast.intervalHours ?? 2,
-          days: expected.map((slot, index) => ({
-            date: slot.date,
-            hours: days.value[index]?.hours.map((hour) => hour.timestamp) ?? slot.hours,
-          })),
+          days: (depth === maximumDays ? expected.slice(0, days.value.length) : expected).map(
+            (slot, index) => ({
+              date: slot.date,
+              hours: days.value[index]?.hours.map((hour) => hour.timestamp) ?? slot.hours,
+            }),
+          ),
         });
-        if (days.value.length < 3) nextDepth = (depth + 1) as 2 | 3;
+        if (depth !== maximumDays && days.value.length < maximumDays)
+          nextDepth = depth === 1 && days.value.length < 3 ? 3 : 16;
       } catch (error) {
         if (token !== revision || attempt !== current) return;
         failure.value = error instanceof ApiError ? error.kind : 'connection';
+        failedDepth = depth;
       } finally {
         if (token === revision && attempt === current) {
           attempt = null;
@@ -120,12 +128,13 @@ export const useForecastStore = defineStore('forecast', () => {
     session = context;
     services = dependencies;
     selectedDepth = 1;
+    failedDepth = null;
     days.value = [];
     failure.value = null;
     grid.update({
       now: context.now,
       timeZone: context.timeZone,
-      days: createForecastSlots(context.now, context.timeZone, 3),
+      days: createForecastSlots(context.now, context.timeZone, maximumDays),
     });
     loadThrough(1);
   }
@@ -135,8 +144,8 @@ export const useForecastStore = defineStore('forecast', () => {
    * @param row The visible row selected by a swipe or keyboard navigation.
    */
   function focus(row: number): void {
-    if (!Number.isInteger(row) || row < 0 || row > 2) return;
-    selectedDepth = (row + 1) as 1 | 2 | 3;
+    if (!Number.isInteger(row) || row < 0 || row >= maximumDays) return;
+    selectedDepth = row === 0 ? 1 : row < 3 ? 3 : 16;
     loadThrough(selectedDepth);
   }
 
@@ -144,7 +153,7 @@ export const useForecastStore = defineStore('forecast', () => {
    * retry
    */
   function retry(): void {
-    const depth = Math.max(selectedDepth, Math.min(days.value.length + 1, 3)) as 1 | 2 | 3;
+    const depth = failedDepth ?? (days.value.length < 3 ? 3 : 16);
     loadThrough(depth);
   }
 

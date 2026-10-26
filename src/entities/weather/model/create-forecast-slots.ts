@@ -11,8 +11,10 @@ import type { ForecastDaySlots } from './types';
 export function createForecastSlots(
   now: number,
   timeZone: string,
-  count: 1 | 2 | 3,
+  count: number,
 ): readonly ForecastDaySlots[] {
+  if (!Number.isInteger(count) || count < 1 || count > 16)
+    throw new RangeError(messages.en.incompleteForecastCalendar);
   const formatter = new Intl.DateTimeFormat('en-CA', {
     timeZone,
     year: 'numeric',
@@ -26,7 +28,7 @@ export function createForecastSlots(
   const localMinute = formatter.formatToParts(now).find((part) => part.type === 'minute')?.value;
   if (localMinute === undefined) throw new RangeError(messages.en.missingDatePart);
   const firstHour = now - Number(localMinute) * 60_000 - (now % 60_000);
-  for (let offset = 0; offset < 120; offset++) {
+  for (let offset = 0; offset < (count + 1) * 25; offset++) {
     const timestamp = firstHour + offset * 3_600_000;
     const parts = formatter.formatToParts(timestamp);
     const year = parts.find((part) => part.type === 'year')?.value;

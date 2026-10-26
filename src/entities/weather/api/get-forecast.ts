@@ -15,7 +15,7 @@ interface ForecastOptions extends RequestOptions {
   readonly location: LocationQuery;
   readonly locale: 'ru' | 'en';
   readonly timeZone: string;
-  readonly days: 1 | 2 | 3;
+  readonly days: number;
 }
 
 /**
@@ -135,6 +135,8 @@ function parseDay(
  */
 export async function getForecast(options: ForecastOptions): Promise<Forecast> {
   if (!options.apiKey.trim()) throw new ApiError('configuration');
+  if (!Number.isInteger(options.days) || options.days < 1 || options.days > 14)
+    throw new ApiError('invalidResponse');
   const position = options.location;
   if (position.source !== 'automatic' && !validCoordinates(position.latitude, position.longitude))
     throw new ApiError('invalidResponse');
@@ -165,8 +167,7 @@ export async function getForecast(options: ForecastOptions): Promise<Forecast> {
   const payload = record(await requestJson(url.toString(), options));
   const forecast = record(payload['forecast']);
   const entries = forecast['forecastday'];
-  if (!Array.isArray(entries) || entries.length < options.days)
-    throw new ApiError('invalidResponse');
+  if (!Array.isArray(entries) || entries.length === 0) throw new ApiError('invalidResponse');
   const days = entries
     .slice(0, options.days)
     .map((entry: unknown) => parseDay(entry, formatter, options.locale));

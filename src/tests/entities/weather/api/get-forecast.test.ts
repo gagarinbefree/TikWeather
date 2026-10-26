@@ -3,6 +3,24 @@ import { getForecast } from '@/entities/weather';
 import { forecastResponse } from '@/tests/entities/weather/api/forecast-fixture';
 
 describe('getForecast', () => {
+  it('accepts the shorter horizon returned for a large request', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(forecastResponse));
+
+    const forecast = await getForecast({
+      apiKey: 'example-only',
+      location: { source: 'device', latitude: 58, longitude: 56.25, countryCode: null },
+      locale: 'ru',
+      timeZone: 'Asia/Yekaterinburg',
+      days: 14,
+      fetcher,
+    });
+
+    expect(forecast.days).toHaveLength(3);
+    const requestUrl = fetcher.mock.calls[0]?.[0];
+    if (typeof requestUrl !== 'string') throw new Error('Expected a URL');
+    expect(new URL(requestUrl).searchParams.get('days')).toBe('14');
+  });
+
   it('requests only the needed horizon and normalizes daily and hourly weather', async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
       Response.json({

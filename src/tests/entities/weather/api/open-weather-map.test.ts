@@ -113,6 +113,38 @@ describe('OpenWeatherMap adapter', () => {
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
 
+  it('keeps every calendar date supplied by the five day forecast', async () => {
+    const extended = {
+      ...forecastResponse,
+      list: Array.from({ length: 6 }, (_, index) => forecastHour(Date.UTC(2026, 9, 26 + index, 7))),
+    };
+    const fetcher = vi.fn<typeof fetch>().mockImplementation((input) => {
+      if (typeof input !== 'string') throw new Error('Expected a URL');
+      return Promise.resolve(
+        Response.json(new URL(input).pathname.endsWith('/weather') ? currentResponse : extended),
+      );
+    });
+
+    const forecast = await getOpenWeatherMapForecast({
+      apiKey: 'example-only',
+      location,
+      locale: 'ru',
+      timeZone: 'Asia/Yekaterinburg',
+      days: 16,
+      now: Date.UTC(2026, 9, 26, 7),
+      fetcher,
+    });
+
+    expect(forecast.days.map((day) => day.date)).toEqual([
+      '2026-10-26',
+      '2026-10-27',
+      '2026-10-28',
+      '2026-10-29',
+      '2026-10-30',
+      '2026-10-31',
+    ]);
+  });
+
   it('refuses a missing key before any request', async () => {
     const fetcher = vi.fn<typeof fetch>();
     await expect(

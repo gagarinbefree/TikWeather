@@ -30,4 +30,13 @@ describe('createForecastSlots', () => {
     const grid = createWeatherGrid({ now, timeZone: 'Asia/Kathmandu', days });
     expect(grid[0]?.[1]).toMatchObject({ kind: 'hourly', timestamp: Date.UTC(2026, 9, 26, 7, 15) });
   });
+
+  it('creates loading rows through the full sixteen day horizon', () => {
+    const now = Date.UTC(2026, 9, 26, 5, 37);
+    const days = createForecastSlots(now, 'Asia/Yekaterinburg', 16);
+
+    expect(days).toHaveLength(16);
+    expect(days.at(-1)?.date).toBe('2026-11-10');
+    expect(days.every((day) => day.hours.length > 0)).toBe(true);
+  });
 });

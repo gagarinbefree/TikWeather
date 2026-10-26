@@ -39,7 +39,7 @@ interface MapOptions extends RequestOptions {
 
 interface MapForecastOptions extends MapOptions {
   readonly timeZone: string;
-  readonly days: 1 | 2 | 3;
+  readonly days: number;
   readonly now: number;
 }
 
@@ -305,11 +305,11 @@ export async function getOpenWeatherMapForecast(options: MapForecastOptions): Pr
   const currentSource = record(currentPayload);
   const solar = record(currentSource['sys']);
   const days: ForecastDay[] = [];
-  for (let offset = 0; offset < 3; offset++) {
+  for (let offset = 0; offset < 16; offset++) {
     const date = nextDate(today, offset);
     const hours = grouped.get(date) ?? [];
     const includesCurrent = offset === 0 && localTime(current.observedAt, dateTime).date === date;
-    if (!hours.length && !includesCurrent) throw new ApiError('invalidResponse');
+    if (!hours.length && !includesCurrent) break;
     const temperatures = [
       ...hours.map((hour) => hour.temperature),
       ...(includesCurrent ? [current.temperature] : []),
@@ -339,5 +339,6 @@ export async function getOpenWeatherMapForecast(options: MapForecastOptions): Pr
       hours,
     });
   }
+  if (days.length === 0) throw new ApiError('invalidResponse');
   return { days, intervalHours: 3 };
 }

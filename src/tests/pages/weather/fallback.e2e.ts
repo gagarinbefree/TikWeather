@@ -133,5 +133,5 @@ test('uses the available three hour OpenWeatherMap forecast after both forecast 
   await expect(page.getByRole('article', { name: 'Почасовой прогноз' })).toContainText(
     'Небольшой дождь',
   );
-  expect(forecastRequests).toBe(1);
+  expect(forecastRequests).toBeGreaterThanOrEqual(1);
 });

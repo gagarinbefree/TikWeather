@@ -10,9 +10,11 @@ import {
   getOpenWeatherMapCurrent,
   getOpenWeatherMapForecast,
   withFallback,
+  type Forecast,
 } from '@/entities/weather';
-import { forecastServicesKey, type ForecastServices } from '@/features/forecast';
+import { forecastServicesKey, longestForecast, type ForecastServices } from '@/features/forecast';
 import { openWeatherMapKey, weatherApiKey } from '@/shared/config';
+import { ApiError } from '@/shared/api';
 import App from './App.vue';
 import './styles/main.scss';
 
@@ -32,27 +34,83 @@ const services: CurrentWeatherServices = {
     ),
   now: Date.now,
 };
+
+/**
+ * requireDays
+ * @param request The forecast response from one provider.
+ * @param minimum The requested minimum number of local days.
+ * @returns A forecast with enough days to display.
+ */
+async function requireDays(request: Promise<Forecast>, minimum: number): Promise<Forecast> {
+  const forecast = await request;
+  if (forecast.days.length < minimum) throw new ApiError('invalidResponse');
+  return forecast;
+}
+
 const forecastServices: ForecastServices = {
   forecast: (location, locale, timeZone, days, now, signal) =>
-    withFallback(
-      [
-        (): ReturnType<ForecastServices['forecast']> =>
-          getForecast({ location, locale, timeZone, days, signal, apiKey: weatherApiKey() }),
-        (): ReturnType<ForecastServices['forecast']> =>
-          getOpenMeteoForecast({ location, locale, timeZone, days, signal }),
-        (): ReturnType<ForecastServices['forecast']> =>
-          getOpenWeatherMapForecast({
-            location,
-            locale,
-            timeZone,
-            days,
-            now,
-            signal,
-            apiKey: openWeatherMapKey(),
-          }),
-      ],
-      signal,
-    ),
+    days === 16
+      ? longestForecast(
+          [
+            (): Promise<Forecast> =>
+              requireDays(
+                getOpenMeteoForecast({ location, locale, timeZone, days: 16, signal }),
+                3,
+              ),
+            (): Promise<Forecast> =>
+              requireDays(
+                getForecast({
+                  location,
+                  locale,
+                  timeZone,
+                  days: 14,
+                  signal,
+                  apiKey: weatherApiKey(),
+                }),
+                3,
+              ),
+            (): Promise<Forecast> =>
+              requireDays(
+                getOpenWeatherMapForecast({
+                  location,
+                  locale,
+                  timeZone,
+                  days,
+                  now,
+                  signal,
+                  apiKey: openWeatherMapKey(),
+                }),
+                3,
+              ),
+          ],
+          signal,
+          16,
+        )
+      : withFallback(
+          [
+            (): Promise<Forecast> =>
+              requireDays(
+                getForecast({ location, locale, timeZone, days, signal, apiKey: weatherApiKey() }),
+                days,
+              ),
+            (): Promise<Forecast> =>
+              requireDays(getOpenMeteoForecast({ location, locale, timeZone, days, signal }), days),
+            (): Promise<Forecast> =>
+              requireDays(
+                getOpenWeatherMapForecast({
+                  location,
+                  locale,
+                  timeZone,
+                  days,
+                  now,
+                  signal,
+                  apiKey: openWeatherMapKey(),
+                }),
+                days,
+              ),
+          ],
+          signal,
+        ),
 };
 createApp(App)
   .use(createPinia())
