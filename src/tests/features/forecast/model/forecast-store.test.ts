@@ -162,4 +162,38 @@ describe('forecast loading', () => {
         .map((cell) => cell.timestamp),
     ).toEqual([Date.UTC(2026, 9, 27, 7)]);
   });
+
+  it('replaces three hour cells when a later request succeeds through an hourly provider', async () => {
+    const forecast = await forecastFixture();
+    const firstDay = forecast.days[0];
+    const firstHour = firstDay?.hours[0];
+    if (!firstDay || !firstHour) throw new Error('Missing forecast fixture');
+    const mapHour = {
+      ...firstHour,
+      timestamp: Date.UTC(2026, 9, 26, 8),
+    };
+    const request = vi.fn<ForecastServices['forecast']>((_location, _locale, _timeZone, depth) =>
+      Promise.resolve(
+        depth === 1
+          ? {
+              days: [{ ...firstDay, hours: [mapHour] }],
+              intervalHours: 3,
+            }
+          : { days: forecast.days.slice(0, depth), intervalHours: 2 },
+      ),
+    );
+    const store = useForecastStore();
+    store.start(
+      { location, locale: 'ru', timeZone: 'Asia/Yekaterinburg', now },
+      { forecast: request },
+    );
+
+    await vi.waitFor(() => {
+      expect(store.days).toHaveLength(3);
+    });
+    const grid = useWeatherGridStore().grid;
+    const currentHour = grid[0]?.[1]?.timestamp;
+    expect(currentHour).toBe(Date.UTC(2026, 9, 26, 7));
+    expect(store.hour('2026-10-26', currentHour ?? NaN)).toBeDefined();
+  });
 });

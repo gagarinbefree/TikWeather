@@ -115,7 +115,8 @@ export function createWeatherGrid(options: WeatherGridOptions): WeatherGrid {
 
     for (const timestamp of [...new Set(hours)].sort((first, second) => first - second)) {
       const { hour } = localTime(formatter, timestamp);
-      if (hour < originHour + interval) continue;
+      if (isToday && interval === 3 ? timestamp <= options.now : hour < originHour + interval)
+        continue;
       if (interval === 2 && (hour - originHour) % interval !== 0) continue;
       row.push(
         Object.freeze({ id: `${date}/hour/${String(timestamp)}`, kind: 'hourly', date, timestamp }),

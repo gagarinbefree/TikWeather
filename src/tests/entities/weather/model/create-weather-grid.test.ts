@@ -160,6 +160,19 @@ describe('createWeatherGrid', () => {
     expect(grid[1]?.slice(1).map((cell) => cell.timestamp)).toEqual(hours.slice(1));
   });
 
+  it('keeps the next available three hour forecast in the current day', () => {
+    const current = timestamp('2026-10-26T20:30:00Z');
+    const next = timestamp('2026-10-26T21:00:00Z');
+    const grid = createWeatherGrid({
+      now: current,
+      timeZone: 'UTC',
+      intervalHours: 3,
+      days: [{ date: '2026-10-26', hours: [next] }],
+    });
+
+    expect(grid[0]?.[1]?.timestamp).toBe(next);
+  });
+
   it('skips a nonexistent local hour during the spring daylight saving change', () => {
     const grid = createWeatherGrid({
       now: timestamp('2026-03-28T12:00:00Z'),

@@ -34,6 +34,7 @@ test('shows A1 while forecast is pending and prioritizes the swiped day', async 
   await expect(page.getByRole('article', { name: 'Текущая погода' })).toBeVisible();
   await expect.poll(() => requestedDays).toContain(1);
   const viewport = page.getByRole('region', { name: 'Навигация по прогнозу' });
+  await expect(viewport.locator('[data-cell-id="2026-10-27/daily"]')).toHaveCount(1);
   await viewport.focus();
   await viewport.press('ArrowDown');
   await expect(viewport).toHaveAttribute('data-row', '1');

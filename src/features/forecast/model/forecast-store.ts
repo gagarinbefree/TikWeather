@@ -87,17 +87,15 @@ export const useForecastStore = defineStore('forecast', () => {
             throw new ApiError('invalidResponse');
         }
         days.value = forecast.days.slice(0, 3);
-        if (forecast.intervalHours === 3) {
-          grid.update({
-            now: context.now,
-            timeZone: context.timeZone,
-            intervalHours: 3,
-            days: forecast.days.slice(0, 3).map((day) => ({
-              date: day.date,
-              hours: day.hours.map((hour) => hour.timestamp),
-            })),
-          });
-        }
+        grid.update({
+          now: context.now,
+          timeZone: context.timeZone,
+          intervalHours: forecast.intervalHours ?? 2,
+          days: expected.map((slot, index) => ({
+            date: slot.date,
+            hours: days.value[index]?.hours.map((hour) => hour.timestamp) ?? slot.hours,
+          })),
+        });
         if (days.value.length < 3) nextDepth = (depth + 1) as 2 | 3;
       } catch (error) {
         if (token !== revision || attempt !== current) return;

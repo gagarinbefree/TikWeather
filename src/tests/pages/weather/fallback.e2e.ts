@@ -77,7 +77,7 @@ test('shows OpenWeatherMap current weather after both earlier providers fail', a
 test('uses the available three hour OpenWeatherMap forecast after both forecast failures', async ({
   page,
 }) => {
-  await page.clock.setFixedTime(new Date('2026-10-26T07:00:00Z'));
+  await page.clock.setFixedTime(new Date('2026-10-26T15:30:00Z'));
   await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
     await route.fulfill({ json: currentResponse });
   });
@@ -109,7 +109,7 @@ test('uses the available three hour OpenWeatherMap forecast after both forecast 
     await route.fulfill({
       json: {
         list: [26, 27, 28].map((day) => ({
-          dt: Date.UTC(2026, 9, day, 7) / 1000,
+          dt: Date.UTC(2026, 9, day, day === 26 ? 16 : 7) / 1000,
           main: { temp: 8, feels_like: 6, humidity: 75, pressure: 1011 },
           wind: { speed: 4, deg: 180 },
           pop: 0.4,
@@ -123,6 +123,8 @@ test('uses the available three hour OpenWeatherMap forecast after both forecast 
   await expect(page.getByRole('article', { name: 'Текущая погода' })).toBeVisible();
   const viewport = page.getByRole('region', { name: 'Навигация по прогнозу' });
   await viewport.focus();
+  await viewport.press('ArrowRight');
+  await expect(page.getByRole('article', { name: 'Почасовой прогноз' })).toContainText('21:00');
   await viewport.press('ArrowDown');
   await expect(viewport).toHaveAttribute('data-row', '1');
   await expect(page.getByRole('article', { name: 'Прогноз на день' })).toContainText('Завтра');
