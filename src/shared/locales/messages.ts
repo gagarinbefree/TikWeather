@@ -55,6 +55,7 @@ export const messages = {
     wrongDay: 'Время прогноза не соответствует местной дате',
     invalidInterval: 'Интервал прогноза должен составлять два или три часа',
     missingDatePart: 'Не удалось определить местную дату',
+    incompleteForecastCalendar: 'Не удалось построить дни прогноза',
   },
   en: {
     appName: 'TikWeather',
@@ -111,5 +112,6 @@ export const messages = {
     wrongDay: 'Forecast timestamp does not belong to its local date',
     invalidInterval: 'Forecast interval must be two or three hours',
     missingDatePart: 'Unable to determine the local date',
+    incompleteForecastCalendar: 'Unable to build forecast days',
   },
 } as const;
