@@ -1,0 +1,50 @@
+@use 'bootstrap/scss/root';
+@use 'bootstrap/scss/content/reboot';
+@use 'bootstrap/scss/spinner';
+@use 'bootstrap/scss/helpers/visually-hidden';
+@use '@/shared/themes/default';
+
+// Bootstrap root declarations are unlayered and require an unlayered override.
+:root {
+  scrollbar-gutter: auto;
+  color-scheme: light;
+}
+
+@layer custom {
+  :root {
+    font-family: Inter, system-ui, sans-serif;
+    color: var(--weather-ink);
+    background: var(--weather-page);
+  }
+
+  html,
+  body,
+  #app {
+    margin: 0;
+    min-block-size: 100%;
+  }
+
+  .weather-page {
+    display: grid;
+    place-items: center;
+    min-block-size: 100dvh;
+    color: var(--weather-ink);
+    background: var(--weather-page);
+  }
+
+  .weather-viewport {
+    display: grid;
+    place-items: center;
+    inline-size: min(100vw, 56.25dvh);
+    block-size: 100dvh;
+    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+      max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+    background: var(--weather-surface);
+  }
+
+  @media (orientation: portrait) {
+    .weather-viewport {
+      inline-size: 100%;
+    }
+  }
+}
