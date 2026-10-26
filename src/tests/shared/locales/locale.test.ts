@@ -15,6 +15,8 @@ describe('weather localization', () => {
     expect(conditionLabel(1000, false, 'ru')).toBe('Ясно');
     expect(conditionLabel(1009, true, 'ru')).toBe('Пасмурно');
     expect(conditionLabel(1009, true, 'en')).toBe('Overcast');
+    expect(conditionLabel(800, true, 'ru', 'ясно')).toBe('Ясно');
+    expect(conditionLabel(500, true, 'en', 'light rain')).toBe('Light rain');
     expect(conditionLabel(9999, true, 'ru')).toBe(messages.ru.unknownCondition);
     expect(Object.keys(messages.ru).sort()).toEqual(Object.keys(messages.en).sort());
   });

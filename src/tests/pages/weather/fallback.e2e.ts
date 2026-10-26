@@ -129,7 +129,7 @@ test('uses the available three hour OpenWeatherMap forecast after both forecast 
   await expect(page.getByRole('article', { name: 'Прогноз на день' })).toContainText('Нет данных');
   await viewport.press('ArrowRight');
   await expect(page.getByRole('article', { name: 'Почасовой прогноз' })).toContainText(
-    'небольшой дождь',
+    'Небольшой дождь',
   );
   expect(forecastRequests).toBe(1);
 });

@@ -47,7 +47,7 @@ export function countryLabel(country: string, locale: Locale): string {
 
 /**
  * conditionLabel
- * @param code The WeatherAPI condition code.
+ * @param code The active provider condition code.
  * @param isDay Whether the observation is in daylight.
  * @param locale The current interface language.
  * @param fallback The provider text in the matching language when a new code is introduced.
@@ -71,5 +71,8 @@ export function conditionLabel(
     const translated = englishConditions.find((condition) => condition.code === code);
     if (translated) return isDay ? translated.day : translated.night;
   }
-  return fallback || messages[locale].unknownCondition;
+  const providerText = fallback.trim();
+  return providerText
+    ? providerText.charAt(0).toLocaleUpperCase(locale) + providerText.slice(1)
+    : messages[locale].unknownCondition;
 }
