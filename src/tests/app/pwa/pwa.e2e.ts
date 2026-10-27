@@ -1,0 +1,31 @@
+import { expect, test } from '@playwright/test';
+
+test('exposes an installable manifest scoped to GitHub Pages', async ({ page }) => {
+  await page.goto('./');
+  const manifestUrl = await page.locator('link[rel="manifest"]').getAttribute('href');
+  expect(manifestUrl).toBeTruthy();
+  const response = await page.request.get(new URL(manifestUrl ?? '', page.url()).toString());
+  expect(response.ok()).toBe(true);
+  const manifest: unknown = await response.json();
+  expect(manifest).toMatchObject({
+    name: 'TikWeather',
+    id: '/TikWeather/',
+    start_url: '/TikWeather/',
+    scope: '/TikWeather/',
+    display: 'standalone',
+  });
+  const icons = (manifest as { icons: { sizes: string }[] }).icons;
+  expect(icons.map((icon) => icon.sizes)).toEqual(expect.arrayContaining(['192x192', '512x512']));
+});
+
+test('opens the application shell after the network goes offline', async ({ page, context }) => {
+  await page.goto('./');
+  await page.evaluate(async () => navigator.serviceWorker.ready);
+  await page.reload();
+  await expect
+    .poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)))
+    .toBe(true);
+  await context.setOffline(true);
+  await page.reload();
+  await expect(page.getByRole('main', { name: /weather|погода/i })).toBeVisible();
+});

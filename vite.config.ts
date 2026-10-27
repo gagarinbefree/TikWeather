@@ -1,5 +1,6 @@
 import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
+import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig, type ConfigEnv, type UserConfig } from 'vite';
 
 /**
@@ -19,7 +20,34 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
   }
   return {
     base: '/TikWeather/',
-    plugins: [vue()],
+    plugins: [
+      vue(),
+      VitePWA({
+        registerType: 'prompt',
+        includeAssets: ['app-icon-180.png'],
+        manifest: {
+          name: 'TikWeather',
+          short_name: 'TikWeather',
+          description: 'Weather now and in the days ahead.',
+          id: '/TikWeather/',
+          start_url: '/TikWeather/',
+          scope: '/TikWeather/',
+          display: 'standalone',
+          background_color: '#F5F7FA',
+          theme_color: '#F5F7FA',
+          icons: [
+            { src: 'app-icon-192.png', sizes: '192x192', type: 'image/png' },
+            { src: 'app-icon-512.png', sizes: '512x512', type: 'image/png' },
+          ],
+        },
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,png,svg,ttf,webmanifest}'],
+          navigateFallback: '/TikWeather/index.html',
+          navigateFallbackAllowlist: [/^\/TikWeather\/?$/],
+          cleanupOutdatedCaches: true,
+        },
+      }),
+    ],
     ...(isBrowserTest
       ? {
           define: {
