@@ -19,13 +19,25 @@ test('exposes an installable manifest scoped to GitHub Pages', async ({ page }) 
 });
 
 test('opens the application shell after the network goes offline', async ({ page, context }) => {
-  await page.goto('./');
+  await page.route('https://api.weatherapi.com/**', async (route) => {
+    await route.fulfill({ status: 503, json: {} });
+  });
+  await page.route('https://api.open-meteo.com/**', async (route) => {
+    await route.fulfill({ status: 503, json: {} });
+  });
+  await page.route('https://api.openweathermap.org/**', async (route) => {
+    await route.fulfill({ status: 503, json: {} });
+  });
+  await page.route('https://get.geojs.io/**', async (route) => {
+    await route.fulfill({ status: 503, json: {} });
+  });
+  await page.goto('./', { waitUntil: 'domcontentloaded' });
   await page.evaluate(async () => navigator.serviceWorker.ready);
-  await page.reload();
+  await page.reload({ waitUntil: 'domcontentloaded' });
   await expect
     .poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)))
     .toBe(true);
   await context.setOffline(true);
-  await page.reload();
+  await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('main', { name: /weather|погода/i })).toBeVisible();
 });

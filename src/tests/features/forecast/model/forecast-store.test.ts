@@ -31,6 +31,14 @@ async function forecastFixture(): Promise<Forecast> {
 }
 
 describe('forecast loading', () => {
+  it('restores saved daily and hourly cells without a provider request', async () => {
+    const store = useForecastStore();
+    const saved = await forecastFixture();
+    store.restore(saved, now, 'Asia/Yekaterinburg');
+    expect(store.days).toHaveLength(3);
+    expect(store.day('2026-10-27')).toBeDefined();
+    expect(useWeatherGridStore().grid[1]?.[1]?.kind).toBe('hourly');
+  });
   it('expands through the available sixteen days and keeps their real hours', async () => {
     const fixture = await forecastFixture();
     const first = fixture.days[0];

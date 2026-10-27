@@ -2,7 +2,13 @@
 import { storeToRefs } from 'pinia';
 import type { Position } from 'tikitaki';
 import { computed, inject, onBeforeUnmount, onMounted, watch } from 'vue';
-import { CurrentWeatherCard, useWeatherGridStore } from '@/entities/weather';
+import {
+  CurrentWeatherCard,
+  readWeatherSnapshot,
+  writeWeatherSnapshot,
+  useWeatherGridStore,
+  type WeatherSnapshot,
+} from '@/entities/weather';
 import { currentWeatherServicesKey, useCurrentWeatherStore } from '@/features/current-weather';
 import { ForecastCell, forecastServicesKey, useForecastStore } from '@/features/forecast';
 import { messages } from '@/shared/locales';
@@ -20,6 +26,23 @@ const text = computed(() => messages[locale.value]);
 let loadRevision = 0;
 
 /**
+ * saveSnapshot
+ * @param forecastDays The currently available normalized forecast.
+ */
+function saveSnapshot(forecastDays = forecast.days): void {
+  const current = weather.state;
+  if (current.status !== 'ready' || current.cachedAt !== null) return;
+  const snapshot: WeatherSnapshot = {
+    version: 1,
+    savedAt: Date.now(),
+    locale: weather.locale,
+    weather: current.weather,
+    forecast: { days: forecastDays },
+  };
+  writeWeatherSnapshot(snapshot);
+}
+
+/**
  * retry
  */
 function retry(): void {
@@ -29,7 +52,7 @@ function retry(): void {
   void weather.load(services).then(() => {
     if (token !== loadRevision || !forecastServices) return;
     const current = weather.state;
-    if (current.status !== 'ready') return;
+    if (current.status !== 'ready' || current.cachedAt !== null) return;
     forecast.start(
       {
         location: current.location,
@@ -39,6 +62,7 @@ function retry(): void {
       },
       forecastServices,
     );
+    saveSnapshot([]);
   });
 }
 
@@ -58,12 +82,43 @@ function dayIndex(date: string): number {
 function onPositionChange(position: Position): void {
   forecast.focus(position.row);
 }
-onMounted(retry);
+/**
+ * start
+ */
+function start(): void {
+  const snapshot = readWeatherSnapshot();
+  if (snapshot) {
+    try {
+      weather.restore(snapshot);
+      forecast.restore(
+        snapshot.forecast,
+        weather.state.status === 'ready' ? weather.state.now : Date.now(),
+        snapshot.weather.timeZone,
+      );
+    } catch {
+      // An invalid saved time zone or calendar must not prevent a fresh load.
+    }
+  }
+  if (navigator.onLine) retry();
+  else weather.offline();
+}
+
+onMounted(() => {
+  start();
+  window.addEventListener('online', retry);
+});
 onBeforeUnmount(() => {
+  window.removeEventListener('online', retry);
   loadRevision++;
   weather.cancel();
   forecast.cancel();
 });
+watch(
+  () => forecast.days,
+  (days) => {
+    saveSnapshot(days);
+  },
+);
 watch(
   locale,
   (language) => {
@@ -82,6 +137,8 @@ watch(
           v-if="cell.kind === 'current' && state.status === 'ready'"
           :weather="state.weather"
           :locale="locale"
+          :cached-at="state.cachedAt"
+          @retry="retry"
         />
         <section
           v-else-if="cell.kind === 'current' && state.status === 'error'"
@@ -97,6 +154,7 @@ watch(
           :city="state.weather.city"
           :time-zone="state.weather.timeZone"
           :locale="locale"
+          :cached-at="state.cachedAt"
         />
         <LoadingIndicator
           v-else

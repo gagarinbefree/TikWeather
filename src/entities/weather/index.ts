@@ -6,6 +6,8 @@ export { withFallback } from './api/with-fallback';
 export { getOpenMeteoCurrent, getOpenMeteoForecast } from './api/open-meteo';
 export { getOpenWeatherMapCurrent, getOpenWeatherMapForecast } from './api/open-weather-map';
 export { createForecastSlots } from './model/create-forecast-slots';
+export { readWeatherSnapshot, writeWeatherSnapshot } from './model/weather-snapshot';
+export type { WeatherSnapshot } from './model/weather-snapshot';
 export type { Forecast, ForecastDay, ForecastHour } from './model/forecast';
 export type { CurrentWeather } from './model/current-weather';
 export { default as CurrentWeatherCard } from './ui/CurrentWeatherCard.vue';

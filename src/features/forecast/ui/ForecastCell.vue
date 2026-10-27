@@ -15,6 +15,7 @@ const props = defineProps<{
   readonly city: string;
   readonly timeZone: string;
   readonly locale: Locale;
+  readonly cachedAt?: number | null;
 }>();
 
 const forecast = useForecastStore();
@@ -38,6 +39,7 @@ const failure = computed(
     :city="city"
     :time-zone="timeZone"
     :locale="locale"
+    :cached-at="cachedAt"
   />
   <section v-else-if="failure" class="forecast-error">
     <p role="alert">{{ text.failures[failure] }}</p>

@@ -1,0 +1,59 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getCurrentWeather, getForecast, type WeatherSnapshot } from '@/entities/weather';
+import { readWeatherSnapshot, writeWeatherSnapshot } from '@/entities/weather';
+import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
+import { forecastResponse } from '@/tests/entities/weather/api/forecast-fixture';
+
+beforeEach(() => {
+  localStorage.clear();
+});
+
+/**
+ * snapshot
+ * @returns A current observation and forecast without provider credentials.
+ */
+async function snapshot(): Promise<WeatherSnapshot> {
+  const location = { source: 'automatic' } as const;
+  const weather = await getCurrentWeather({
+    apiKey: 'example-only',
+    location,
+    locale: 'ru',
+    fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),
+  });
+  const forecast = await getForecast({
+    apiKey: 'example-only',
+    location,
+    locale: 'ru',
+    timeZone: weather.timeZone,
+    days: 3,
+    fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(forecastResponse)),
+  });
+  return { version: 1, savedAt: Date.UTC(2026, 9, 26, 7), locale: 'ru', weather, forecast };
+}
+
+describe('weather snapshot', () => {
+  it('restores the last successful forecast without storing credentials or coordinates', async () => {
+    const value = await snapshot();
+    writeWeatherSnapshot(value);
+
+    expect(readWeatherSnapshot()).toEqual(value);
+    expect(localStorage.getItem(localStorage.key(0) ?? '')).not.toMatch(/example-only|latitude/);
+  });
+
+  it('ignores corrupt, unsupported and incomplete stored weather', async () => {
+    const value = await snapshot();
+    writeWeatherSnapshot(value);
+    const key = localStorage.key(0);
+    if (!key) throw new Error('Missing snapshot key');
+
+    localStorage.setItem(key, '{broken');
+    expect(readWeatherSnapshot()).toBeNull();
+    localStorage.setItem(key, JSON.stringify({ ...value, version: 2 }));
+    expect(readWeatherSnapshot()).toBeNull();
+    localStorage.setItem(
+      key,
+      JSON.stringify({ ...value, forecast: { days: [{ date: '2026-10-26' }] } }),
+    );
+    expect(readWeatherSnapshot()).toBeNull();
+  });
+});

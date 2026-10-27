@@ -50,6 +50,28 @@ describe('current weather flow', () => {
     expect(store.state.status).toBe('ready');
   });
 
+  it('shows saved weather during refresh and keeps it if the network fails', async () => {
+    const store = useCurrentWeatherStore();
+    await store.load(services());
+    if (store.state.status !== 'ready') throw new Error('Missing weather fixture');
+    const snapshot = {
+      version: 1 as const,
+      savedAt: store.state.now,
+      locale: store.locale,
+      weather: store.state.weather,
+      forecast: { days: [] },
+    };
+    store.restore(snapshot);
+    expect(store.state).toMatchObject({ status: 'ready', cachedAt: snapshot.savedAt });
+    await store.load({
+      ...services(),
+      current: (): Promise<CurrentWeather> => Promise.reject(new ApiError('timeout')),
+    });
+    expect(store.state).toMatchObject({ status: 'ready', cachedAt: snapshot.savedAt });
+    await store.load(services());
+    expect(store.state).toMatchObject({ status: 'ready', cachedAt: null });
+  });
+
   it('keeps the selected language when a keyless provider has no country name', async () => {
     const store = useCurrentWeatherStore();
     await store.load({

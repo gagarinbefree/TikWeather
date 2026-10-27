@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { shallowRef } from 'vue';
-import { useWeatherGridStore, type CurrentWeather } from '@/entities/weather';
+import { useWeatherGridStore, type CurrentWeather, type WeatherSnapshot } from '@/entities/weather';
 import { ApiError, type FailureKind, type LocationQuery } from '@/shared/api';
 import { localeForCountry, browserLocale } from '@/shared/locales';
 import type { CurrentWeatherServices } from './services';
@@ -12,6 +12,7 @@ type CurrentWeatherState =
       readonly weather: CurrentWeather;
       readonly location: LocationQuery;
       readonly now: number;
+      readonly cachedAt: number | null;
     }
   | { readonly status: 'error'; readonly failure: FailureKind };
 
@@ -36,6 +37,31 @@ export const useCurrentWeatherStore = defineStore('current-weather', () => {
   }
 
   /**
+   * restore
+   * @param snapshot The last normalized weather saved in this browser.
+   * @param now The current instant used for the restored grid.
+   */
+  function restore(snapshot: WeatherSnapshot, now = Date.now()): void {
+    cancel();
+    locale.value = snapshot.locale;
+    grid.update({ now, timeZone: snapshot.weather.timeZone, days: [] });
+    state.value = {
+      status: 'ready',
+      weather: snapshot.weather,
+      location: { source: 'automatic' },
+      now,
+      cachedAt: snapshot.savedAt,
+    };
+  }
+
+  /**
+   * offline
+   */
+  function offline(): void {
+    if (state.value.status !== 'ready') state.value = { status: 'error', failure: 'connection' };
+  }
+
+  /**
    * load
    * @param services The location and current weather dependencies for this session.
    * @returns A promise that settles after publishing the latest request outcome.
@@ -45,29 +71,31 @@ export const useCurrentWeatherStore = defineStore('current-weather', () => {
     const token = revision;
     const active = new AbortController();
     controller = active;
-    state.value = { status: 'loading', phase: 'location' };
+    const cached = state.value.status === 'ready' && state.value.cachedAt !== null;
+    if (!cached) state.value = { status: 'loading', phase: 'location' };
     try {
       const location = await services.locate(active.signal);
       if (token !== revision) return;
       if (location.source !== 'automatic' && location.countryCode)
         locale.value = localeForCountry(location.countryCode);
-      state.value = { status: 'loading', phase: 'weather' };
+      if (!cached) state.value = { status: 'loading', phase: 'weather' };
       const weather = await services.current(location, locale.value, active.signal);
       if (token !== revision) return;
       if (weather.country.trim()) locale.value = localeForCountry(weather.country);
       const now = services.now();
       grid.update({ now, timeZone: weather.timeZone, days: [] });
-      state.value = { status: 'ready', weather, location, now };
+      state.value = { status: 'ready', weather, location, now, cachedAt: null };
     } catch (error) {
       if (token !== revision) return;
-      state.value = {
-        status: 'error',
-        failure: error instanceof ApiError ? error.kind : 'connection',
-      };
+      if (!cached)
+        state.value = {
+          status: 'error',
+          failure: error instanceof ApiError ? error.kind : 'connection',
+        };
     } finally {
       if (token === revision) controller = null;
     }
   }
 
-  return { state, locale, load, cancel };
+  return { state, locale, load, restore, offline, cancel };
 });

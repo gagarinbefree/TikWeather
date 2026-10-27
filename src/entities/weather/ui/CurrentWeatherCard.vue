@@ -11,7 +11,12 @@ import clockIcon from '@/shared/assets/icons/clock_20_regular.svg?url';
 import { conditionLabel, countryLabel, messages, type Locale } from '@/shared/locales';
 import { weatherPresentation } from '@/shared/weather';
 
-const props = defineProps<{ readonly weather: CurrentWeather; readonly locale: Locale }>();
+const props = defineProps<{
+  readonly weather: CurrentWeather;
+  readonly locale: Locale;
+  readonly cachedAt?: number | null;
+}>();
+const emit = defineEmits<{ retry: [] }>();
 const text = computed(() => messages[props.locale]);
 const presentation = computed(() =>
   weatherPresentation(props.weather.conditionCode, props.weather.isDay, 'current'),
@@ -34,6 +39,18 @@ const time = computed(() =>
     minute: '2-digit',
     hourCycle: 'h23',
   }).format(props.weather.observedAt),
+);
+const savedTime = computed(() =>
+  props.cachedAt == null
+    ? ''
+    : new Intl.DateTimeFormat(props.locale, {
+        timeZone: props.weather.timeZone,
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+      }).format(props.cachedAt),
 );
 const dateLabel = computed(() =>
   new Intl.DateTimeFormat(props.locale, {
@@ -110,6 +127,10 @@ const measurements = computed(() => [
         {{ text.updated }}
         <time :datetime="new Date(weather.observedAt).toISOString()">{{ time }}</time>
       </p>
+      <div v-if="cachedAt != null" class="current-weather-card__saved" role="status">
+        <span>{{ text.savedForecast }} {{ savedTime }}</span>
+        <button type="button" class="btn" @click="emit('retry')">{{ text.retry }}</button>
+      </div>
     </header>
     <div class="current-weather-card__summary">
       <span
@@ -183,6 +204,21 @@ const measurements = computed(() => [
     block-size: 0.9rem;
     background: currentColor;
     mask: center / contain no-repeat;
+  }
+  .current-weather-card__saved {
+    margin-block-start: var(--spacer-2);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    color: var(--weather-muted);
+    font-size: 0.8rem;
+  }
+  .current-weather-card__saved .btn {
+    --btn-bg: var(--weather-surface);
+    --btn-color: var(--weather-ink);
+    padding: 0.2rem 0.65rem;
+    font-size: 0.8rem;
   }
   .current-weather-card__summary {
     flex: 1;

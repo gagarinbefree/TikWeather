@@ -18,6 +18,7 @@ const props = defineProps<{
   readonly city: string;
   readonly timeZone: string;
   readonly locale: Locale;
+  readonly cachedAt?: number | null | undefined;
 }>();
 
 const text = computed(() => messages[props.locale]);
@@ -169,6 +170,21 @@ const measurements = computed(() => {
           {{ dateLabel }}
         </time>
         <time v-else-if="daily" :datetime="daily.date">{{ dateLabel }}</time>
+      </p>
+      <p v-if="cachedAt != null" class="forecast-weather-card__date" role="status">
+        {{ text.savedForecast }}
+        <time :datetime="new Date(cachedAt).toISOString()">
+          {{
+            new Intl.DateTimeFormat(locale, {
+              timeZone,
+              day: 'numeric',
+              month: 'short',
+              hour: '2-digit',
+              minute: '2-digit',
+              hourCycle: 'h23',
+            }).format(cachedAt)
+          }}
+        </time>
       </p>
     </header>
     <div class="forecast-weather-card__summary">

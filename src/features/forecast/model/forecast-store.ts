@@ -56,6 +56,33 @@ export const useForecastStore = defineStore('forecast', () => {
   }
 
   /**
+   * restore
+   * @param forecast The last normalized forecast saved in this browser.
+   * @param now The current instant used for the restored grid.
+   * @param timeZone The saved location time zone.
+   */
+  function restore(
+    forecast: { readonly days: readonly ForecastDay[]; readonly intervalHours?: 2 | 3 },
+    now: number,
+    timeZone: string,
+  ): void {
+    cancel();
+    days.value = forecast.days;
+    failure.value = null;
+    loadedInterval = forecast.intervalHours ?? 2;
+    grid.update({
+      now,
+      timeZone,
+      intervalHours: loadedInterval,
+      days: forecast.days.map((day) => ({
+        date: day.date,
+        hours: day.hours.map((hour) => hour.timestamp),
+        ...(day.intervalHours ? { intervalHours: day.intervalHours } : {}),
+      })),
+    });
+  }
+
+  /**
    * loadThrough
    * @param depth The smallest provider horizon containing the requested day.
    * @param force Whether an explicit retry may repeat a completed request.
@@ -193,5 +220,5 @@ export const useForecastStore = defineStore('forecast', () => {
     return day(date)?.hours.find((item) => item.timestamp === timestamp);
   }
 
-  return { days, failure, loadingDepth, start, focus, retry, cancel, day, hour };
+  return { days, failure, loadingDepth, start, restore, focus, retry, cancel, day, hour };
 });
