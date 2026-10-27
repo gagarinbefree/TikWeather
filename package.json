@@ -10,6 +10,9 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "build:e2e": "vite build --mode e2e",
+    "build:android": "npm run typecheck && vite build --mode android",
+    "android:sync": "npm run build:android && cap sync android",
+    "android:open": "cap open android",
     "preview": "vite preview",
     "preview:e2e": "vite preview --outDir dist-e2e",
     "typecheck": "vue-tsc --noEmit",
@@ -23,6 +26,9 @@
     "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e"
   },
   "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/geolocation": "8.2.4",
     "@photostructure/tz-lookup": "11.6.1",
     "@tikitaki_gagarinbefree/vue": "0.1.14",
     "@vue/devtools-api": "8.2.1",
@@ -32,6 +38,7 @@
     "vue": "3.5.44"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.5.3",
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.64.1",
     "@types/node": "24.19.2",

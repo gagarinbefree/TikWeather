@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { weatherPresentation } from '@/shared/weather';
-import theme from '@/shared/themes/default.json';
+import theme from '@assets/themes/default.json';
 
 describe('weather presentation', () => {
   it('uses the AvaWeather current and forecast surfaces for the same condition', () => {

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TikWeather</string>
+    <string name="title_activity_main">TikWeather</string>
+    <string name="package_name">com.gagarinbefree.tikweather</string>
+    <string name="custom_url_scheme">com.gagarinbefree.tikweather</string>
+</resources>

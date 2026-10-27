@@ -1,0 +1,1 @@
+The application icons use the AvaWeather artwork from SharedAssets. The browser favicon, PWA icons, and Android launcher icon come from `branding`. Vite serves that directory as its public asset source. Gradle copies its 512-pixel icon into generated Android resources.

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { ForecastDay, ForecastHour } from '@/entities/weather/model/forecast';
-import humidityIcon from '@/shared/assets/icons/weather_humidity_20_regular.svg?url';
-import windIcon from '@/shared/assets/icons/weather_squalls_20_regular.svg?url';
-import rainIcon from '@/shared/assets/icons/drop_20_regular.svg?url';
-import uvIcon from '@/shared/assets/icons/weather_sunny_high_20_regular.svg?url';
-import clockIcon from '@/shared/assets/icons/clock_20_regular.svg?url';
-import temperatureIcon from '@/shared/assets/icons/temperature_20_regular.svg?url';
-import visibilityIcon from '@/shared/assets/icons/eye_20_regular.svg?url';
+import humidityIcon from '@assets/icons/weather_humidity_20_regular.svg?url';
+import windIcon from '@assets/icons/weather_squalls_20_regular.svg?url';
+import rainIcon from '@assets/icons/drop_20_regular.svg?url';
+import uvIcon from '@assets/icons/weather_sunny_high_20_regular.svg?url';
+import clockIcon from '@assets/icons/clock_20_regular.svg?url';
+import temperatureIcon from '@assets/icons/temperature_20_regular.svg?url';
+import visibilityIcon from '@assets/icons/eye_20_regular.svg?url';
 import { conditionLabel, messages, type Locale } from '@/shared/locales';
 import { weatherPresentation } from '@/shared/weather';
 

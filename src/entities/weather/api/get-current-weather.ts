@@ -49,9 +49,17 @@ export async function getCurrentWeather(options: CurrentWeatherOptions): Promise
   }
   const observedAt = numeric(current['last_updated_epoch'], 1, 8640000000000) * 1000;
   return {
-    city: text(location['name']),
+    city:
+      position.source === 'device' && position.city?.trim()
+        ? position.city.trim()
+        : text(location['name']),
     country: text(location['country']),
-    region: typeof location['region'] === 'string' ? location['region'] : '',
+    region:
+      position.source === 'device' && position.region?.trim()
+        ? position.region.trim()
+        : typeof location['region'] === 'string'
+          ? location['region']
+          : '',
     timeZone,
     observedAt,
     temperature: numeric(current['temp_c'], -150, 100),

@@ -24,7 +24,7 @@
     "skipLibCheck": true,
     "noEmit": true,
     "types": ["node", "vite/client"],
-    "paths": { "@/*": ["./src/*"] }
+    "paths": { "@/*": ["./src/*"], "@assets/*": ["./shared/assets/*"] }
   },
   "include": ["src/**/*.ts", "src/**/*.vue", "*.config.ts"],
   "vueCompilerOptions": { "strictTemplates": true, "dataAttributes": ["data-*"] }

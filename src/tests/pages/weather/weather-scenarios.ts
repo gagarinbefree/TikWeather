@@ -63,11 +63,11 @@ export async function verifyPortraitViewport(page: Page): Promise<void> {
   expect(box.width).toBeLessThanOrEqual(viewport.width);
   expect(box.x).toBeGreaterThanOrEqual(0);
   expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
-  if (viewport.width < viewport.height) {
+  if (viewport.width <= viewport.height * 0.48) {
     expect(Math.abs(box.width - viewport.width)).toBeLessThanOrEqual(1);
-  }
-  if (viewport.width > viewport.height) {
-    expect(box.width).toBeLessThan(box.height);
+  } else {
+    expect(box.width / box.height).toBeGreaterThanOrEqual(0.47);
+    expect(box.width / box.height).toBeLessThanOrEqual(0.49);
     expect(Math.abs(box.x - (viewport.width - box.width) / 2)).toBeLessThanOrEqual(1);
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(

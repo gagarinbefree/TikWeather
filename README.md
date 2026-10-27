@@ -2,7 +2,7 @@
 
 # TikWeather
 
-![TikWeather app icon](public/app-icon-192.png)
+![TikWeather app icon](shared/assets/branding/app-icon-192.png)
 
 ## English
 

@@ -2,6 +2,7 @@ node_modules/
 .cache/
 dist/
 dist-e2e/
+dist-android/
 coverage/
 playwright-report/
 test-results/

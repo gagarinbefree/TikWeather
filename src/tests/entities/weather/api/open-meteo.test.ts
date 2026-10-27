@@ -71,6 +71,34 @@ describe('Open Meteo adapter', () => {
     expect(new URL(requestUrl).searchParams.get('forecast_days')).toBe('16');
   });
 
+  it('keeps complete days when the provider includes an empty trailing day', async () => {
+    const nextDay = 86400;
+    const partial = {
+      ...response,
+      hourly: Object.fromEntries(
+        Object.entries(response.hourly).map(([field, values]) => [
+          field,
+          [...values, field === 'time' ? (values[0] ?? 0) + nextDay : null],
+        ]),
+      ),
+      daily: Object.fromEntries(
+        Object.entries(response.daily).map(([field, values]) => [
+          field,
+          [...values, field === 'time' ? (values[0] ?? 0) + nextDay : null],
+        ]),
+      ),
+    };
+    const forecast = await getOpenMeteoForecast({
+      location,
+      locale: 'ru',
+      timeZone: 'Asia/Yekaterinburg',
+      days: 2,
+      fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(partial)),
+    });
+    expect(forecast.days).toHaveLength(1);
+    expect(forecast.days[0]?.date).toBe('2026-10-26');
+  });
+
   it('maps the current response to the shared weather card model', async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(response));
     const current = await getOpenMeteoCurrent({ location, locale: 'ru', fetcher });

@@ -91,6 +91,29 @@ describe('current weather flow', () => {
     expect(store.locale).toBe('ru');
   });
 
+  it('requests Russian weather for a resolved Russian device location', async () => {
+    const store = useCurrentWeatherStore();
+    const current = vi.fn(services().current);
+    await store.load({
+      ...services(),
+      locate: (): Promise<LocationQuery> =>
+        Promise.resolve({
+          source: 'device',
+          latitude: 58.0047,
+          longitude: 56.2514,
+          countryCode: 'RU',
+          city: 'Пермь',
+        }),
+      current,
+    });
+    expect(store.locale).toBe('ru');
+    expect(current).toHaveBeenCalledWith(
+      expect.objectContaining({ city: 'Пермь' }),
+      'ru',
+      expect.any(AbortSignal),
+    );
+  });
+
   it('ignores an old response after retry and cancellation', async () => {
     const store = useCurrentWeatherStore();
     const dependencies = services();

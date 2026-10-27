@@ -12,6 +12,8 @@ export default tseslint.config(
       '.cache/**',
       'dist/**',
       'dist-e2e/**',
+      'dist-android/**',
+      'android/**',
       'coverage/**',
       'playwright-report/**',
       'test-results/**',

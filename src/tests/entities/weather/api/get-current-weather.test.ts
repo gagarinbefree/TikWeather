@@ -46,6 +46,24 @@ describe('getCurrentWeather', () => {
     expect(new URL(requested).searchParams.get('q')).toBe('auto:ip');
   });
 
+  it('uses the localized device city instead of the provider transliteration', async () => {
+    const weather = await getCurrentWeather({
+      location: {
+        source: 'device',
+        latitude: 58.0047,
+        longitude: 56.2514,
+        countryCode: 'RU',
+        city: 'Пермь',
+        region: 'Пермский край',
+      },
+      locale: 'ru',
+      apiKey: 'example-only',
+      fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),
+    });
+    expect(weather.city).toBe('Пермь');
+    expect(weather.region).toBe('Пермский край');
+  });
+
   it('fails clearly without a key and does not send a useless request', async () => {
     const fetcher = vi.fn<typeof fetch>();
     await expect(

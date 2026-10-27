@@ -1,4 +1,4 @@
-import theme from './default.json';
+import theme from '@assets/themes/default.json';
 
 export const baseThemeStyle: Readonly<Record<string, string>> = {
   '--weather-page': theme.colors.Page,

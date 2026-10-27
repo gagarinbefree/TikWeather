@@ -1,7 +1,7 @@
-import conditions from '@/shared/assets/weather/conditions.json';
-import theme from '@/shared/themes/default.json';
+import conditions from '@assets/weather/conditions.json';
+import theme from '@assets/themes/default.json';
 
-const icons = import.meta.glob<string>('/src/shared/assets/icons/*.svg', {
+const icons = import.meta.glob<string>('/shared/assets/icons/*.svg', {
   eager: true,
   query: '?url',
   import: 'default',
@@ -30,7 +30,7 @@ export function weatherPresentation(
   const icon = descriptor?.icon ?? 'WeatherCloudy';
   return {
     icon,
-    iconUrl: icons[`/src/shared/assets/icons/${icon}.svg`] ?? '',
+    iconUrl: icons[`/shared/assets/icons/${icon}.svg`] ?? '',
     style: {
       '--card-background':
         colors[`Weather.${kind}.${card === 'current' ? 'Current' : 'Forecast'}`] ??

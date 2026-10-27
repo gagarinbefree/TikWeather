@@ -8,6 +8,7 @@ import {
   type RequestOptions,
 } from '@/shared/api';
 import type { DeviceGeolocation } from '@/entities/location/model/types';
+import { reverseGeocode } from './reverse-geocode';
 
 interface LocateOptions extends RequestOptions {
   readonly device?: DeviceGeolocation | null;
@@ -99,7 +100,15 @@ export async function locate(options: LocateOptions = {}): Promise<LocationQuery
       : options.device;
   const found = await devicePosition(device ?? null, options);
   if (options.signal?.aborted) throw new ApiError('cancelled');
-  if (found) return found;
+  if (found && found.source === 'device') {
+    try {
+      return await reverseGeocode(found, options);
+    } catch (error) {
+      if (options.signal?.aborted || (error instanceof ApiError && error.kind === 'cancelled'))
+        throw new ApiError('cancelled');
+      return found;
+    }
+  }
   try {
     const payload = record(
       await requestJson('https://get.geojs.io/v1/ip/geo.json', {
