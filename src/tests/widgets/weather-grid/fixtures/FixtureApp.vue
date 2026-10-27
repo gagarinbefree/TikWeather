@@ -10,21 +10,21 @@ const grid = shallowRef(fixtureGrid);
 const mounted = ref(true);
 
 /**
- * removeTomorrow(). Remove tomorrow from the forecast test fixture
+ * removeTomorrow. Remove tomorrow from the forecast test fixture
  */
 function removeTomorrow(): void {
   grid.value = fixtureGrid.filter((_, index) => index !== 1);
 }
 
 /**
- * restoreForecast(). Restore all forecast rows in the test fixture
+ * restoreForecast. Restore all forecast rows in the test fixture
  */
 function restoreForecast(): void {
   grid.value = fixtureGrid;
 }
 
 /**
- * removeForecast(). Keep only the current day in the forecast test fixture
+ * removeForecast. Keep only the current day in the forecast test fixture
  */
 function removeForecast(): void {
   grid.value = fixtureGrid.slice(0, 1);

@@ -25,7 +25,7 @@ export interface RequestOptions {
 }
 
 /**
- * ApiError(). Represent a safe API failure without request URLs or provider details
+ * ApiError. Represent a safe API failure without request URLs or provider details
  */
 export class ApiError extends Error {
   constructor(readonly kind: FailureKind) {

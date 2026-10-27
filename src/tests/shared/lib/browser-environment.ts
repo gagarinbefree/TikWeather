@@ -10,7 +10,7 @@ export interface BrowserTestEnvironment {
 }
 
 /**
- * installBrowserEnvironment(). Set up browser APIs and layout values for component tests
+ * installBrowserEnvironment. Set up browser APIs and layout values for component tests
  *
  * @returns Controlled browser geometry and animation frames for component integration tests.
  */
@@ -22,7 +22,7 @@ export function installBrowserEnvironment(): BrowserTestEnvironment {
   const callbacks = new Map<ResizeObserver, ResizeObserverCallback>();
 
   /**
-   * createObserver(). Create a resize observer controlled by the test
+   * createObserver. Create a resize observer controlled by the test
    *
    * @param callback The observer notification callback.
    * @returns A browser observer substitute with explicit cleanup.
@@ -61,7 +61,7 @@ export function installBrowserEnvironment(): BrowserTestEnvironment {
   }
 
   /**
-   * settle(). Run queued browser frames and Vue updates
+   * settle. Run queued browser frames and Vue updates
    *
    * @returns A promise that resolves after queued browser frames and Vue updates finish.
    */
@@ -77,7 +77,7 @@ export function installBrowserEnvironment(): BrowserTestEnvironment {
   }
 
   /**
-   * resize(). Notify test resize observers and wait for updates
+   * resize. Notify test resize observers and wait for updates
    *
    * @returns A promise that resolves after all observers receive a geometry update.
    */
@@ -87,7 +87,7 @@ export function installBrowserEnvironment(): BrowserTestEnvironment {
   }
 
   /**
-   * restore(). Restore the original browser APIs and stop test timers
+   * restore. Restore the original browser APIs and stop test timers
    */
   function restore(): void {
     for (const [index, name] of methods.entries()) {

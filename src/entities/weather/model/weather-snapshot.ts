@@ -13,7 +13,7 @@ export interface WeatherSnapshot {
 }
 
 /**
- * isRecord(). Check whether a value is a plain object
+ * isRecord. Check whether a value is a plain object
  *
  * @param value The value to inspect.
  * @returns Whether the value is a plain object.
@@ -23,7 +23,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 /**
- * isNumber(). Check whether a value is a finite number
+ * isNumber. Check whether a value is a finite number
  *
  * @param value The value to inspect.
  * @returns Whether the value is finite.
@@ -33,7 +33,7 @@ function isNumber(value: unknown): value is number {
 }
 
 /**
- * isCondition(). Check the required weather condition fields
+ * isCondition. Check the required weather condition fields
  *
  * @param value The normalized weather condition to inspect.
  * @returns Whether the required condition fields are present.
@@ -47,7 +47,7 @@ function isCondition(value: Record<string, unknown>): boolean {
 }
 
 /**
- * isHour(). Validate an hourly forecast from saved data
+ * isHour. Validate an hourly forecast from saved data
  *
  * @param value The hourly forecast to inspect.
  * @returns Whether the forecast can be rendered.
@@ -71,7 +71,7 @@ function isHour(value: unknown): value is ForecastHour {
 }
 
 /**
- * isDay(). Validate a daily forecast from saved data
+ * isDay. Validate a daily forecast from saved data
  *
  * @param value The daily forecast to inspect.
  * @returns Whether the forecast can be rendered.
@@ -99,7 +99,7 @@ function isDay(value: unknown): value is ForecastDay {
 }
 
 /**
- * isWeather(). Validate current weather from saved data
+ * isWeather. Validate current weather from saved data
  *
  * @param value The current observation to inspect.
  * @returns Whether the observation can be rendered.
@@ -126,7 +126,7 @@ function isWeather(value: unknown): value is CurrentWeather {
 }
 
 /**
- * isSnapshot(). Check the version and contents of a saved forecast
+ * isSnapshot. Check the version and contents of a saved forecast
  *
  * @param value The stored JSON value to inspect.
  * @returns Whether the value is a supported complete snapshot.
@@ -148,7 +148,7 @@ function isSnapshot(value: unknown): value is WeatherSnapshot {
 }
 
 /**
- * readWeatherSnapshot(). Read and validate the last saved forecast
+ * readWeatherSnapshot. Read and validate the last saved forecast
  *
  * @param storage The browser storage provider.
  * @returns The last complete normalized weather snapshot when available.
@@ -165,7 +165,7 @@ export function readWeatherSnapshot(storage: Storage = localStorage): WeatherSna
 }
 
 /**
- * writeWeatherSnapshot(). Save the current weather and forecast on the device
+ * writeWeatherSnapshot. Save the current weather and forecast on the device
  *
  * @param value The normalized current observation and available forecast.
  * @param storage The browser storage provider.

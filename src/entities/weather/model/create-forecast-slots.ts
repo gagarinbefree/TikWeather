@@ -2,7 +2,7 @@ import { messages } from '@/shared/locales';
 import type { ForecastDaySlots } from './types';
 
 /**
- * createForecastSlots(). Create calendar rows for forecast loading placeholders
+ * createForecastSlots. Create calendar rows for forecast loading placeholders
  *
  * @param now The instant at which current weather became available.
  * @param timeZone The IANA time zone of the weather location.

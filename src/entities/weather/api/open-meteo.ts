@@ -47,7 +47,7 @@ interface MeteoForecastOptions extends MeteoOptions {
 }
 
 /**
- * coordinates(). Read and validate the detected coordinates
+ * coordinates. Read and validate the detected coordinates
  *
  * @param location The detected location requiring real coordinates.
  * @returns Valid latitude and longitude for the provider query.
@@ -59,7 +59,7 @@ function coordinates(location: LocationQuery): { latitude: number; longitude: nu
 }
 
 /**
- * endpoint(). Build the Open Meteo request URL
+ * endpoint. Build the Open Meteo request URL
  *
  * @param location The detected position.
  * @param timeZone The requested IANA time zone.
@@ -81,7 +81,7 @@ function endpoint(location: LocationQuery, timeZone: string, days?: number): str
 }
 
 /**
- * epoch(). Convert a provider Unix time to milliseconds
+ * epoch. Convert a provider Unix time to milliseconds
  *
  * @param value The provider Unix timestamp in seconds.
  * @returns The validated absolute timestamp in milliseconds.
@@ -93,7 +93,7 @@ function epoch(value: unknown): number {
 }
 
 /**
- * arrayAt(). Read and validate a measurement from a provider array
+ * arrayAt. Read and validate a measurement from a provider array
  *
  * @param source The parallel provider arrays.
  * @param field The requested variable.
@@ -107,7 +107,7 @@ function arrayAt(source: Record<string, unknown>, field: string, index: number):
 }
 
 /**
- * dateFormatter(). Create a date formatter for the weather location
+ * dateFormatter. Create a date formatter for the weather location
  *
  * @param timeZone The weather location time zone.
  * @returns A strict formatter for local calendar dates.
@@ -126,7 +126,7 @@ function dateFormatter(timeZone: string): Intl.DateTimeFormat {
 }
 
 /**
- * localDate(). Read the local date of a timestamp
+ * localDate. Read the local date of a timestamp
  *
  * @param timestamp An absolute weather forecast instant.
  * @param formatter The location date formatter.
@@ -143,7 +143,7 @@ function localDate(timestamp: number, formatter: Intl.DateTimeFormat): string {
 }
 
 /**
- * direction(). Convert a wind bearing to a compass direction
+ * direction. Convert a wind bearing to a compass direction
  *
  * @param degrees The wind bearing clockwise from north.
  * @returns A compass code understood by the shared localization resources.
@@ -154,7 +154,7 @@ function direction(degrees: number): string {
 }
 
 /**
- * clock(). Format a sun event in local twenty four hour time
+ * clock. Format a sun event in local twenty four hour time
  *
  * @param value A sunrise or sunset instant or null at polar latitudes.
  * @param timeZone The weather location time zone.
@@ -171,7 +171,7 @@ function clock(value: unknown, timeZone: string): string | null {
 }
 
 /**
- * getOpenMeteoCurrent(). Load the current weather from Open Meteo
+ * getOpenMeteoCurrent. Load the current weather from Open Meteo
  *
  * @param options The detected coordinates and cancellable transport.
  * @returns Current measurements normalized for the shared weather card.
@@ -209,7 +209,7 @@ export async function getOpenMeteoCurrent(options: MeteoOptions): Promise<Curren
 }
 
 /**
- * getOpenMeteoForecast(). Load daily and hourly forecasts from Open Meteo
+ * getOpenMeteoForecast. Load daily and hourly forecasts from Open Meteo
  *
  * @param options The detected location, time zone and requested horizon.
  * @returns Hourly and daily weather normalized for the shared forecast cards.

@@ -20,7 +20,7 @@ const keyboardDirections: Readonly<Record<string, Direction>> = {
 };
 
 /**
- * findCellPosition(). Find the current position of a forecast cell
+ * findCellPosition. Find the current position of a forecast cell
  *
  * @param grid The next available forecast grid.
  * @param id The identity of the selected forecast cell.
@@ -35,7 +35,7 @@ function findCellPosition(grid: WeatherGrid, id: string | null): Position | unde
 }
 
 /**
- * useWeatherSwipe(). Connect the weather grid to swipe and keyboard navigation
+ * useWeatherSwipe. Connect the weather grid to swipe and keyboard navigation
  *
  * @param container The Vue reference to the engine viewport.
  * @param readGrid The current immutable forecast snapshot.
@@ -59,7 +59,7 @@ export function useWeatherSwipe(
   let disposed = false;
 
   /**
-   * stop(). Stop the swipe controller and discard pending updates
+   * stop. Stop the swipe controller and discard pending updates
    */
   function stop(): void {
     revision++;
@@ -68,7 +68,7 @@ export function useWeatherSwipe(
   }
 
   /**
-   * reportError(). Stop navigation and report a controller error
+   * reportError. Stop navigation and report a controller error
    *
    * @param error The failure reported by the controller or a navigation promise.
    */
@@ -80,7 +80,7 @@ export function useWeatherSwipe(
   }
 
   /**
-   * publishPosition(). Save the selected cell and notify the page
+   * publishPosition. Save the selected cell and notify the page
    *
    * @param next The coordinates committed by TikiTaki.
    */
@@ -92,7 +92,7 @@ export function useWeatherSwipe(
   }
 
   /**
-   * updateGrid(). Update forecast cells while keeping the selected cell
+   * updateGrid. Update forecast cells while keeping the selected cell
    *
    * @param grid The next forecast snapshot.
    * @returns A promise that resolves after the selected cell is reconciled.
@@ -117,7 +117,7 @@ export function useWeatherSwipe(
   }
 
   /**
-   * onKeydown(). Move between forecast cells with the arrow keys
+   * onKeydown. Move between forecast cells with the arrow keys
    *
    * @param event The keyboard event originating from the viewport itself.
    */

@@ -10,7 +10,7 @@ import {
 } from './widgets/weather-grid/swipe-scenarios.ts';
 
 /**
- * runConnectedChrome(). Run browser checks through an existing Chrome session
+ * runConnectedChrome. Run browser checks through an existing Chrome session
  *
  * @returns A promise that resolves after all isolated browser checks pass.
  */

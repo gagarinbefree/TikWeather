@@ -26,7 +26,7 @@ const text = computed(() => messages[locale.value]);
 let loadRevision = 0;
 
 /**
- * saveSnapshot(). Save the latest successful weather and loaded forecast days
+ * saveSnapshot. Save the latest successful weather and loaded forecast days
  *
  * @param forecastDays The currently available normalized forecast.
  */
@@ -44,7 +44,7 @@ function saveSnapshot(forecastDays = forecast.days): void {
 }
 
 /**
- * retry(). Reload current weather and restart the background forecast
+ * retry. Reload current weather and restart the background forecast
  */
 function retry(): void {
   const token = ++loadRevision;
@@ -68,7 +68,7 @@ function retry(): void {
 }
 
 /**
- * dayIndex(). Find the grid row for a local date
+ * dayIndex. Find the grid row for a local date
  *
  * @param date The local date of a visible weather cell.
  * @returns Its row index in the swipe grid.
@@ -78,7 +78,7 @@ function dayIndex(date: string): number {
 }
 
 /**
- * onPositionChange(). Load the forecast needed by the selected grid row
+ * onPositionChange. Load the forecast needed by the selected grid row
  *
  * @param position The selected grid row and column.
  */
@@ -86,7 +86,7 @@ function onPositionChange(position: Position): void {
   forecast.focus(position.row);
 }
 /**
- * start(). Show saved weather and start loading fresh data
+ * start. Show saved weather and start loading fresh data
  */
 function start(): void {
   const snapshot = readWeatherSnapshot();

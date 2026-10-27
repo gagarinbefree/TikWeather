@@ -1,5 +1,5 @@
 /**
- * weatherApiKey(). Read the WeatherAPI key supplied at build time
+ * weatherApiKey. Read the WeatherAPI key supplied at build time
  *
  * @returns The public browser credential supplied locally or by the release workflow.
  */
@@ -9,7 +9,7 @@ export function weatherApiKey(): string {
 }
 
 /**
- * openWeatherMapKey(). Read the OpenWeatherMap key supplied at build time
+ * openWeatherMapKey. Read the OpenWeatherMap key supplied at build time
  *
  * @returns The public browser credential for the final weather fallback.
  */

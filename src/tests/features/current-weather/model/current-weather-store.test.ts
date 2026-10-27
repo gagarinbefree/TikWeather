@@ -8,7 +8,7 @@ import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 beforeEach(() => setActivePinia(createPinia()));
 
 /**
- * services(). Create predictable weather services for store tests
+ * services. Create predictable weather services for store tests
  *
  * @returns Deterministic services for the current weather flow.
  */

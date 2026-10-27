@@ -1,7 +1,7 @@
 import { ApiError, type RequestOptions } from './types';
 
 /**
- * requestJson(). Fetch and parse a JSON response with cancellation and a timeout
+ * requestJson. Fetch and parse a JSON response with cancellation and a timeout
  *
  * @param url The HTTPS API endpoint including its query parameters.
  * @param options The transport dependencies and bounded request lifetime.
@@ -15,7 +15,7 @@ export async function requestJson(url: string, options: RequestOptions = {}): Pr
     rejectAbort = reject;
   });
   /**
-   * cancel(). Cancel the HTTP request
+   * cancel. Cancel the HTTP request
    */
   function cancel(): void {
     controller.abort(new ApiError('cancelled'));

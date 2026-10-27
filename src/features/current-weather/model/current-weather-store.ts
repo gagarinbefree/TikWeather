@@ -17,7 +17,7 @@ type CurrentWeatherState =
   | { readonly status: 'error'; readonly failure: FailureKind };
 
 /**
- * useCurrentWeatherStore(). Manage location detection and current weather loading
+ * useCurrentWeatherStore. Manage location detection and current weather loading
  *
  * @returns The cancellable device location and current observation flow.
  */
@@ -29,7 +29,7 @@ export const useCurrentWeatherStore = defineStore('current-weather', () => {
   let revision = 0;
 
   /**
-   * cancel(). Cancel the current weather request and discard pending results
+   * cancel. Cancel the current weather request and discard pending results
    */
   function cancel(): void {
     revision++;
@@ -38,7 +38,7 @@ export const useCurrentWeatherStore = defineStore('current-weather', () => {
   }
 
   /**
-   * restore(). Restore saved current weather and rebuild its grid
+   * restore. Restore saved current weather and rebuild its grid
    *
    * @param snapshot The last normalized weather saved in this browser.
    * @param now The current instant used for the restored grid.
@@ -57,14 +57,14 @@ export const useCurrentWeatherStore = defineStore('current-weather', () => {
   }
 
   /**
-   * offline(). Show a connection error when no saved weather is available
+   * offline. Show a connection error when no saved weather is available
    */
   function offline(): void {
     if (state.value.status !== 'ready') state.value = { status: 'error', failure: 'connection' };
   }
 
   /**
-   * load(). Find the location and load its current weather
+   * load. Find the location and load its current weather
    *
    * @param services The location and current weather dependencies for this session.
    * @returns A promise that settles after publishing the latest request outcome.

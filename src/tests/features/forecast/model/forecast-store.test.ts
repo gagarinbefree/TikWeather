@@ -16,7 +16,7 @@ const now = Date.UTC(2026, 9, 26, 5, 37);
 beforeEach(() => setActivePinia(createPinia()));
 
 /**
- * forecastFixture(). Load sample weather into a forecast for store tests
+ * forecastFixture. Load sample weather into a forecast for store tests
  *
  * @returns A normalized three day forecast for scheduler tests.
  */

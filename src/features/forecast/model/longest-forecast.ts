@@ -2,7 +2,7 @@ import type { Forecast } from '@/entities/weather';
 import { ApiError } from '@/shared/api';
 
 /**
- * throwIfCancelled(). Stop when the request has been cancelled
+ * throwIfCancelled. Stop when the request has been cancelled
  *
  * @param signal The location session cancellation signal.
  */
@@ -11,7 +11,7 @@ function throwIfCancelled(signal: AbortSignal): void {
 }
 
 /**
- * mergeForecast(). Combine forecast days while keeping the most detailed readings
+ * mergeForecast. Combine forecast days while keeping the most detailed readings
  *
  * @param first An already loaded provider forecast.
  * @param second A newer provider forecast that may reach more days.
@@ -38,7 +38,7 @@ export function mergeForecast(first: Forecast, second: Forecast): Forecast {
 }
 
 /**
- * longestForecast(). Try providers to extend the forecast without losing loaded data
+ * longestForecast. Try providers to extend the forecast without losing loaded data
  *
  * @param sources The forecast providers in preferred order.
  * @param signal The cancellation signal for the location session.

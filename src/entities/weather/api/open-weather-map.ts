@@ -44,7 +44,7 @@ interface MapForecastOptions extends MapOptions {
 }
 
 /**
- * point(). Read and validate the detected coordinates
+ * point. Read and validate the detected coordinates
  *
  * @param location The detected location.
  * @returns Valid coordinates accepted by the provider.
@@ -56,7 +56,7 @@ function point(location: LocationQuery): { latitude: number; longitude: number }
 }
 
 /**
- * endpoint(). Build the OpenWeatherMap request URL
+ * endpoint. Build the OpenWeatherMap request URL
  *
  * @param path The current or forecast provider path.
  * @param options The coordinates, language and public browser key.
@@ -77,7 +77,7 @@ function endpoint(path: 'weather' | 'forecast', options: MapOptions): string {
 }
 
 /**
- * epoch(). Convert a provider Unix time to milliseconds
+ * epoch. Convert a provider Unix time to milliseconds
  *
  * @param value The provider Unix timestamp in seconds.
  * @returns A validated absolute instant in milliseconds.
@@ -89,7 +89,7 @@ function epoch(value: unknown): number {
 }
 
 /**
- * formatter(). Create a date and time formatter for the weather location
+ * formatter. Create a date and time formatter for the weather location
  *
  * @param timeZone The location IANA time zone.
  * @returns A formatter for the local forecast calendar.
@@ -110,7 +110,7 @@ function formatter(timeZone: string): Intl.DateTimeFormat {
 }
 
 /**
- * localTime(). Read the local date and hour of a timestamp
+ * localTime. Read the local date and hour of a timestamp
  *
  * @param timestamp The absolute provider instant.
  * @param dateTime The location formatter.
@@ -133,7 +133,7 @@ function localTime(
 }
 
 /**
- * direction(). Convert a wind bearing to a compass direction
+ * direction. Convert a wind bearing to a compass direction
  *
  * @param bearing The wind bearing clockwise from north.
  * @returns A localized compass lookup code.
@@ -144,7 +144,7 @@ function direction(bearing: unknown): string {
 }
 
 /**
- * optionalVisibility(). Convert visibility from metres to kilometres when available
+ * optionalVisibility. Convert visibility from metres to kilometres when available
  *
  * @param value The optional provider visibility in metres.
  * @returns Kilometres or null when the provider omitted the measurement.
@@ -154,7 +154,7 @@ function optionalVisibility(value: unknown): number | null {
 }
 
 /**
- * firstCondition(). Read and validate the first weather condition
+ * firstCondition. Read and validate the first weather condition
  *
  * @param value The provider condition list.
  * @returns A validated condition code, text and daylight flag.
@@ -172,7 +172,7 @@ function firstCondition(value: unknown): { code: number; description: string; is
 }
 
 /**
- * parseCurrent(). Convert the OpenWeatherMap response into current weather
+ * parseCurrent. Convert the OpenWeatherMap response into current weather
  *
  * @param payload The untrusted current response.
  * @param location The original detected location.
@@ -217,7 +217,7 @@ function parseCurrent(
 }
 
 /**
- * getOpenWeatherMapCurrent(). Load the current weather from OpenWeatherMap
+ * getOpenWeatherMapCurrent. Load the current weather from OpenWeatherMap
  *
  * @param options The detected location, browser key and cancellable transport.
  * @returns Validated current observations with an offline coordinate time zone.
@@ -233,7 +233,7 @@ export async function getOpenWeatherMapCurrent(options: MapOptions): Promise<Cur
 }
 
 /**
- * parseHour(). Read and validate one forecast reading
+ * parseHour. Read and validate one forecast reading
  *
  * @param value The provider three hour forecast entry.
  * @param locale The requested provider language.
@@ -263,7 +263,7 @@ function parseHour(value: unknown, locale: Locale): ForecastHour {
 }
 
 /**
- * nextDate(). Add a day offset to a calendar date
+ * nextDate. Add a day offset to a calendar date
  *
  * @param first The first local calendar date.
  * @param offset The number of following days.
@@ -276,7 +276,7 @@ function nextDate(first: string, offset: number): string {
 }
 
 /**
- * sunTime(). Format a sun event in local twenty four hour time
+ * sunTime. Format a sun event in local twenty four hour time
  *
  * @param value The provider sunrise or sunset Unix timestamp.
  * @param timeZone The detected IANA time zone.
@@ -292,7 +292,7 @@ function sunTime(value: unknown, timeZone: string): string {
 }
 
 /**
- * getOpenWeatherMapForecast(). Load three hour forecasts and group them into days
+ * getOpenWeatherMapForecast. Load three hour forecasts and group them into days
  *
  * @param options The location, current time and requested forecast horizon.
  * @returns Available three hour forecasts grouped by local day

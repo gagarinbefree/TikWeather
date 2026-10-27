@@ -7,7 +7,7 @@ interface LocalTime {
 }
 
 /**
- * validateInterval(). Reject unsupported forecast hour intervals
+ * validateInterval. Reject unsupported forecast hour intervals
  *
  * @param interval The requested number of hours between forecast slots.
  */
@@ -16,7 +16,7 @@ function validateInterval(interval: number): void {
 }
 
 /**
- * validateTimestamp(). Reject invalid timestamps
+ * validateTimestamp. Reject invalid timestamps
  *
  * @param timestamp The instant in milliseconds since the Unix epoch.
  */
@@ -27,7 +27,7 @@ function validateTimestamp(timestamp: number): void {
 }
 
 /**
- * validateDate(). Reject invalid calendar dates
+ * validateDate. Reject invalid calendar dates
  *
  * @param date The calendar date in the YYYY MM DD numeric format.
  */
@@ -43,7 +43,7 @@ function validateDate(date: string): void {
 }
 
 /**
- * readDatePart(). Read a required part from a formatted date
+ * readDatePart. Read a required part from a formatted date
  *
  * @param parts The parts returned by the location time formatter.
  * @param type The required date part.
@@ -59,7 +59,7 @@ function readDatePart(
 }
 
 /**
- * localTime(). Read the local date and hour of a timestamp
+ * localTime. Read the local date and hour of a timestamp
  *
  * @param formatter The formatter using the location time zone.
  * @param timestamp The instant in milliseconds since the Unix epoch.
@@ -75,7 +75,7 @@ function localTime(formatter: Intl.DateTimeFormat, timestamp: number): LocalTime
 }
 
 /**
- * createWeatherGrid(). Build forecast cells from local dates and provider times
+ * createWeatherGrid. Build forecast cells from local dates and provider times
  *
  * @param options The fixed clock and location time zone with available forecast days.
  * @returns The immutable grid with a current cell and available daily and hourly cells.

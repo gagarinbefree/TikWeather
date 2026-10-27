@@ -6,7 +6,7 @@ import { swipe } from '@/tests/widgets/weather-grid/swipe-scenarios';
 test.use({ permissions: ['geolocation'], geolocation: { latitude: 58, longitude: 56.25 } });
 
 /**
- * mapHour(). Create an OpenWeatherMap forecast reading for a test day
+ * mapHour. Create an OpenWeatherMap forecast reading for a test day
  *
  * @param index The local day offset from the fixed opening date.
  * @returns One lower resolution OpenWeatherMap forecast reading.
@@ -23,7 +23,7 @@ function mapHour(index: number): object {
 }
 
 /**
- * settleFrames(). Wait for the swipe animation and Vue updates to finish
+ * settleFrames. Wait for the swipe animation and Vue updates to finish
  *
  * @param page The browser page after a completed navigation transition.
  * @returns A promise that resolves after the engine and Vue finish one transition.

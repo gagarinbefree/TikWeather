@@ -4,7 +4,7 @@ export const androidApkUrl =
   'https://github.com/gagarinbefree/TikWeather/releases/latest/download/TikWeather-Android.apk';
 
 /**
- * loadLatestRelease(). Fetch the latest public release from GitHub
+ * loadLatestRelease. Fetch the latest public release from GitHub
  *
  * @returns The latest public GitHub release
  */
@@ -18,7 +18,7 @@ async function loadLatestRelease(): Promise<unknown> {
 }
 
 /**
- * parseVersion(). Split a valid version into numeric parts
+ * parseVersion. Split a valid version into numeric parts
  *
  * @param value The application or release version
  * @returns The numeric version parts when the format is valid
@@ -30,7 +30,7 @@ function parseVersion(value: string): readonly number[] | null {
 }
 
 /**
- * hasAndroidUpdate(). Compare the installed version with the latest Android release
+ * hasAndroidUpdate. Compare the installed version with the latest Android release
  *
  * @param installedVersion The version of the installed Android app
  * @param loadLatest The release lookup

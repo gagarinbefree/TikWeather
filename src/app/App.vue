@@ -16,7 +16,7 @@ const updateSW = registerSW({
 });
 
 /**
- * applyUpdate(). Activate the new PWA version and reload the app
+ * applyUpdate. Activate the new PWA version and reload the app
  */
 function applyUpdate(): void {
   void updateSW(true);

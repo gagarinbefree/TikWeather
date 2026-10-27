@@ -9,7 +9,7 @@ beforeEach(() => {
 });
 
 /**
- * snapshot(). Create a saved weather fixture without API keys
+ * snapshot. Create a saved weather fixture without API keys
  *
  * @returns A current observation and forecast without provider credentials.
  */

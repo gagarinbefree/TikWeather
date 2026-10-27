@@ -17,7 +17,7 @@ interface CurrentWeatherOptions extends RequestOptions {
 }
 
 /**
- * getCurrentWeather(). Load the current weather from WeatherAPI
+ * getCurrentWeather. Load the current weather from WeatherAPI
  *
  * @param options The detected position and configured WeatherAPI transport.
  * @returns The validated current observations independent of forecast loading.

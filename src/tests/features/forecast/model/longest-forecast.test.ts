@@ -20,7 +20,7 @@ const day: ForecastDay = {
 };
 
 /**
- * forecast(). Create forecast days for provider selection tests
+ * forecast. Create forecast days for provider selection tests
  *
  * @param count The number of available calendar days.
  * @returns A complete provider forecast for source selection tests.

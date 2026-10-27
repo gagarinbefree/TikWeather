@@ -23,7 +23,7 @@ const currentResponse = {
 };
 
 /**
- * forecastHour(). Create an OpenWeatherMap forecast reading for a test time
+ * forecastHour. Create an OpenWeatherMap forecast reading for a test time
  *
  * @param timestamp An absolute three hour provider instant.
  * @returns One OpenWeatherMap forecast entry.

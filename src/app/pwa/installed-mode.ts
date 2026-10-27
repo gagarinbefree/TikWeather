@@ -7,7 +7,7 @@ interface StandaloneNavigator {
 }
 
 /**
- * isInstalledPwa(). Check whether the site is running as an installed PWA
+ * isInstalledPwa. Check whether the site is running as an installed PWA
  *
  * @param display The browser display mode API
  * @param navigation The browser navigation state

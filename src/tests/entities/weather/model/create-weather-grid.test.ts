@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createWeatherGrid } from '@/entities/weather';
 
 /**
- * timestamp(). Convert an ISO date string into milliseconds
+ * timestamp. Convert an ISO date string into milliseconds
  *
  * @param iso The timestamp with an explicit UTC offset.
  * @returns The timestamp in milliseconds.
