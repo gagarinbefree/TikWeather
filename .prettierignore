@@ -3,7 +3,7 @@ node_modules/
 dist/
 dist-e2e/
 dist-android/
-android/
+/android/
 coverage/
 playwright-report/
 test-results/

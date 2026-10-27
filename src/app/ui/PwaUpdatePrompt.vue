@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { messages, type Locale } from '@/shared/locales';
 
-const props = defineProps<{ readonly locale: Locale }>();
+const props = defineProps<{ readonly locale: Locale; readonly updateUrl?: string }>();
 const emit = defineEmits<{ update: []; dismiss: [] }>();
 const text = computed(() => messages[props.locale]);
 </script>
@@ -11,7 +11,17 @@ const text = computed(() => messages[props.locale]);
   <aside class="pwa-update" role="status">
     <span>{{ text.updateAvailable }}</span>
     <div class="pwa-update__actions">
-      <button type="button" class="btn" data-action="update" @click="emit('update')">
+      <a
+        v-if="updateUrl"
+        class="btn"
+        data-action="update"
+        :href="updateUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {{ text.updateNow }}
+      </a>
+      <button v-else type="button" class="btn" data-action="update" @click="emit('update')">
         {{ text.updateNow }}
       </button>
       <button type="button" class="btn" data-action="dismiss" @click="emit('dismiss')">

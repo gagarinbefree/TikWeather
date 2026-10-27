@@ -90,10 +90,16 @@ jobs:
           packages: platform-tools
       - run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - run: npm ci
+      - name: Set release version
+        id: version
+        run: |
+          base=$(node -p "require('./package.json').version.split('.').slice(0, 2).join('.')")
+          echo "name=$base.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
       - run: npm run build:android
         env:
           VITE_WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
           VITE_OPENWEATHERMAP_API_KEY: ${{ secrets.OPENWEATHERMAP_API_KEY }}
+          VITE_APP_VERSION: ${{ steps.version.outputs.name }}
       - name: Check Android web bundle
         run: |
           test ! -e dist-android/sw.js
@@ -108,12 +114,6 @@ jobs:
           name: TikWeather-Android-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-      - name: Set release version
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        id: version
-        run: |
-          base=$(node -p "require('./package.json').version.split('.').slice(0, 2).join('.')")
-          echo "name=$base.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
       - name: Prepare Android signing
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
