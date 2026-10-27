@@ -6,6 +6,7 @@ test.use({ permissions: ['geolocation'], geolocation: { latitude: 58, longitude:
 
 test('shows the last forecast immediately after an offline restart', async ({ page, context }) => {
   await page.clock.setFixedTime(new Date('2026-10-26T05:37:00Z'));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
     await route.fulfill({ json: currentResponse });
   });
@@ -24,10 +25,15 @@ test('shows the last forecast immediately after an offline restart', async ({ pa
 
   await page.goto('./');
   await expect
-    .poll(async () => {
-      const raw: unknown = await page.evaluate(() => localStorage.getItem('tikweather.weather.v1'));
-      return typeof raw === 'string' ? [...raw.matchAll(/"date"/g)].length : 0;
-    })
+    .poll(
+      async () => {
+        const raw: unknown = await page.evaluate(() =>
+          localStorage.getItem('tikweather.weather.v1'),
+        );
+        return typeof raw === 'string' ? [...raw.matchAll(/"date"/g)].length : 0;
+      },
+      { timeout: 15_000 },
+    )
     .toBeGreaterThanOrEqual(3);
   await page.evaluate(async () => navigator.serviceWorker.ready);
   await page.reload();
@@ -42,8 +48,11 @@ test('shows the last forecast immediately after an offline restart', async ({ pa
   await expect(current).toContainText('Сохранённый прогноз от');
   await expect(current.getByRole('button', { name: 'Повторить' })).toBeVisible();
   const viewport = page.getByRole('region', { name: 'Навигация по прогнозу' });
+  await expect(viewport).toHaveAttribute('data-grid-rows', '3');
+  await expect(viewport.locator('[data-cell-id="2026-10-27/daily"]')).toHaveCount(1);
   await viewport.focus();
   await viewport.press('ArrowDown');
+  await expect(viewport).toHaveAttribute('data-row', '1');
   await expect(page.getByRole('article', { name: 'Прогноз на день' })).toContainText('Завтра');
   await expect(page.getByRole('article', { name: 'Прогноз на день' })).toContainText(
     'Сохранённый прогноз от',

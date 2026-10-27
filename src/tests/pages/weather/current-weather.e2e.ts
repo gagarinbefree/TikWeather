@@ -36,7 +36,7 @@ test('shows device weather directly with local icons and translated measurements
     'WeatherCloudy',
   );
   await expect(card.locator('[data-weather-icon]')).not.toHaveCSS('mask-image', 'none');
-  await expect(card.locator('.current-weather-card__temperature')).toHaveCSS('font-weight', '300');
+  await expect(card.locator('.current-weather-card__temperature')).toHaveCSS('font-weight', '700');
   expect(ipRequests).toBe(0);
   const currentCalls = apiCalls.filter((url) => new URL(url).pathname === '/v1/current.json');
   expect(currentCalls).toHaveLength(1);
@@ -47,7 +47,7 @@ test('shows device weather directly with local icons and translated measurements
   }));
   expect(dimensions.contentWidth).toBeLessThanOrEqual(dimensions.width + 1);
   expect(await card.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(
-    'rgb(223, 232, 239)',
+    'rgb(241, 245, 248)',
   );
 });
 

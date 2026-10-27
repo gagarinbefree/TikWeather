@@ -29,7 +29,7 @@ const directions = computed<Readonly<Record<string, string>>>(() => text.value.d
 const daily = computed(() => ('date' in props.forecast ? props.forecast : null));
 const hourly = computed(() => ('timestamp' in props.forecast ? props.forecast : null));
 const presentation = computed(() =>
-  weatherPresentation(props.forecast.conditionCode, hourly.value?.isDay ?? true, 'forecast'),
+  weatherPresentation(props.forecast.conditionCode, hourly.value?.isDay ?? true),
 );
 const condition = computed(() =>
   conditionLabel(

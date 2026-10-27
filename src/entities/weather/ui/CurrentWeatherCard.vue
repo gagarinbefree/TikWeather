@@ -19,7 +19,7 @@ const props = defineProps<{
 const emit = defineEmits<{ retry: [] }>();
 const text = computed(() => messages[props.locale]);
 const presentation = computed(() =>
-  weatherPresentation(props.weather.conditionCode, props.weather.isDay, 'current'),
+  weatherPresentation(props.weather.conditionCode, props.weather.isDay),
 );
 const number = computed(
   () => new Intl.NumberFormat(props.locale, { maximumFractionDigits: 1, useGrouping: false }),
@@ -236,7 +236,7 @@ const measurements = computed(() => [
   .current-weather-card__temperature {
     font-size: clamp(2.5rem, 8dvh, 4.5rem);
     line-height: 1.2;
-    font-weight: 300;
+    font-weight: 700;
     letter-spacing: -0.04em;
     font-variant-numeric: tabular-nums;
   }
@@ -251,12 +251,6 @@ const measurements = computed(() => [
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(0.75rem, 2dvh, 1.5rem) var(--spacer);
-  }
-  .current-weather-card__details::before {
-    content: '';
-    grid-column: 1 / -1;
-    block-size: 1px;
-    background: var(--weather-divider-current);
   }
   dt {
     display: flex;

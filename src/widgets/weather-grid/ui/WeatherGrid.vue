@@ -41,6 +41,7 @@ const activeId = computed(() => props.grid[position.value.row]?.[position.value.
     :aria-label="text.forecastNavigation"
     :aria-describedby="instructionId"
     :data-active-cell="activeId"
+    :data-grid-rows="grid.length"
     :data-row="position.row"
     :data-column="position.col"
     @keydown="onKeydown"

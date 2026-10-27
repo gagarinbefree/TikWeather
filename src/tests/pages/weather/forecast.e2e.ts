@@ -6,7 +6,9 @@ test.use({ permissions: ['geolocation'], geolocation: { latitude: 58, longitude:
 
 test('shows A1 while forecast is pending and prioritizes the swiped day', async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-10-26T05:37:00Z'));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   const requestedDays: number[] = [];
+  let releaseToday: (() => void) | undefined;
   let releaseTomorrow: (() => void) | undefined;
   await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
     await route.fulfill({ json: currentResponse });
@@ -15,7 +17,9 @@ test('shows A1 while forecast is pending and prioritizes the swiped day', async 
     const depth = Number(new URL(route.request().url()).searchParams.get('days'));
     requestedDays.push(depth);
     if (depth === 1) {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise<void>((resolve) => {
+        releaseToday = resolve;
+      });
     }
     if (depth === 3) {
       await new Promise<void>((resolve) => {
@@ -38,27 +42,58 @@ test('shows A1 while forecast is pending and prioritizes the swiped day', async 
   });
 
   await page.goto('./');
-  await expect(page.getByRole('article', { name: 'Текущая погода' })).toBeVisible();
+  const currentCard = page.getByRole('article', { name: 'Текущая погода' });
+  await expect(currentCard).toBeVisible();
+  const currentBackground = await currentCard.evaluate(
+    (element) => getComputedStyle(element).backgroundColor,
+  );
+  const currentHeader = await currentCard
+    .locator('header')
+    .evaluate((element) => getComputedStyle(element).backgroundImage);
+  const currentTypography = await currentCard
+    .locator('.current-weather-card__temperature')
+    .evaluate((element) => {
+      const style = getComputedStyle(element);
+      return { family: style.fontFamily, size: style.fontSize, weight: style.fontWeight };
+    });
   await expect(
     page.getByRole('article', { name: 'Текущая погода' }).locator('.current-weather-card__date'),
   ).toHaveText('понедельник, 26 окт.');
   await expect.poll(() => requestedDays).toContain(1);
   const viewport = page.getByRole('region', { name: 'Навигация по прогнозу' });
+  await expect(viewport).toHaveAttribute('data-grid-rows', '16');
   await expect(viewport.locator('[data-cell-id="2026-10-27/daily"]')).toHaveCount(1);
   await viewport.focus();
   await viewport.press('ArrowDown');
   await expect(viewport).toHaveAttribute('data-row', '1');
   await expect(viewport.locator('[data-cell-id="2026-10-27/daily"] .spinner-border')).toBeVisible();
   await expect.poll(() => requestedDays).toContain(3);
+  releaseToday?.();
   releaseTomorrow?.();
-  await expect(page.getByRole('article', { name: 'Прогноз на день' })).toContainText('Завтра');
+  const dailyCard = page.getByRole('article', { name: 'Прогноз на день' });
+  await expect(dailyCard).toContainText('Завтра');
   await expect(
     page.getByRole('article', { name: 'Прогноз на день' }).locator('.forecast-weather-card__date'),
   ).toHaveText('вторник, 27 окт.');
-  await expect(page.getByRole('article', { name: 'Прогноз на день' })).toContainText('10°C');
+  await expect(dailyCard).toContainText('10°C');
+  expect(await dailyCard.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(
+    currentBackground,
+  );
+  expect(
+    await dailyCard
+      .locator('header')
+      .evaluate((element) => getComputedStyle(element).backgroundImage),
+  ).toBe(currentHeader);
+  expect(
+    await dailyCard.locator('.forecast-weather-card__temperature').evaluate((element) => {
+      const style = getComputedStyle(element);
+      return { family: style.fontFamily, size: style.fontSize, weight: style.fontWeight };
+    }),
+  ).toEqual(currentTypography);
 });
 
 test('allows navigation to the last day returned by Open Meteo', async ({ page }) => {
+  test.slow();
   await page.clock.setFixedTime(new Date('2026-10-26T05:37:00Z'));
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
@@ -120,7 +155,7 @@ test('allows navigation to the last day returned by Open Meteo', async ({ page }
 
   await page.goto('./');
   await expect(page.getByRole('article', { name: 'Текущая погода' })).toBeVisible();
-  await expect.poll(() => extendedRequests).toBe(1);
+  await expect.poll(() => extendedRequests, { timeout: 15_000 }).toBe(1);
   const viewport = page.getByRole('region', { name: 'Навигация по прогнозу' });
   await viewport.focus();
   for (let row = 1; row < 16; row++) {

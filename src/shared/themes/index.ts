@@ -7,5 +7,4 @@ export const baseThemeStyle: Readonly<Record<string, string>> = {
   '--weather-accent': theme.colors['Weather.Cloudy.Accent'],
   '--weather-surface': theme.colors['Weather.Cloudy.Forecast'],
   '--weather-error-background': theme.colors['Error.Background'],
-  '--weather-divider-current': theme.colors['Divider.Current'],
 };
