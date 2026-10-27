@@ -35,6 +35,14 @@ const time = computed(() =>
     hourCycle: 'h23',
   }).format(props.weather.observedAt),
 );
+const dateLabel = computed(() =>
+  new Intl.DateTimeFormat(props.locale, {
+    timeZone: props.weather.timeZone,
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+  }).format(props.weather.observedAt),
+);
 const directions = computed<Readonly<Record<string, string>>>(() => text.value.directions);
 const measurements = computed(() => [
   {
@@ -89,6 +97,9 @@ const measurements = computed(() => [
     <header class="current-weather-card__header">
       <h2>{{ weather.city }}</h2>
       <p>{{ countryLabel(weather.country, locale) }}</p>
+      <p class="current-weather-card__date">
+        <time :datetime="new Date(weather.observedAt).toISOString()">{{ dateLabel }}</time>
+      </p>
       <p class="current-weather-card__updated">
         <span
           class="current-weather-card__updated-icon"
@@ -152,6 +163,11 @@ const measurements = computed(() => [
   }
   p {
     margin: 0;
+  }
+  .current-weather-card__date {
+    margin-block-start: var(--spacer-2);
+    font-size: 0.85rem;
+    color: var(--weather-muted);
   }
   .current-weather-card__updated {
     margin-block-start: var(--spacer-2);

@@ -17,10 +17,10 @@ describe('CurrentWeatherCard', () => {
     expect(wrapper.text()).toContain('Пасмурно');
     expect(wrapper.text()).toContain('9 км/ч ЗЮЗ');
     expect(wrapper.text()).toContain('1021 мбар');
-    expect(wrapper.get('time').attributes('datetime')).toBe(
+    expect(wrapper.get('.current-weather-card__updated time').attributes('datetime')).toBe(
       new Date(weather.observedAt).toISOString(),
     );
-    expect(wrapper.get('time').text()).toBe(
+    expect(wrapper.get('.current-weather-card__updated time').text()).toBe(
       new Intl.DateTimeFormat('ru', {
         timeZone: weather.timeZone,
         hour: '2-digit',
@@ -65,6 +65,26 @@ describe('CurrentWeatherCard', () => {
     const wrapper = mount(CurrentWeatherCard, { props: { weather, locale: 'en' } });
     expect(wrapper.text()).toContain('Clear');
     expect(wrapper.get('[data-weather-icon]').attributes('data-weather-icon')).toBe('WeatherMoon');
+    wrapper.unmount();
+  });
+
+  it('shows the observation weekday and date in the location timezone', async () => {
+    const weather = await getCurrentWeather({
+      apiKey: 'example-only',
+      locale: 'ru',
+      location: { source: 'automatic' },
+      fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),
+    });
+    const observedAt = Date.UTC(2026, 9, 26, 21, 30);
+    const wrapper = mount(CurrentWeatherCard, {
+      props: { weather: { ...weather, observedAt }, locale: 'ru' },
+    });
+
+    expect(wrapper.get('.current-weather-card__date time').text()).toBe('вторник, 27 окт.');
+    expect(wrapper.get('.current-weather-card__date time').attributes('datetime')).toBe(
+      new Date(observedAt).toISOString(),
+    );
+    expect(wrapper.get('.current-weather-card__updated time').text()).toBe('02:30');
     wrapper.unmount();
   });
 });

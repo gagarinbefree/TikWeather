@@ -5,6 +5,7 @@ import { forecastResponse } from '@/tests/entities/weather/api/forecast-fixture'
 test.use({ permissions: ['geolocation'], geolocation: { latitude: 58, longitude: 56.25 } });
 
 test('shows A1 while forecast is pending and prioritizes the swiped day', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-10-26T05:37:00Z'));
   const requestedDays: number[] = [];
   let releaseTomorrow: (() => void) | undefined;
   await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
@@ -38,6 +39,9 @@ test('shows A1 while forecast is pending and prioritizes the swiped day', async 
 
   await page.goto('./');
   await expect(page.getByRole('article', { name: 'Текущая погода' })).toBeVisible();
+  await expect(
+    page.getByRole('article', { name: 'Текущая погода' }).locator('.current-weather-card__date'),
+  ).toHaveText('понедельник, 26 окт.');
   await expect.poll(() => requestedDays).toContain(1);
   const viewport = page.getByRole('region', { name: 'Навигация по прогнозу' });
   await expect(viewport.locator('[data-cell-id="2026-10-27/daily"]')).toHaveCount(1);
@@ -48,6 +52,9 @@ test('shows A1 while forecast is pending and prioritizes the swiped day', async 
   await expect.poll(() => requestedDays).toContain(3);
   releaseTomorrow?.();
   await expect(page.getByRole('article', { name: 'Прогноз на день' })).toContainText('Завтра');
+  await expect(
+    page.getByRole('article', { name: 'Прогноз на день' }).locator('.forecast-weather-card__date'),
+  ).toHaveText('вторник, 27 окт.');
   await expect(page.getByRole('article', { name: 'Прогноз на день' })).toContainText('10°C');
 });
 

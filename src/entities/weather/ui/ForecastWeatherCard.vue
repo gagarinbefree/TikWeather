@@ -63,6 +63,13 @@ const dateLabel = computed(() => {
       day: 'numeric',
       month: 'short',
     }).format(hourly.value.timestamp);
+  if (props.dayIndex === 1)
+    return new Intl.DateTimeFormat(props.locale, {
+      timeZone: 'UTC',
+      weekday: 'long',
+      day: 'numeric',
+      month: 'short',
+    }).format(dayDate.value);
   return new Intl.DateTimeFormat(props.locale, {
     timeZone: 'UTC',
     day: 'numeric',

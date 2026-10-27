@@ -26,6 +26,10 @@ describe('ForecastWeatherCard', () => {
       },
     });
     expect(wrapper.get('h2').text()).toBe('Завтра');
+    expect(wrapper.get('.forecast-weather-card__date time').text()).toBe('вторник, 27 окт.');
+    expect(wrapper.get('.forecast-weather-card__date time').attributes('datetime')).toBe(
+      '2026-10-27',
+    );
     expect(wrapper.get('article').attributes('style')).toContain('--card-background: #F1F5F8');
     expect(wrapper.text()).toContain('10°C');
     expect(wrapper.text()).toContain('5°C');
@@ -33,6 +37,32 @@ describe('ForecastWeatherCard', () => {
     expect(wrapper.text()).toContain('07:47');
     expect(wrapper.text()).toContain('17:26');
     expect(wrapper.findAll('[data-metric-icon]')).toHaveLength(6);
+    wrapper.unmount();
+  });
+
+  it('keeps the existing date format on later days', async () => {
+    const forecast = await getForecast({
+      apiKey: 'example-only',
+      location: { source: 'automatic' },
+      locale: 'ru',
+      timeZone: 'Asia/Yekaterinburg',
+      days: 3,
+      fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(forecastResponse)),
+    });
+    const day = forecast.days[2];
+    if (!day) throw new Error('Expected later forecast');
+    const wrapper = mount(ForecastWeatherCard, {
+      props: {
+        forecast: day,
+        kind: 'daily',
+        dayIndex: 2,
+        city: 'Пермь',
+        timeZone: 'Asia/Yekaterinburg',
+        locale: 'ru',
+      },
+    });
+
+    expect(wrapper.get('.forecast-weather-card__date time').text()).toBe('28 окт. 2026 г.');
     wrapper.unmount();
   });
 
