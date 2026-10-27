@@ -117,7 +117,7 @@ const measurements = computed(() => [
       <p class="current-weather-card__date">
         <time :datetime="new Date(weather.observedAt).toISOString()">{{ dateLabel }}</time>
       </p>
-      <p class="current-weather-card__updated">
+      <p v-if="cachedAt != null" class="current-weather-card__updated">
         <span
           class="current-weather-card__updated-icon"
           data-updated-icon

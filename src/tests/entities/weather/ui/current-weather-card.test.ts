@@ -4,7 +4,7 @@ import { CurrentWeatherCard, getCurrentWeather } from '@/entities/weather';
 import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 
 describe('CurrentWeatherCard', () => {
-  it('renders localized measurements and the observation time in the location timezone', async () => {
+  it('renders localized measurements without an update time for live weather', async () => {
     const weather = await getCurrentWeather({
       apiKey: 'example-only',
       locale: 'en',
@@ -17,18 +17,7 @@ describe('CurrentWeatherCard', () => {
     expect(wrapper.text()).toContain('Пасмурно');
     expect(wrapper.text()).toContain('9 км/ч ЗЮЗ');
     expect(wrapper.text()).toContain('1021 мбар');
-    expect(wrapper.get('.current-weather-card__updated time').attributes('datetime')).toBe(
-      new Date(weather.observedAt).toISOString(),
-    );
-    expect(wrapper.get('.current-weather-card__updated time').text()).toBe(
-      new Intl.DateTimeFormat('ru', {
-        timeZone: weather.timeZone,
-        hour: '2-digit',
-        minute: '2-digit',
-        hourCycle: 'h23',
-      }).format(weather.observedAt),
-    );
-    expect(wrapper.get('[data-updated-icon]').attributes('aria-hidden')).toBe('true');
+    expect(wrapper.find('.current-weather-card__updated').exists()).toBe(false);
     const metricIcons = wrapper.findAll('.current-weather-card__metric-icon');
     expect(metricIcons.map((icon) => icon.attributes('data-metric-icon'))).toEqual([
       'temperature_20_regular',
@@ -68,7 +57,7 @@ describe('CurrentWeatherCard', () => {
     wrapper.unmount();
   });
 
-  it('shows the observation weekday and date in the location timezone', async () => {
+  it('shows the observation time only for saved weather in the location timezone', async () => {
     const weather = await getCurrentWeather({
       apiKey: 'example-only',
       locale: 'ru',
@@ -77,7 +66,7 @@ describe('CurrentWeatherCard', () => {
     });
     const observedAt = Date.UTC(2026, 9, 26, 21, 30);
     const wrapper = mount(CurrentWeatherCard, {
-      props: { weather: { ...weather, observedAt }, locale: 'ru' },
+      props: { weather: { ...weather, observedAt }, locale: 'ru', cachedAt: observedAt + 60000 },
     });
 
     expect(wrapper.get('.current-weather-card__date time').text()).toBe('вторник, 27 окт.');
@@ -85,6 +74,10 @@ describe('CurrentWeatherCard', () => {
       new Date(observedAt).toISOString(),
     );
     expect(wrapper.get('.current-weather-card__updated time').text()).toBe('02:30');
+    expect(wrapper.get('.current-weather-card__updated time').attributes('datetime')).toBe(
+      new Date(observedAt).toISOString(),
+    );
+    expect(wrapper.get('[data-updated-icon]').attributes('aria-hidden')).toBe('true');
     wrapper.unmount();
   });
 });

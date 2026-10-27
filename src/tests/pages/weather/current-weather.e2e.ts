@@ -29,6 +29,7 @@ test('shows device weather directly with local icons and translated measurements
   await expect(card).toBeVisible();
   await expect(card).toContainText('8,9°C');
   await expect(card).toContainText('Пасмурно');
+  await expect(card.locator('.current-weather-card__updated')).toHaveCount(0);
   await expect(card).toContainText('Ощущается как');
   await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
   await expect(card.locator('[data-weather-icon]')).toHaveAttribute(
