@@ -72,6 +72,8 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -106,3 +108,43 @@ jobs:
           name: TikWeather-Android-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+      - name: Set release version
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        id: version
+        run: |
+          base=$(node -p "require('./package.json').version.split('.').slice(0, 2).join('.')")
+          echo "name=$base.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+      - name: Prepare Android signing
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          test -n "$ANDROID_KEYSTORE_BASE64"
+          test -n "$ANDROID_KEYSTORE_PASSWORD"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/tikweather-signing.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/tikweather-signing.jks" >> "$GITHUB_ENV"
+      - name: Build signed Android release
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: ./android/gradlew -p android assembleRelease --no-daemon -PappVersionCode=${{ github.run_number }} -PappVersionName=${{ steps.version.outputs.name }}
+      - name: Verify signed APK and version
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          apk=android/app/build/outputs/apk/release/app-release.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify "$apk"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" | grep -F "versionCode='${{ github.run_number }}' versionName='${{ steps.version.outputs.name }}'"
+      - name: Publish GitHub Release
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ steps.version.outputs.name }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk TikWeather-Android.apk
+          tag="v$RELEASE_VERSION"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" TikWeather-Android.apk --clobber
+          else
+            gh release create "$tag" TikWeather-Android.apk --target "$GITHUB_SHA" --title "TikWeather $RELEASE_VERSION" --generate-notes --latest
+          fi

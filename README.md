@@ -1,5 +1,10 @@
 [Open TikWeather](https://gagarinbefree.github.io/TikWeather/)
 
+[![Build](https://github.com/gagarinbefree/TikWeather/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gagarinbefree/TikWeather/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/gagarinbefree/TikWeather?label=version)](https://github.com/gagarinbefree/TikWeather/releases/latest)
+[![Open PWA](https://img.shields.io/badge/PWA-Open%20site-5A0FC8?logo=pwa&logoColor=white)](https://gagarinbefree.github.io/TikWeather/)
+[![Android APK](https://img.shields.io/badge/Android-Download%20APK-3DDC84?logo=android&logoColor=white)](https://github.com/gagarinbefree/TikWeather/releases/latest/download/TikWeather-Android.apk)
+
 # TikWeather
 
 ![TikWeather app icon](shared/assets/branding/app-icon-192.png)
@@ -26,6 +31,8 @@ TikWeather asks for permission to use your location. If you decline, it tries to
 
 Open [TikWeather](https://gagarinbefree.github.io/TikWeather/) in your browser and choose **Install app** or **Add to Home Screen** from the browser menu. It opens like an app, without a store download. The last successful forecast stays available when you are offline, with the time it was saved. Reconnect and tap **Retry** to refresh it.
 
+On Android, you can also [download the latest APK](https://github.com/gagarinbefree/TikWeather/releases/latest/download/TikWeather-Android.apk) and install it on your phone.
+
 The interface is available in English and Russian. It is comfortable to use on a phone; on a computer, the card keeps its portrait layout, and you can browse with the arrow keys.
 
 [Check the weather](https://gagarinbefree.github.io/TikWeather/)
@@ -51,6 +58,8 @@ TikWeather попросит разрешение определить ваше �
 ### Установка на устройство
 
 Откройте [TikWeather](https://gagarinbefree.github.io/TikWeather/) в браузере и выберите в его меню **Установить приложение** или **Добавить на главный экран**. После этого погода открывается как обычное приложение. Последний успешно полученный прогноз доступен и без сети; рядом указано время сохранения. Когда интернет появится, нажмите **Повторить**, чтобы обновить данные.
+
+На Android также можно [скачать APK последней версии](https://github.com/gagarinbefree/TikWeather/releases/latest/download/TikWeather-Android.apk) и установить его на телефон.
 
 Интерфейс доступен на русском и английском языках. Сайт удобно открывать на телефоне; на компьютере карточка сохраняет вертикальный вид, а прогноз можно листать стрелками клавиатуры.
 
