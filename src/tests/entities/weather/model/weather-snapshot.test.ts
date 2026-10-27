@@ -9,7 +9,8 @@ beforeEach(() => {
 });
 
 /**
- * snapshot
+ * snapshot(). Create a saved weather fixture without API keys
+ *
  * @returns A current observation and forecast without provider credentials.
  */
 async function snapshot(): Promise<WeatherSnapshot> {

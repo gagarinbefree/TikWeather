@@ -20,7 +20,8 @@ const keyboardDirections: Readonly<Record<string, Direction>> = {
 };
 
 /**
- * findCellPosition
+ * findCellPosition(). Find the current position of a forecast cell
+ *
  * @param grid The next available forecast grid.
  * @param id The identity of the selected forecast cell.
  * @returns The new coordinates of the same forecast cell when it is still available.
@@ -34,7 +35,8 @@ function findCellPosition(grid: WeatherGrid, id: string | null): Position | unde
 }
 
 /**
- * useWeatherSwipe
+ * useWeatherSwipe(). Connect the weather grid to swipe and keyboard navigation
+ *
  * @param container The Vue reference to the engine viewport.
  * @param readGrid The current immutable forecast snapshot.
  * @param onPositionChange The callback for a committed selection.
@@ -57,7 +59,7 @@ export function useWeatherSwipe(
   let disposed = false;
 
   /**
-   * stop
+   * stop(). Stop the swipe controller and discard pending updates
    */
   function stop(): void {
     revision++;
@@ -66,7 +68,8 @@ export function useWeatherSwipe(
   }
 
   /**
-   * reportError
+   * reportError(). Stop navigation and report a controller error
+   *
    * @param error The failure reported by the controller or a navigation promise.
    */
   function reportError(error: unknown): void {
@@ -77,7 +80,8 @@ export function useWeatherSwipe(
   }
 
   /**
-   * publishPosition
+   * publishPosition(). Save the selected cell and notify the page
+   *
    * @param next The coordinates committed by TikiTaki.
    */
   function publishPosition(next: Position): void {
@@ -88,7 +92,8 @@ export function useWeatherSwipe(
   }
 
   /**
-   * updateGrid
+   * updateGrid(). Update forecast cells while keeping the selected cell
+   *
    * @param grid The next forecast snapshot.
    * @returns A promise that resolves after the selected cell is reconciled.
    */
@@ -112,7 +117,8 @@ export function useWeatherSwipe(
   }
 
   /**
-   * onKeydown
+   * onKeydown(). Move between forecast cells with the arrow keys
+   *
    * @param event The keyboard event originating from the viewport itself.
    */
   function onKeydown(event: KeyboardEvent): void {

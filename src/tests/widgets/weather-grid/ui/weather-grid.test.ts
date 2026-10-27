@@ -25,7 +25,8 @@ afterEach(() => {
 });
 
 /**
- * renderGrid
+ * renderGrid(). Mount the weather grid with test weather data
+ *
  * @returns A mounted weather grid using the real TikiTaki Vue adapter.
  */
 function renderGrid(): ReturnType<typeof mount<typeof WeatherGrid>> {

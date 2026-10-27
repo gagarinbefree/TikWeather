@@ -4,7 +4,8 @@ import type { Direction } from 'tikitaki';
 const fixturePath = './src/tests/widgets/weather-grid/fixtures/index.html';
 
 /**
- * settleViewport
+ * settleViewport(). Wait until the selected card is centered
+ *
  * @param page The browser page containing the weather viewport.
  * @returns A promise that resolves when the current card is centered in its viewport.
  */
@@ -33,7 +34,8 @@ async function settleViewport(page: Page): Promise<void> {
 }
 
 /**
- * swipe
+ * swipe(). Perform a mouse or touch swipe in the browser
+ *
  * @param page The browser page containing the weather viewport.
  * @param direction The requested physical swipe direction.
  * @param cancel Whether the touch gesture should be cancelled before release.
@@ -78,7 +80,8 @@ export async function swipe(page: Page, direction: Direction, cancel = false): P
 }
 
 /**
- * verifySwipeNavigation
+ * verifySwipeNavigation(). Check swipes and forecast grid boundaries
+ *
  * @param page The isolated browser page using mouse or touch input.
  * @returns A promise that resolves after checking real gestures and grid boundaries.
  */
@@ -112,7 +115,8 @@ export async function verifySwipeNavigation(page: Page): Promise<void> {
 }
 
 /**
- * verifyForecastUpdates
+ * verifyForecastUpdates(). Check navigation while forecast data and viewport size change
+ *
  * @param page The isolated browser page containing the forecast fixture.
  * @returns A promise that resolves after checking selection during data updates and remounting.
  */
@@ -147,7 +151,8 @@ export async function verifyForecastUpdates(page: Page): Promise<void> {
 }
 
 /**
- * verifyCancelledTouch
+ * verifyCancelledTouch(). Check that a cancelled touch restores the selected cell
+ *
  * @param page The isolated browser page with touch enabled.
  * @returns A promise that resolves after verifying that cancellation restores the current cell.
  */

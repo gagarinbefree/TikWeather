@@ -7,7 +7,8 @@ interface NativeGeolocation {
 }
 
 /**
- * createAndroidGeolocation
+ * createAndroidGeolocation(). Adapt native Android location to the shared location service
+ *
  * @param native The Capacitor geolocation plugin.
  * @returns The device interface used by the shared location service.
  */

@@ -25,8 +25,7 @@ export interface RequestOptions {
 }
 
 /**
- * ApiError
- * A sanitized failure that never contains request URLs or provider messages.
+ * ApiError(). Represent a safe API failure without request URLs or provider details
  */
 export class ApiError extends Error {
   constructor(readonly kind: FailureKind) {

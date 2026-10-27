@@ -1,7 +1,8 @@
 import { expect, type Page } from '@playwright/test';
 
 /**
- * holdCurrentRequest
+ * holdCurrentRequest(). Keep weather loading pending for browser layout tests
+ *
  * @param page The isolated browser page for a stable loading screen.
  * @returns A promise that resolves after installing deterministic location and network handlers.
  */
@@ -21,7 +22,8 @@ async function holdCurrentRequest(page: Page): Promise<void> {
 }
 
 /**
- * verifyApplicationShell
+ * verifyApplicationShell(). Check the loading screen and look for browser errors
+ *
  * @param page The isolated browser page with the application base URL.
  * @returns A promise that resolves after checking the loading screen and browser errors.
  */
@@ -44,7 +46,8 @@ export async function verifyApplicationShell(page: Page): Promise<void> {
 }
 
 /**
- * verifyPortraitViewport
+ * verifyPortraitViewport(). Check that the weather card fits a portrait viewport
+ *
  * @param page The isolated browser page with the required viewport.
  * @returns A promise that resolves after checking the card geometry.
  */

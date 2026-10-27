@@ -1,7 +1,8 @@
 import { ApiError } from '@/shared/api';
 
 /**
- * ensureActive
+ * ensureActive(). Stop when the request has been cancelled
+ *
  * @param signal The caller cancellation signal.
  */
 function ensureActive(signal: AbortSignal): void {
@@ -9,7 +10,8 @@ function ensureActive(signal: AbortSignal): void {
 }
 
 /**
- * withFallback
+ * withFallback(). Try weather providers in order until one succeeds
+ *
  * @param sources The providers to try in preferred order.
  * @param signal The cancellation signal shared by all requests.
  * @returns The first successfully validated provider result.

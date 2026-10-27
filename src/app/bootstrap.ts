@@ -16,7 +16,8 @@ import { forecastServicesKey, longestForecast, type ForecastServices } from '@/f
 import { openWeatherMapKey, weatherApiKey } from '@/shared/config';
 import { ApiError } from '@/shared/api';
 /**
- * mountWeatherApp
+ * mountWeatherApp(). Start the app with shared weather and location services
+ *
  * @param root The platform specific root view.
  * @param device The optional native geolocation bridge.
  */
@@ -47,7 +48,8 @@ export function mountWeatherApp(root: Component, device?: DeviceGeolocation): vo
 }
 
 /**
- * requireDays
+ * requireDays(). Reject forecasts that contain too few days
+ *
  * @param request The forecast response from one provider.
  * @param minimum The requested minimum number of local days.
  * @returns A forecast with enough days to display.
@@ -58,6 +60,11 @@ async function requireDays(request: Promise<Forecast>, minimum: number): Promise
   return forecast;
 }
 
+/**
+ * createForecastServices(). Create the forecast services and provider fallback order
+ *
+ * @returns The shared forecast request service
+ */
 function createForecastServices(): ForecastServices {
   return {
     forecast: (location, locale, timeZone, days, now, signal) =>

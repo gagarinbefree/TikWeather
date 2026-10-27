@@ -1,7 +1,8 @@
 import { record, requestJson, type LocationQuery, type RequestOptions } from '@/shared/api';
 
 /**
- * placeName
+ * placeName(). Read a place name and ignore empty values
+ *
  * @param value A locality value from the geocoding provider.
  * @returns The usable place name when one is available.
  */
@@ -10,7 +11,8 @@ function placeName(value: unknown): string | null {
 }
 
 /**
- * reverseGeocode
+ * reverseGeocode(). Find the local city and country for device coordinates
+ *
  * @param location The current coordinates obtained from this device.
  * @param options The cancellable client request dependencies.
  * @returns The same coordinates enriched with a local city and country.

@@ -1,7 +1,8 @@
 import { ApiError } from './types';
 
 /**
- * record
+ * record(). Read a response object and reject invalid values
+ *
  * @param value The untrusted response fragment.
  * @returns A plain record with unknown values.
  */
@@ -12,7 +13,8 @@ export function record(value: unknown): Record<string, unknown> {
 }
 
 /**
- * numeric
+ * numeric(). Read a finite number within the allowed range
+ *
  * @param value The untrusted measurement.
  * @param minimum The inclusive lower bound.
  * @param maximum The inclusive upper bound.
@@ -25,7 +27,8 @@ export function numeric(value: unknown, minimum = -Infinity, maximum = Infinity)
 }
 
 /**
- * text
+ * text(). Read a nonempty trimmed string
+ *
  * @param value The untrusted text fragment.
  * @returns A nonempty trimmed string.
  */
@@ -35,7 +38,8 @@ export function text(value: unknown): string {
 }
 
 /**
- * validCoordinates
+ * validCoordinates(). Check latitude and longitude bounds
+ *
  * @param latitude The latitude supplied by a location provider.
  * @param longitude The longitude supplied by a location provider.
  * @returns Whether both coordinates are finite and within geographic bounds.

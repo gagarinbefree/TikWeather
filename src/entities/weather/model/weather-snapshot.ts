@@ -13,7 +13,8 @@ export interface WeatherSnapshot {
 }
 
 /**
- * isRecord
+ * isRecord(). Check whether a value is a plain object
+ *
  * @param value The value to inspect.
  * @returns Whether the value is a plain object.
  */
@@ -22,7 +23,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 /**
- * isNumber
+ * isNumber(). Check whether a value is a finite number
+ *
  * @param value The value to inspect.
  * @returns Whether the value is finite.
  */
@@ -31,7 +33,8 @@ function isNumber(value: unknown): value is number {
 }
 
 /**
- * isCondition
+ * isCondition(). Check the required weather condition fields
+ *
  * @param value The normalized weather condition to inspect.
  * @returns Whether the required condition fields are present.
  */
@@ -44,7 +47,8 @@ function isCondition(value: Record<string, unknown>): boolean {
 }
 
 /**
- * isHour
+ * isHour(). Validate an hourly forecast from saved data
+ *
  * @param value The hourly forecast to inspect.
  * @returns Whether the forecast can be rendered.
  */
@@ -67,7 +71,8 @@ function isHour(value: unknown): value is ForecastHour {
 }
 
 /**
- * isDay
+ * isDay(). Validate a daily forecast from saved data
+ *
  * @param value The daily forecast to inspect.
  * @returns Whether the forecast can be rendered.
  */
@@ -94,7 +99,8 @@ function isDay(value: unknown): value is ForecastDay {
 }
 
 /**
- * isWeather
+ * isWeather(). Validate current weather from saved data
+ *
  * @param value The current observation to inspect.
  * @returns Whether the observation can be rendered.
  */
@@ -120,7 +126,8 @@ function isWeather(value: unknown): value is CurrentWeather {
 }
 
 /**
- * isSnapshot
+ * isSnapshot(). Check the version and contents of a saved forecast
+ *
  * @param value The stored JSON value to inspect.
  * @returns Whether the value is a supported complete snapshot.
  */
@@ -141,7 +148,8 @@ function isSnapshot(value: unknown): value is WeatherSnapshot {
 }
 
 /**
- * readWeatherSnapshot
+ * readWeatherSnapshot(). Read and validate the last saved forecast
+ *
  * @param storage The browser storage provider.
  * @returns The last complete normalized weather snapshot when available.
  */
@@ -157,7 +165,8 @@ export function readWeatherSnapshot(storage: Storage = localStorage): WeatherSna
 }
 
 /**
- * writeWeatherSnapshot
+ * writeWeatherSnapshot(). Save the current weather and forecast on the device
+ *
  * @param value The normalized current observation and available forecast.
  * @param storage The browser storage provider.
  */

@@ -10,7 +10,8 @@ const russian: Readonly<Record<string, string | { readonly day: string; readonly
 const wmo: Readonly<Record<string, { readonly ru: string; readonly en: string }>> = wmoConditions;
 
 /**
- * browserLocale
+ * browserLocale(). Choose a supported language from browser settings
+ *
  * @returns The initial supported language before the country is known.
  */
 export function browserLocale(): Locale {
@@ -20,7 +21,8 @@ export function browserLocale(): Locale {
 }
 
 /**
- * localeForCountry
+ * localeForCountry(). Choose Russian or English for the detected country
+ *
  * @param country The ISO code or provider country name.
  * @returns The supported language selected using the AvaWeather country policy.
  */
@@ -32,7 +34,8 @@ export function localeForCountry(country: string): Locale {
 }
 
 /**
- * countryLabel
+ * countryLabel(). Translate a country name into the selected language
+ *
  * @param country The country name returned by the provider.
  * @param locale The current interface language.
  * @returns A localized country name when its ISO code is known.
@@ -46,7 +49,8 @@ export function countryLabel(country: string, locale: Locale): string {
 }
 
 /**
- * conditionLabel
+ * conditionLabel(). Translate a weather condition with local resources
+ *
  * @param code The active provider condition code.
  * @param isDay Whether the observation is in daylight.
  * @param locale The current interface language.

@@ -19,7 +19,8 @@ interface ForecastOptions extends RequestOptions {
 }
 
 /**
- * localDate
+ * localDate(). Read the local date of a timestamp
+ *
  * @param timestamp The provider hour as milliseconds since the Unix epoch.
  * @param formatter The formatter for the weather location.
  * @returns The calendar date of the hour at the weather location.
@@ -34,7 +35,8 @@ function localDate(timestamp: number, formatter: Intl.DateTimeFormat): string {
 }
 
 /**
- * clockTime
+ * clockTime(). Convert an astronomy time to twenty four hour time
+ *
  * @param value The provider astronomy time with an AM or PM suffix.
  * @param absent The expected phrase for a polar day without this sun event.
  * @returns The same clock time in twenty four hour format or null for no event.
@@ -49,7 +51,8 @@ function clockTime(value: unknown, absent: 'No sunrise' | 'No sunset'): string |
 }
 
 /**
- * parseHour
+ * parseHour(). Read and validate one forecast reading
+ *
  * @param value The untrusted provider hour.
  * @param date The expected local date.
  * @param formatter The location date formatter.
@@ -86,7 +89,8 @@ function parseHour(
 }
 
 /**
- * parseDay
+ * parseDay(). Read and validate one day of weather and sun times
+ *
  * @param value The untrusted provider day.
  * @param formatter The location date formatter.
  * @param locale The requested condition language.
@@ -129,7 +133,8 @@ function parseDay(
 }
 
 /**
- * getForecast
+ * getForecast(). Load daily and hourly forecasts from WeatherAPI
+ *
  * @param options The detected position, forecast horizon and WeatherAPI transport.
  * @returns Validated daily and hourly weather for the requested horizon.
  */

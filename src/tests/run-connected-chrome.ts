@@ -10,9 +10,8 @@ import {
 } from './widgets/weather-grid/swipe-scenarios.ts';
 
 /**
- * runConnectedChrome
+ * runConnectedChrome(). Run browser checks through an existing Chrome session
  *
- * Run the shared browser scenarios through an existing Chrome debugging endpoint.
  * @returns A promise that resolves after all isolated browser checks pass.
  */
 async function runConnectedChrome(): Promise<void> {

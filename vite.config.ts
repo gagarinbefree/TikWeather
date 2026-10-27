@@ -4,7 +4,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig, type ConfigEnv, type UserConfig } from 'vite';
 
 /**
- * createViteConfig
+ * createViteConfig(). Configure the web and Android builds
+ *
  * @param environment The selected Vite build mode.
  * @returns The application configuration with isolated browser fixtures in test mode.
  */

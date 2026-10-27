@@ -25,7 +25,8 @@ interface RequestAttempt {
 const maximumDays = 16;
 
 /**
- * useForecastStore
+ * useForecastStore(). Load daily and hourly forecasts in the background
+ *
  * @returns Progressive daily and hourly forecasts with priority for the visible day.
  */
 export const useForecastStore = defineStore('forecast', () => {
@@ -43,7 +44,7 @@ export const useForecastStore = defineStore('forecast', () => {
   let revision = 0;
 
   /**
-   * cancel
+   * cancel(). Cancel forecast loading and discard pending results
    */
   function cancel(): void {
     revision++;
@@ -56,7 +57,8 @@ export const useForecastStore = defineStore('forecast', () => {
   }
 
   /**
-   * restore
+   * restore(). Restore saved forecast days and their hourly cells
+   *
    * @param forecast The last normalized forecast saved in this browser.
    * @param now The current instant used for the restored grid.
    * @param timeZone The saved location time zone.
@@ -83,7 +85,8 @@ export const useForecastStore = defineStore('forecast', () => {
   }
 
   /**
-   * loadThrough
+   * loadThrough(). Load enough forecast days to cover the selected row
+   *
    * @param depth The smallest provider horizon containing the requested day.
    * @param force Whether an explicit retry may repeat a completed request.
    */
@@ -161,7 +164,8 @@ export const useForecastStore = defineStore('forecast', () => {
   }
 
   /**
-   * start
+   * start(). Start forecast loading for a new location
+   *
    * @param context The location, language and fixed current weather instant.
    * @param dependencies The cancellable provider request.
    */
@@ -184,7 +188,8 @@ export const useForecastStore = defineStore('forecast', () => {
   }
 
   /**
-   * focus
+   * focus(). Give loading priority to the selected forecast day
+   *
    * @param row The visible row selected by a swipe or keyboard navigation.
    */
   function focus(row: number): void {
@@ -194,7 +199,7 @@ export const useForecastStore = defineStore('forecast', () => {
   }
 
   /**
-   * retry
+   * retry(). Retry the forecast request that failed
    */
   function retry(): void {
     const depth = failedDepth ?? (days.value.length < 3 ? 3 : 16);
@@ -202,7 +207,8 @@ export const useForecastStore = defineStore('forecast', () => {
   }
 
   /**
-   * day
+   * day(). Find the loaded forecast for a local date
+   *
    * @param date The local calendar date of the visible row.
    * @returns The available daily forecast if its request has finished.
    */
@@ -211,7 +217,8 @@ export const useForecastStore = defineStore('forecast', () => {
   }
 
   /**
-   * hour
+   * hour(). Find a loaded forecast reading by its timestamp
+   *
    * @param date The local calendar date of the visible row.
    * @param timestamp The hourly forecast instant in milliseconds.
    * @returns The matching hourly forecast if it has loaded.

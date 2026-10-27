@@ -16,7 +16,8 @@ interface LocateOptions extends RequestOptions {
 }
 
 /**
- * devicePosition
+ * devicePosition(). Read device coordinates within the location timeout
+ *
  * @param device The available secure browser geolocation API.
  * @param options The cancellation and permission prompt budget.
  * @returns Device coordinates or null when location is unavailable.
@@ -34,7 +35,8 @@ function devicePosition(
       finish(null);
     }, timeoutMs);
     /**
-     * finish
+     * finish(). Finish the location request and clear its timer
+     *
      * @param result The valid device coordinates or unavailable result.
      */
     function finish(result: LocationQuery | null): void {
@@ -45,7 +47,7 @@ function devicePosition(
       resolve(result);
     }
     /**
-     * cancel
+     * cancel(). Cancel location detection and clear its timer
      */
     function cancel(): void {
       if (finished) return;
@@ -77,7 +79,8 @@ function devicePosition(
 }
 
 /**
- * coordinate
+ * coordinate(). Read a coordinate and check its allowed range
+ *
  * @param value The numeric or textual coordinate returned by GeoJS.
  * @param bound The maximum absolute geographic value.
  * @returns A validated finite coordinate.
@@ -87,7 +90,8 @@ function coordinate(value: unknown, bound: number): number {
 }
 
 /**
- * locate
+ * locate(). Find the device location or fall back to IP detection
+ *
  * @param options The optional browser API and network dependencies.
  * @returns The device location with IP detection as a bounded fallback.
  */

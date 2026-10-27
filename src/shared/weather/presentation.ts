@@ -9,7 +9,8 @@ const icons = import.meta.glob<string>('/shared/assets/icons/*.svg', {
 const colors: Readonly<Record<string, string>> = theme.colors;
 
 /**
- * weatherPresentation
+ * weatherPresentation(). Choose weather icons and theme colors for a condition
+ *
  * @param code The observed provider condition code.
  * @param isDay Whether the location is in daylight.
  * @returns The original AvaWeather icon and named pastel theme tokens.
