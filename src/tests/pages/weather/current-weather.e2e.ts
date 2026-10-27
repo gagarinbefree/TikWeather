@@ -113,9 +113,9 @@ test('keeps a short portrait screen readable with long place names', async ({ pa
   const card = page.getByRole('article', { name: 'Current weather' });
   await expect(card).toBeVisible();
   await expect(card).toContainText('Feels like');
-  const visibility = card.getByText('Visibility', { exact: true });
-  await visibility.scrollIntoViewIfNeeded();
-  await expect(visibility).toBeInViewport();
+  const sunset = card.getByText('Sunset', { exact: true });
+  await sunset.scrollIntoViewIfNeeded();
+  await expect(sunset).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );

@@ -44,6 +44,9 @@ test('shows A1 while forecast is pending and prioritizes the swiped day', async 
   await page.goto('./');
   const currentCard = page.getByRole('article', { name: 'Текущая погода' });
   await expect(currentCard).toBeVisible();
+  await expect(currentCard).toContainText('Восход');
+  await expect(currentCard).toContainText('Закат');
+  await expect(currentCard).not.toContainText('07:45');
   const currentBackground = await currentCard.evaluate(
     (element) => getComputedStyle(element).backgroundColor,
   );
@@ -90,6 +93,12 @@ test('shows A1 while forecast is pending and prioritizes the swiped day', async 
       return { family: style.fontFamily, size: style.fontSize, weight: style.fontWeight };
     }),
   ).toEqual(currentTypography);
+  await expect(dailyCard).toContainText('07:47');
+  await expect(dailyCard).toContainText('17:26');
+  await viewport.press('ArrowUp');
+  await expect(viewport).toHaveAttribute('data-row', '0');
+  await expect(currentCard).toContainText('07:45');
+  await expect(currentCard).toContainText('17:28');
 });
 
 test('allows navigation to the last day returned by Open Meteo', async ({ page }) => {

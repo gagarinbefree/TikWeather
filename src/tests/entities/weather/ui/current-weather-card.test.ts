@@ -26,12 +26,36 @@ describe('CurrentWeatherCard', () => {
       'weather_sunny_high_20_regular',
       'gauge_20_regular',
       'eye_20_regular',
+      'clock_20_regular',
+      'clock_20_regular',
     ]);
     for (const icon of metricIcons) {
       expect(icon.attributes('aria-hidden')).toBe('true');
       expect(icon.attributes('style')).toContain('mask-image: url(');
     }
     expect(wrapper.find('img').exists()).toBe(false);
+    wrapper.unmount();
+  });
+
+  it('adds today sun times when the background forecast arrives', async () => {
+    const weather = await getCurrentWeather({
+      apiKey: 'example-only',
+      locale: 'ru',
+      location: { source: 'automatic' },
+      fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),
+    });
+    const wrapper = mount(CurrentWeatherCard, { props: { weather, locale: 'ru' } });
+
+    expect(wrapper.text()).toContain('Восход');
+    expect(wrapper.text()).toContain('Закат');
+    await wrapper.setProps({ sunTimes: { sunrise: '07:45', sunset: '17:28' } });
+    expect(wrapper.text()).toContain('07:45');
+    expect(wrapper.text()).toContain('17:28');
+    expect(wrapper.text()).toContain('8,9°C');
+
+    await wrapper.setProps({ sunTimes: { sunrise: null, sunset: null }, locale: 'en' });
+    expect(wrapper.text()).toContain('No sunrise');
+    expect(wrapper.text()).toContain('No sunset');
     wrapper.unmount();
   });
 

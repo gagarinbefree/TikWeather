@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { CurrentWeather } from '@/entities/weather/model/current-weather';
+import type { ForecastDay } from '@/entities/weather/model/forecast';
 import temperatureIcon from '@assets/icons/temperature_20_regular.svg?url';
 import humidityIcon from '@assets/icons/weather_humidity_20_regular.svg?url';
 import windIcon from '@assets/icons/weather_squalls_20_regular.svg?url';
@@ -15,6 +16,7 @@ const props = defineProps<{
   readonly weather: CurrentWeather;
   readonly locale: Locale;
   readonly cachedAt?: number | null;
+  readonly sunTimes?: Pick<ForecastDay, 'sunrise' | 'sunset'> | undefined;
 }>();
 const emit = defineEmits<{ retry: [] }>();
 const text = computed(() => messages[props.locale]);
@@ -101,6 +103,24 @@ const measurements = computed(() => [
         : `${number.value.format(props.weather.visibility)} ${text.value.kilometers}`,
     icon: 'eye_20_regular',
     iconUrl: visibilityIcon,
+  },
+  {
+    name: text.value.sunrise,
+    value:
+      props.sunTimes?.sunrise === undefined
+        ? text.value.noData
+        : (props.sunTimes.sunrise ?? text.value.noSunrise),
+    icon: 'clock_20_regular',
+    iconUrl: clockIcon,
+  },
+  {
+    name: text.value.sunset,
+    value:
+      props.sunTimes?.sunset === undefined
+        ? text.value.noData
+        : (props.sunTimes.sunset ?? text.value.noSunset),
+    icon: 'clock_20_regular',
+    iconUrl: clockIcon,
   },
 ]);
 </script>

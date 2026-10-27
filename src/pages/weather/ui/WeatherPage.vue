@@ -138,6 +138,7 @@ watch(
           :weather="state.weather"
           :locale="locale"
           :cached-at="state.cachedAt"
+          :sun-times="forecast.day(cell.date)"
           @retry="retry"
         />
         <section
