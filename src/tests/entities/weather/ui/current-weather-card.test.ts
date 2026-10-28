@@ -17,7 +17,7 @@ describe('CurrentWeatherCard', () => {
     expect(wrapper.text()).toContain('Пасмурно');
     expect(wrapper.text()).toContain('9 км/ч ЗЮЗ');
     expect(wrapper.text()).toContain('1021 мбар');
-    expect(wrapper.find('.current-weather-card__updated').exists()).toBe(false);
+    expect(wrapper.find('.weather-cache-status').exists()).toBe(false);
     const metricIcons = wrapper.findAll('.current-weather-card__metric-icon');
     expect(metricIcons.map((icon) => icon.attributes('data-metric-icon'))).toEqual([
       'temperature_20_regular',
@@ -97,11 +97,13 @@ describe('CurrentWeatherCard', () => {
     expect(wrapper.get('.current-weather-card__date time').attributes('datetime')).toBe(
       new Date(observedAt).toISOString(),
     );
-    expect(wrapper.get('.current-weather-card__updated time').text()).toBe('02:30');
-    expect(wrapper.get('.current-weather-card__updated time').attributes('datetime')).toBe(
+    expect(wrapper.get('.weather-cache-status__updated time').text()).toBe('02:30');
+    expect(wrapper.get('.weather-cache-status__updated time').attributes('datetime')).toBe(
       new Date(observedAt).toISOString(),
     );
-    expect(wrapper.get('[data-updated-icon]').attributes('aria-hidden')).toBe('true');
+    expect(wrapper.get('.weather-cache-status__icon').attributes('aria-hidden')).toBe('true');
+    await wrapper.get('.weather-cache-status button').trigger('click');
+    expect(wrapper.emitted('retry')).toEqual([[]]);
     wrapper.unmount();
   });
 });

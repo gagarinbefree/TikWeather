@@ -11,6 +11,7 @@ import visibilityIcon from '@assets/icons/eye_20_regular.svg?url';
 import clockIcon from '@assets/icons/clock_20_regular.svg?url';
 import { conditionLabel, countryLabel, messages, type Locale } from '@/shared/locales';
 import { weatherPresentation } from '@/shared/weather';
+import WeatherCacheStatus from './WeatherCacheStatus.vue';
 
 const props = defineProps<{
   readonly weather: CurrentWeather;
@@ -33,26 +34,6 @@ const condition = computed(() =>
     props.locale,
     props.weather.conditionLocale === props.locale ? props.weather.conditionText : '',
   ),
-);
-const time = computed(() =>
-  new Intl.DateTimeFormat(props.locale, {
-    timeZone: props.weather.timeZone,
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(props.weather.observedAt),
-);
-const savedTime = computed(() =>
-  props.cachedAt == null
-    ? ''
-    : new Intl.DateTimeFormat(props.locale, {
-        timeZone: props.weather.timeZone,
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hourCycle: 'h23',
-      }).format(props.cachedAt),
 );
 const dateLabel = computed(() =>
   new Intl.DateTimeFormat(props.locale, {
@@ -137,20 +118,15 @@ const measurements = computed(() => [
       <p class="current-weather-card__date">
         <time :datetime="new Date(weather.observedAt).toISOString()">{{ dateLabel }}</time>
       </p>
-      <p v-if="cachedAt != null" class="current-weather-card__updated">
-        <span
-          class="current-weather-card__updated-icon"
-          data-updated-icon
-          :style="{ maskImage: `url(${JSON.stringify(clockIcon)})` }"
-          aria-hidden="true"
-        />
-        {{ text.updated }}
-        <time :datetime="new Date(weather.observedAt).toISOString()">{{ time }}</time>
-      </p>
-      <div v-if="cachedAt != null" class="current-weather-card__saved" role="status">
-        <span>{{ text.savedForecast }} {{ savedTime }}</span>
-        <button type="button" class="btn" @click="emit('retry')">{{ text.retry }}</button>
-      </div>
+      <WeatherCacheStatus
+        v-if="cachedAt != null"
+        :cached-at="cachedAt"
+        :observed-at="weather.observedAt"
+        :time-zone="weather.timeZone"
+        :locale="locale"
+        retryable
+        @retry="emit('retry')"
+      />
     </header>
     <div class="current-weather-card__summary">
       <span
@@ -193,11 +169,13 @@ const measurements = computed(() => [
     overflow: clip;
   }
   .current-weather-card__header {
+    position: relative;
     padding: clamp(1rem, 3dvh, 1.75rem);
     background: linear-gradient(135deg, var(--card-header-start), var(--card-header-end));
   }
   h2 {
     margin: 0;
+    padding-inline-end: 3rem;
     font-size: clamp(1.5rem, 4dvh, 2rem);
     font-weight: 600;
     overflow-wrap: anywhere;
@@ -209,36 +187,6 @@ const measurements = computed(() => [
     margin-block-start: var(--spacer-2);
     font-size: 0.85rem;
     color: var(--weather-muted);
-  }
-  .current-weather-card__updated {
-    margin-block-start: var(--spacer-2);
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.85rem;
-    color: var(--weather-muted);
-  }
-  .current-weather-card__updated-icon {
-    flex: none;
-    inline-size: 0.9rem;
-    block-size: 0.9rem;
-    background: currentColor;
-    mask: center / contain no-repeat;
-  }
-  .current-weather-card__saved {
-    margin-block-start: var(--spacer-2);
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.35rem 0.75rem;
-    color: var(--weather-muted);
-    font-size: 0.8rem;
-  }
-  .current-weather-card__saved .btn {
-    --btn-bg: var(--weather-surface);
-    --btn-color: var(--weather-ink);
-    padding: 0.2rem 0.65rem;
-    font-size: 0.8rem;
   }
   .current-weather-card__summary {
     flex: 1;

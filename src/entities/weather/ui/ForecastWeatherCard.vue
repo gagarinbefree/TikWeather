@@ -10,6 +10,7 @@ import temperatureIcon from '@assets/icons/temperature_20_regular.svg?url';
 import visibilityIcon from '@assets/icons/eye_20_regular.svg?url';
 import { conditionLabel, messages, type Locale } from '@/shared/locales';
 import { weatherPresentation } from '@/shared/weather';
+import WeatherCacheStatus from './WeatherCacheStatus.vue';
 
 const props = defineProps<{
   readonly forecast: ForecastDay | ForecastHour;
@@ -171,21 +172,12 @@ const measurements = computed(() => {
         </time>
         <time v-else-if="daily" :datetime="daily.date">{{ dateLabel }}</time>
       </p>
-      <p v-if="cachedAt != null" class="forecast-weather-card__date" role="status">
-        {{ text.savedForecast }}
-        <time :datetime="new Date(cachedAt).toISOString()">
-          {{
-            new Intl.DateTimeFormat(locale, {
-              timeZone,
-              day: 'numeric',
-              month: 'short',
-              hour: '2-digit',
-              minute: '2-digit',
-              hourCycle: 'h23',
-            }).format(cachedAt)
-          }}
-        </time>
-      </p>
+      <WeatherCacheStatus
+        v-if="cachedAt != null"
+        :cached-at="cachedAt"
+        :time-zone="timeZone"
+        :locale="locale"
+      />
     </header>
     <div class="forecast-weather-card__summary">
       <span
@@ -233,11 +225,13 @@ const measurements = computed(() => {
     overflow: clip;
   }
   .forecast-weather-card__header {
+    position: relative;
     padding: clamp(1rem, 3dvh, 1.75rem);
     background: linear-gradient(135deg, var(--card-header-start), var(--card-header-end));
   }
   h2 {
     margin: 0;
+    padding-inline-end: 3rem;
     font-size: clamp(1.5rem, 4dvh, 2rem);
     font-weight: 600;
     overflow-wrap: anywhere;
