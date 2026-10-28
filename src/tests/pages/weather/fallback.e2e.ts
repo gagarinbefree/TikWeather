@@ -78,6 +78,7 @@ test('uses the available three hour OpenWeatherMap forecast after both forecast 
   page,
 }) => {
   await page.clock.setFixedTime(new Date('2026-10-26T15:30:00Z'));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
     await route.fulfill({ json: currentResponse });
   });
@@ -122,6 +123,9 @@ test('uses the available three hour OpenWeatherMap forecast after both forecast 
   await page.goto('./');
   await expect(page.getByRole('article', { name: 'Текущая погода' })).toBeVisible();
   const viewport = page.getByRole('region', { name: 'Навигация по прогнозу' });
+  await expect(
+    viewport.locator(`[data-cell-id="2026-10-26/hour/${String(Date.UTC(2026, 9, 26, 16))}"]`),
+  ).toHaveCount(1);
   await viewport.focus();
   await viewport.press('ArrowRight');
   await expect(page.getByRole('article', { name: 'Почасовой прогноз' })).toContainText('21:00');

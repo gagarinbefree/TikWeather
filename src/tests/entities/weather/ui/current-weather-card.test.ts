@@ -13,7 +13,7 @@ describe('CurrentWeatherCard', () => {
     });
     const wrapper = mount(CurrentWeatherCard, { props: { weather, locale: 'ru' } });
     expect(wrapper.text()).toContain('8,9°C');
-    expect(wrapper.text()).toContain('Ощущается как');
+    expect(wrapper.get('dt').text()).toBe('Ощущается');
     expect(wrapper.text()).toContain('Пасмурно');
     expect(wrapper.text()).toContain('9 км/ч ЗЮЗ');
     expect(wrapper.text()).toContain('1021 мбар');

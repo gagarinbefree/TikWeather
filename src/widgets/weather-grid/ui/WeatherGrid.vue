@@ -64,7 +64,7 @@ const activeId = computed(() => props.grid[position.value.row]?.[position.value.
 
 .weather-cell {
   display: grid;
-  place-items: center;
+  place-items: safe center;
   inline-size: 100%;
   block-size: 100%;
   overflow-y: auto;

@@ -17,7 +17,7 @@ export const messages = {
     noData: 'Нет данных',
     locating: 'Определяем местоположение...',
     retry: 'Повторить',
-    feelsLike: 'Ощущается как',
+    feelsLike: 'Ощущается',
     humidity: 'Влажность',
     wind: 'Ветер',
     uv: 'УФ-индекс',

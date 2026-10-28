@@ -29,8 +29,8 @@ test('shows device weather directly with local icons and translated measurements
   await expect(card).toBeVisible();
   await expect(card).toContainText('8,9°C');
   await expect(card).toContainText('Пасмурно');
-  await expect(card.locator('.current-weather-card__updated')).toHaveCount(0);
-  await expect(card).toContainText('Ощущается как');
+  await expect(card.locator('.weather-cache-status')).toHaveCount(0);
+  await expect(card.getByText('Ощущается', { exact: true })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
   await expect(card.locator('[data-weather-icon]')).toHaveAttribute(
     'data-weather-icon',
@@ -96,6 +96,17 @@ test('falls back to GeoJS after permission denial and retries below the error te
 
 test('keeps a short portrait screen readable with long place names', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
+  await page.route('https://api.bigdatacloud.net/**', async (route) => {
+    await route.fulfill({
+      json: {
+        lookupSource: 'coordinates',
+        latitude: 58.0047,
+        longitude: 56.2514,
+        countryCode: 'US',
+        city: 'Petropavlovsk-Kamchatsky',
+      },
+    });
+  });
   await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
     await route.fulfill({
       json: {
@@ -113,9 +124,20 @@ test('keeps a short portrait screen readable with long place names', async ({ pa
   const card = page.getByRole('article', { name: 'Current weather' });
   await expect(card).toBeVisible();
   await expect(card).toContainText('Feels like');
+  const cell = card.locator('..');
+  await cell.evaluate((element) => {
+    element.scrollTop = 0;
+  });
+  const heading = card.locator('h2');
+  await expect(heading).toHaveText('Petropavlovsk-Kamchatsky');
+  await expect(heading).toBeInViewport({ ratio: 1 });
   const sunset = card.getByText('Sunset', { exact: true });
   await sunset.scrollIntoViewIfNeeded();
   await expect(sunset).toBeInViewport();
+  await cell.evaluate((element) => {
+    element.scrollTop = 0;
+  });
+  await expect(heading).toBeInViewport({ ratio: 1 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
