@@ -75,7 +75,6 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
-        '@shared': fileURLToPath(new URL('./shared', import.meta.url)),
         '@assets': fileURLToPath(new URL('./shared/assets', import.meta.url)),
       },
     },
