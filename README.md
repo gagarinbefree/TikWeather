@@ -19,9 +19,11 @@
 
 Each card fills the screen. Current weather appears first, followed by the forecast for the days ahead. Soft card colors change with the weather.
 
-- **Swipe left or right** to see another time on the selected day.
-- **Swipe up or down** to move between days.
-- **See a loading indicator** while a card's forecast is on its way; you can keep browsing.
+**Swipe left or right** to see another time on the selected day.
+
+**Swipe up or down** to move between days.
+
+**See a loading indicator** while a card's forecast is on its way; you can keep browsing.
 
 Cards show the temperature, conditions, and helpful details such as humidity, wind, and chance of rain. The number of forecast days depends on the available weather data.
 
@@ -47,17 +49,19 @@ The interface is available in English and Russian. It is comfortable to use on a
 
 ### Всё на одном экране
 
-Каждая карточка занимает экран целиком. Текущая погода появляется первой, а прогноз на другие дни — следом. Цвета карточек мягко меняются вместе с погодой.
+Каждая карточка занимает экран целиком. Сначала появляется текущая погода, затем прогноз на другие дни. Цвета карточек мягко меняются вместе с погодой.
 
-- **Свайп влево или вправо** — погода в другое время выбранного дня.
-- **Свайп вверх или вниз** — прогноз на следующий или предыдущий день.
-- **Индикатор загрузки** — прогноз для этой карточки ещё готовится; можно продолжать листать.
+**Свайп влево или вправо** показывает погоду в другое время выбранного дня.
+
+**Свайп вверх или вниз** открывает прогноз на следующий или предыдущий день.
+
+**Индикатор загрузки** появляется, пока прогноз для карточки готовится. Можно продолжать листать.
 
 На карточках есть температура, погодные условия и полезные подробности: влажность, ветер, вероятность дождя и другие доступные показатели. Число дней прогноза зависит от доступных данных.
 
 ### Погода там, где вы находитесь
 
-TikWeather попросит разрешение определить ваше местоположение. Если вы не предоставите доступ, сайт попробует определить город приблизительно по интернет-соединению. Для обновления погоды нужен интернет.
+TikWeather попросит разрешение определить ваше местоположение. Если вы не предоставите доступ, сайт попробует определить город приблизительно по подключению к интернету. Для обновления погоды нужен интернет.
 
 ### Установка на устройство
 
