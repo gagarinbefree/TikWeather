@@ -13,7 +13,7 @@
 
 **Weather without the clutter.** Open the site to see the weather right now, what is coming in the next few hours, and the forecast for the days ahead. No account or lengthy setup needed.
 
-<img src="shared/assets/screenshots/android-en.png" alt="TikWeather for Android showing the current weather in Strand, United Kingdom, in English" width="320">
+<img src="shared/assets/screenshots/android-en-overview.svg" alt="TikWeather for Android showing current weather in London and two hourly forecasts to the right, connected by red arrows" width="960">
 
 ### Everything on one screen
 
@@ -43,7 +43,7 @@ The interface is available in English and Russian. It is comfortable to use on a
 
 **Погода без лишнего.** Откройте сайт и сразу узнайте, какая погода сейчас, что ждёт вас в ближайшие часы и в следующие дни. Без регистрации и долгих настроек.
 
-<img src="shared/assets/screenshots/android-ru.png" alt="TikWeather для Android с текущей погодой в Перми на русском языке" width="320">
+<img src="shared/assets/screenshots/android-ru-overview.svg" alt="TikWeather для Android с текущей погодой в Перми и двумя почасовыми прогнозами справа, соединёнными красными стрелками" width="960">
 
 ### Всё на одном экране
 
