@@ -50,4 +50,26 @@ describe('withFallback', () => {
       ),
     ).rejects.toMatchObject({ kind: 'timeout' });
   });
+  it('tries fresh backups before returning a server snapshot and keeps the newest snapshot', async () => {
+    const stale = vi.fn().mockResolvedValue({ temperature: 1, serverCachedAt: 100 });
+    const live = vi.fn().mockResolvedValue({ temperature: 2 });
+    const third = vi.fn().mockResolvedValue({ temperature: 3, serverCachedAt: 200 });
+    await expect(withFallback([stale, live, third], new AbortController().signal)).resolves.toEqual(
+      { temperature: 2 },
+    );
+    expect(live).toHaveBeenCalledOnce();
+    expect(third).not.toHaveBeenCalled();
+    await expect(withFallback([stale, third], new AbortController().signal)).resolves.toEqual({
+      temperature: 3,
+      serverCachedAt: 200,
+    });
+  });
+  it('stops at a shared backend limit instead of retrying other routes on the same server', async () => {
+    const backup = vi.fn().mockResolvedValue('unexpected');
+    const source = vi.fn().mockRejectedValue(new ApiError('unavailable', 429, true));
+    await expect(
+      withFallback([source, backup], new AbortController().signal),
+    ).rejects.toMatchObject({ status: 429 });
+    expect(backup).not.toHaveBeenCalled();
+  });
 });

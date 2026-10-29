@@ -7,7 +7,6 @@ describe('getForecast', () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(forecastResponse));
 
     const forecast = await getForecast({
-      apiKey: 'example-only',
       location: { source: 'device', latitude: 58, longitude: 56.25, countryCode: null },
       locale: 'ru',
       timeZone: 'Asia/Yekaterinburg',
@@ -28,7 +27,6 @@ describe('getForecast', () => {
       }),
     );
     const forecast = await getForecast({
-      apiKey: 'example-only',
       location: { source: 'device', latitude: 58, longitude: 56.25, countryCode: null },
       locale: 'ru',
       timeZone: 'Asia/Yekaterinburg',
@@ -38,7 +36,7 @@ describe('getForecast', () => {
     const requestUrl = fetcher.mock.calls[0]?.[0];
     if (typeof requestUrl !== 'string') throw new Error('Expected a WeatherAPI request URL');
     const url = new URL(requestUrl);
-    expect(url.pathname).toBe('/v1/forecast.json');
+    expect(url.pathname).toBe('/api/weatherapi/v1/forecast.json');
     expect(url.searchParams.get('q')).toBe('58,56.25');
     expect(url.searchParams.get('days')).toBe('2');
     expect(url.searchParams.get('lang')).toBe('ru');
@@ -57,7 +55,6 @@ describe('getForecast', () => {
   it('rejects missing forecast measurements without exposing provider text', async () => {
     await expect(
       getForecast({
-        apiKey: 'example-only',
         location: { source: 'automatic' },
         locale: 'en',
         timeZone: 'Asia/Yekaterinburg',
@@ -81,7 +78,6 @@ describe('getForecast', () => {
   it('keeps a polar day usable when the provider reports no sunrise or sunset', async () => {
     const first = forecastResponse.forecast.forecastday[0];
     const forecast = await getForecast({
-      apiKey: 'example-only',
       location: { source: 'automatic' },
       locale: 'en',
       timeZone: 'Asia/Yekaterinburg',

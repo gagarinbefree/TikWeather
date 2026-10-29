@@ -13,7 +13,6 @@ import {
   type Forecast,
 } from '@/entities/weather';
 import { forecastServicesKey, longestForecast, type ForecastServices } from '@/features/forecast';
-import { openWeatherMapKey, weatherApiKey } from '@/shared/config';
 import { ApiError } from '@/shared/api';
 /**
  * mountWeatherApp. Start the app with shared weather and location services
@@ -28,11 +27,11 @@ export function mountWeatherApp(root: Component, device?: DeviceGeolocation): vo
       withFallback(
         [
           (): ReturnType<CurrentWeatherServices['current']> =>
-            getCurrentWeather({ location, locale, signal, apiKey: weatherApiKey() }),
+            getCurrentWeather({ location, locale, signal }),
           (): ReturnType<CurrentWeatherServices['current']> =>
             getOpenMeteoCurrent({ location, locale, signal }),
           (): ReturnType<CurrentWeatherServices['current']> =>
-            getOpenWeatherMapCurrent({ location, locale, signal, apiKey: openWeatherMapKey() }),
+            getOpenWeatherMapCurrent({ location, locale, signal }),
         ],
         signal,
       ),
@@ -84,7 +83,6 @@ function createForecastServices(): ForecastServices {
                     timeZone,
                     days: 14,
                     signal,
-                    apiKey: weatherApiKey(),
                   }),
                   3,
                 ),
@@ -97,7 +95,6 @@ function createForecastServices(): ForecastServices {
                     days,
                     now,
                     signal,
-                    apiKey: openWeatherMapKey(),
                   }),
                   3,
                 ),
@@ -115,7 +112,6 @@ function createForecastServices(): ForecastServices {
                     timeZone,
                     days,
                     signal,
-                    apiKey: weatherApiKey(),
                   }),
                   days,
                 ),
@@ -133,7 +129,6 @@ function createForecastServices(): ForecastServices {
                     days,
                     now,
                     signal,
-                    apiKey: openWeatherMapKey(),
                   }),
                   days,
                 ),

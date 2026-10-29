@@ -13,13 +13,14 @@ describe('getCurrentWeather', () => {
         countryCode: null,
       },
       locale: 'ru',
-      apiKey: 'example-only',
       fetcher,
     });
     const requested = fetcher.mock.calls[0]?.[0];
     if (typeof requested !== 'string') throw new Error('Expected a string API URL');
     const url = new URL(requested);
-    expect(url.pathname).toBe('/v1/current.json');
+    expect(url.origin).toBe('https://gagarinbefree.clodocd.com');
+    expect(url.pathname).toBe('/api/weatherapi/v1/current.json');
+    expect(url.searchParams.has('key')).toBe(false);
     expect(url.searchParams.get('q')).toBe('58.0047,56.2514');
     expect(url.searchParams.get('lang')).toBe('ru');
     expect(weather).toMatchObject({
@@ -38,7 +39,6 @@ describe('getCurrentWeather', () => {
     await getCurrentWeather({
       location: { source: 'automatic' },
       locale: 'en',
-      apiKey: 'example-only',
       fetcher,
     });
     const requested = fetcher.mock.calls[0]?.[0];
@@ -57,19 +57,18 @@ describe('getCurrentWeather', () => {
         region: 'Пермский край',
       },
       locale: 'ru',
-      apiKey: 'example-only',
       fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),
     });
     expect(weather.city).toBe('Пермь');
     expect(weather.region).toBe('Пермский край');
   });
 
-  it('fails clearly without a key and does not send a useless request', async () => {
-    const fetcher = vi.fn<typeof fetch>();
-    await expect(
-      getCurrentWeather({ location: { source: 'automatic' }, locale: 'en', apiKey: '', fetcher }),
-    ).rejects.toMatchObject({ kind: 'configuration' });
-    expect(fetcher).not.toHaveBeenCalled();
+  it('loads automatic location without any client credential', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse));
+    await getCurrentWeather({ location: { source: 'automatic' }, locale: 'en', fetcher });
+    const requested = fetcher.mock.calls[0]?.[0];
+    if (typeof requested !== 'string') throw new Error('Expected a backend URL');
+    expect(new URL(requested).searchParams.has('key')).toBe(false);
   });
 
   it.each([
@@ -82,7 +81,6 @@ describe('getCurrentWeather', () => {
       getCurrentWeather({
         location: { source: 'automatic' },
         locale: 'en',
-        apiKey: 'example-only',
         fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(payload)),
       }),
     ).rejects.toMatchObject({ kind: 'invalidResponse' });

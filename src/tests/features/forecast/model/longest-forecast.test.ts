@@ -120,4 +120,24 @@ describe('longestForecast', () => {
       ),
     ).rejects.toMatchObject({ kind: 'timeout' });
   });
+  it('replaces retained readings with fresh data even when retained data has more hours', async () => {
+    const saved = forecast(16);
+    const live = forecast(3);
+    const older = {
+      ...saved,
+      serverCachedAt: 100,
+      days: saved.days.map((value) => ({ ...value, serverCachedAt: 100 })),
+    };
+    const result = await longestForecast(
+      [
+        (): Promise<Forecast> => Promise.resolve(older),
+        (): Promise<Forecast> => Promise.resolve(live),
+      ],
+      new AbortController().signal,
+      16,
+    );
+    expect(result.days).toHaveLength(16);
+    expect(result.days[0]?.serverCachedAt).toBeUndefined();
+    expect(result.days[3]?.serverCachedAt).toBe(100);
+  });
 });

@@ -105,7 +105,7 @@ describe('Open Meteo adapter', () => {
     const requestUrl = fetcher.mock.calls[0]?.[0];
     if (typeof requestUrl !== 'string') throw new Error('Expected a URL');
     const url = new URL(requestUrl);
-    expect(url.pathname).toBe('/v1/forecast');
+    expect(url.pathname).toBe('/api/open-meteo/v1/forecast');
     expect(url.searchParams.get('current')).toContain('temperature_2m');
     expect(url.searchParams.get('timeformat')).toBe('unixtime');
     expect(current).toMatchObject({

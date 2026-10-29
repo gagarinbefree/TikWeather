@@ -2,7 +2,8 @@ import {
   ApiError,
   numeric,
   record,
-  requestJson,
+  requestWeatherJson,
+  weatherEndpoint,
   text,
   validCoordinates,
   type LocationQuery,
@@ -11,7 +12,6 @@ import {
 import type { CurrentWeather } from '@/entities/weather/model/current-weather';
 
 interface CurrentWeatherOptions extends RequestOptions {
-  readonly apiKey: string;
   readonly location: LocationQuery;
   readonly locale: 'ru' | 'en';
 }
@@ -23,7 +23,6 @@ interface CurrentWeatherOptions extends RequestOptions {
  * @returns The validated current observations independent of forecast loading.
  */
 export async function getCurrentWeather(options: CurrentWeatherOptions): Promise<CurrentWeather> {
-  if (!options.apiKey.trim()) throw new ApiError('configuration');
   const position = options.location;
   if (position.source !== 'automatic' && !validCoordinates(position.latitude, position.longitude))
     throw new ApiError('invalidResponse');
@@ -31,14 +30,14 @@ export async function getCurrentWeather(options: CurrentWeatherOptions): Promise
     position.source === 'automatic'
       ? 'auto:ip'
       : `${position.latitude.toString()},${position.longitude.toString()}`;
-  const url = new URL('https://api.weatherapi.com/v1/current.json');
+  const url = weatherEndpoint('api/weatherapi/v1/current.json');
   url.search = new URLSearchParams({
-    key: options.apiKey.trim(),
     q: query,
     lang: options.locale,
     aqi: 'no',
   }).toString();
-  const payload = record(await requestJson(url.toString(), options));
+  const { payload: body, serverCachedAt } = await requestWeatherJson(url.toString(), options);
+  const payload = record(body);
   const location = record(payload['location']);
   const current = record(payload['current']);
   const condition = record(current['condition']);
@@ -50,6 +49,7 @@ export async function getCurrentWeather(options: CurrentWeatherOptions): Promise
   }
   const observedAt = numeric(current['last_updated_epoch'], 1, 8640000000000) * 1000;
   return {
+    ...(serverCachedAt === undefined ? {} : { serverCachedAt }),
     city:
       position.source === 'device' && position.city?.trim()
         ? position.city.trim()

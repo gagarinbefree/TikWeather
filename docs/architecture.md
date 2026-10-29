@@ -129,3 +129,5 @@ Fluent SVG и именованные пастельные цвета AvaWeather.
 Bootstrap подключается через Sass `@use`. Импортируются только корневые стили,
 сброс оформления, спиннер, кнопка и вспомогательные стили скрытого доступного текста.
 JavaScript плагины Bootstrap стартовому экрану не нужны.
+
+Weather provider access now uses the shared VPS without client credentials. See [backend transport](backend.md).

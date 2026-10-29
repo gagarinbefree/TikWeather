@@ -2,7 +2,8 @@ import {
   ApiError,
   numeric,
   record,
-  requestJson,
+  requestWeatherJson,
+  weatherEndpoint,
   text,
   validCoordinates,
   type LocationQuery,
@@ -68,7 +69,7 @@ function coordinates(location: LocationQuery): { latitude: number; longitude: nu
  */
 function endpoint(location: LocationQuery, timeZone: string, days?: number): string {
   const point = coordinates(location);
-  const url = new URL('https://api.open-meteo.com/v1/forecast');
+  const url = weatherEndpoint('api/open-meteo/v1/forecast');
   url.search = new URLSearchParams({
     latitude: String(point.latitude),
     longitude: String(point.longitude),
@@ -177,7 +178,11 @@ function clock(value: unknown, timeZone: string): string | null {
  * @returns Current measurements normalized for the shared weather card.
  */
 export async function getOpenMeteoCurrent(options: MeteoOptions): Promise<CurrentWeather> {
-  const payload = record(await requestJson(endpoint(options.location, 'auto'), options));
+  const { payload: body, serverCachedAt } = await requestWeatherJson(
+    endpoint(options.location, 'auto'),
+    options,
+  );
+  const payload = record(body);
   const current = record(payload['current']);
   const timeZone = text(payload['timezone']);
   dateFormatter(timeZone);
@@ -185,6 +190,7 @@ export async function getOpenMeteoCurrent(options: MeteoOptions): Promise<Curren
   const isDay = numeric(current['is_day'], 0, 1) === 1;
   const point = coordinates(options.location);
   return {
+    ...(serverCachedAt === undefined ? {} : { serverCachedAt }),
     city:
       options.location.source !== 'automatic' && options.location.city?.trim()
         ? options.location.city.trim()
@@ -217,9 +223,11 @@ export async function getOpenMeteoCurrent(options: MeteoOptions): Promise<Curren
 export async function getOpenMeteoForecast(options: MeteoForecastOptions): Promise<Forecast> {
   if (!Number.isInteger(options.days) || options.days < 1 || options.days > 16)
     throw new ApiError('invalidResponse');
-  const payload = record(
-    await requestJson(endpoint(options.location, options.timeZone, options.days), options),
+  const { payload: body, serverCachedAt } = await requestWeatherJson(
+    endpoint(options.location, options.timeZone, options.days),
+    options,
   );
+  const payload = record(body);
   if (text(payload['timezone']) !== options.timeZone) throw new ApiError('invalidResponse');
   const hourly = record(payload['hourly']);
   const daily = record(payload['daily']);
@@ -291,6 +299,7 @@ export async function getOpenMeteoForecast(options: MeteoForecastOptions): Promi
     const dayHours = hours.get(date);
     if (!dayHours?.length) throw new ApiError('invalidResponse');
     days.push({
+      ...(serverCachedAt === undefined ? {} : { serverCachedAt }),
       date,
       maximum: arrayAt(daily, 'temperature_2m_max', index),
       minimum: arrayAt(daily, 'temperature_2m_min', index),
@@ -312,5 +321,5 @@ export async function getOpenMeteoForecast(options: MeteoForecastOptions): Promi
       hours: dayHours,
     });
   }
-  return { days, intervalHours: 2 };
+  return { days, intervalHours: 2, ...(serverCachedAt === undefined ? {} : { serverCachedAt }) };
 }

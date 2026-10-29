@@ -20,7 +20,6 @@ function services(): CurrentWeatherServices {
         location,
         locale,
         signal,
-        apiKey: 'example-only',
         fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),
       }),
     now: () => currentResponse.location.localtime_epoch * 1000,

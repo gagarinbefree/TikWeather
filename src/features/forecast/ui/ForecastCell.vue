@@ -39,7 +39,7 @@ const failure = computed(
     :city="city"
     :time-zone="timeZone"
     :locale="locale"
-    :cached-at="cachedAt"
+    :cached-at="forecast.day(cell.date)?.serverCachedAt ?? cachedAt"
   />
   <section v-else-if="failure" class="forecast-error">
     <p role="alert">{{ text.failures[failure] }}</p>

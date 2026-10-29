@@ -1,19 +1,29 @@
-/**
- * weatherApiKey. Read the WeatherAPI key supplied at build time
- *
- * @returns The public browser credential supplied locally or by the release workflow.
- */
-export function weatherApiKey(): string {
-  const key: unknown = import.meta.env['VITE_WEATHER_API_KEY'];
-  return typeof key === 'string' ? key : '';
-}
+import configuration from '@assets/config/weather-server.json';
+import { ApiError } from '@/shared/api/types';
 
 /**
- * openWeatherMapKey. Read the OpenWeatherMap key supplied at build time
+ * weatherServerUrl. Read the public backend address without loading provider credentials
  *
- * @returns The public browser credential for the final weather fallback.
+ * @returns The validated HTTPS backend address or a local development address.
  */
-export function openWeatherMapKey(): string {
-  const key: unknown = import.meta.env['VITE_OPENWEATHERMAP_API_KEY'];
-  return typeof key === 'string' ? key : '';
+export function weatherServerUrl(): URL {
+  const override: unknown = import.meta.env['VITE_WEATHER_SERVER_URL'];
+  try {
+    const url = new URL(
+      typeof override === 'string' && override.trim() ? override : configuration.baseUrl,
+    );
+    const local = import.meta.env.DEV && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+    if (
+      (url.protocol !== 'https:' && !(local && url.protocol === 'http:')) ||
+      url.username ||
+      url.password ||
+      url.search ||
+      url.hash ||
+      url.pathname !== '/'
+    )
+      throw new ApiError('configuration');
+    return url;
+  } catch {
+    throw new ApiError('configuration');
+  }
 }

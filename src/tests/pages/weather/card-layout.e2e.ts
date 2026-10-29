@@ -54,16 +54,22 @@ test('keeps current daily and hourly cards fully visible at the Android viewport
       },
     });
   });
-  await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
-    await route.fulfill({ json: currentResponse });
-  });
-  await page.route('https://api.weatherapi.com/v1/forecast.json?**', async (route) => {
-    await route.fulfill({ json: forecastResponse });
-  });
-  await page.route('https://api.open-meteo.com/**', async (route) => {
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/current.json?**',
+    async (route) => {
+      await route.fulfill({ json: currentResponse });
+    },
+  );
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/forecast.json?**',
+    async (route) => {
+      await route.fulfill({ json: forecastResponse });
+    },
+  );
+  await page.route('https://gagarinbefree.clodocd.com/api/open-meteo/**', async (route) => {
     await route.fulfill({ status: 503, json: {} });
   });
-  await page.route('https://api.openweathermap.org/**', async (route) => {
+  await page.route('https://gagarinbefree.clodocd.com/api/openweathermap/**', async (route) => {
     await route.fulfill({ status: 503, json: {} });
   });
   await page.goto('./');

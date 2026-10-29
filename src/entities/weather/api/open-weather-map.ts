@@ -2,7 +2,8 @@ import {
   ApiError,
   numeric,
   record,
-  requestJson,
+  requestWeatherJson,
+  weatherEndpoint,
   text,
   validCoordinates,
   type LocationQuery,
@@ -32,7 +33,6 @@ const directions = [
 ] as const;
 
 interface MapOptions extends RequestOptions {
-  readonly apiKey: string;
   readonly location: LocationQuery;
   readonly locale: Locale;
 }
@@ -59,17 +59,15 @@ function point(location: LocationQuery): { latitude: number; longitude: number }
  * endpoint. Build the OpenWeatherMap request URL
  *
  * @param path The current or forecast provider path.
- * @param options The coordinates, language and public browser key.
+ * @param options The coordinates, language and backend transport.
  * @returns An encoded OpenWeatherMap URL.
  */
 function endpoint(path: 'weather' | 'forecast', options: MapOptions): string {
-  if (!options.apiKey.trim()) throw new ApiError('configuration');
   const location = point(options.location);
-  const url = new URL(`https://api.openweathermap.org/data/2.5/${path}`);
+  const url = weatherEndpoint(`api/openweathermap/data/2.5/${path}`);
   url.search = new URLSearchParams({
     lat: String(location.latitude),
     lon: String(location.longitude),
-    appid: options.apiKey.trim(),
     units: 'metric',
     lang: options.locale,
   }).toString();
@@ -219,17 +217,20 @@ function parseCurrent(
 /**
  * getOpenWeatherMapCurrent. Load the current weather from OpenWeatherMap
  *
- * @param options The detected location, browser key and cancellable transport.
+ * @param options The detected location and cancellable backend transport.
  * @returns Validated current observations with an offline coordinate time zone.
  */
 export async function getOpenWeatherMapCurrent(options: MapOptions): Promise<CurrentWeather> {
   const url = endpoint('weather', options);
-  const payload = await requestJson(url, options);
+  const { payload, serverCachedAt } = await requestWeatherJson(url, options);
   const coordinates = point(options.location);
   const { default: lookup } = await import('@photostructure/tz-lookup');
   const timeZone = lookup(coordinates.latitude, coordinates.longitude);
   formatter(timeZone);
-  return parseCurrent(payload, options.location, options.locale, timeZone);
+  return {
+    ...parseCurrent(payload, options.location, options.locale, timeZone),
+    ...(serverCachedAt === undefined ? {} : { serverCachedAt }),
+  };
 }
 
 /**
@@ -300,10 +301,17 @@ function sunTime(value: unknown, timeZone: string): string {
 export async function getOpenWeatherMapForecast(options: MapForecastOptions): Promise<Forecast> {
   const currentUrl = endpoint('weather', options);
   const forecastUrl = endpoint('forecast', options);
-  const [currentPayload, forecastPayload] = await Promise.all([
-    requestJson(currentUrl, options),
-    requestJson(forecastUrl, options),
+  const [
+    { payload: currentPayload, serverCachedAt: currentCachedAt },
+    { payload: forecastPayload, serverCachedAt: forecastCachedAt },
+  ] = await Promise.all([
+    requestWeatherJson(currentUrl, options),
+    requestWeatherJson(forecastUrl, options),
   ]);
+  const times = [currentCachedAt, forecastCachedAt].filter(
+    (value): value is number => value !== undefined,
+  );
+  const serverCachedAt = times.length ? Math.min(...times) : undefined;
   const dateTime = formatter(options.timeZone);
   const current = parseCurrent(currentPayload, options.location, options.locale, options.timeZone);
   const today = localTime(options.now, dateTime).date;
@@ -337,7 +345,9 @@ export async function getOpenWeatherMapForecast(options: MapForecastOptions): Pr
         )[0]
       : current;
     if (!representative) throw new ApiError('invalidResponse');
+    const retainedAt = offset === 0 ? serverCachedAt : forecastCachedAt;
     days.push({
+      ...(retainedAt === undefined ? {} : { serverCachedAt: retainedAt }),
       date,
       maximum: Math.max(...temperatures),
       minimum: Math.min(...temperatures),
@@ -354,5 +364,5 @@ export async function getOpenWeatherMapForecast(options: MapForecastOptions): Pr
     });
   }
   if (days.length === 0) throw new ApiError('invalidResponse');
-  return { days, intervalHours: 3 };
+  return { days, intervalHours: 3, ...(serverCachedAt === undefined ? {} : { serverCachedAt }) };
 }

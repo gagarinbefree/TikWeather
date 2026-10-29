@@ -6,7 +6,6 @@ import { forecastResponse } from '@/tests/entities/weather/api/forecast-fixture'
 describe('ForecastWeatherCard', () => {
   it('shows a localized tomorrow card with daily measurements and astronomy', async () => {
     const forecast = await getForecast({
-      apiKey: 'example-only',
       location: { source: 'automatic' },
       locale: 'ru',
       timeZone: 'Asia/Yekaterinburg',
@@ -42,7 +41,6 @@ describe('ForecastWeatherCard', () => {
 
   it('keeps the existing date format on later days', async () => {
     const forecast = await getForecast({
-      apiKey: 'example-only',
       location: { source: 'automatic' },
       locale: 'ru',
       timeZone: 'Asia/Yekaterinburg',
@@ -68,7 +66,6 @@ describe('ForecastWeatherCard', () => {
 
   it('shows an hourly forecast at its location time with rain chance', async () => {
     const forecast = await getForecast({
-      apiKey: 'example-only',
       location: { source: 'automatic' },
       locale: 'en',
       timeZone: 'Asia/Yekaterinburg',

@@ -10,34 +10,42 @@ test('shows A1 while forecast is pending and prioritizes the swiped day', async 
   const requestedDays: number[] = [];
   let releaseToday: (() => void) | undefined;
   let releaseTomorrow: (() => void) | undefined;
-  await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
-    await route.fulfill({ json: currentResponse });
-  });
-  await page.route('https://api.weatherapi.com/v1/forecast.json?**', async (route) => {
-    const depth = Number(new URL(route.request().url()).searchParams.get('days'));
-    requestedDays.push(depth);
-    if (depth === 1) {
-      await new Promise<void>((resolve) => {
-        releaseToday = resolve;
-      });
-    }
-    if (depth === 3) {
-      await new Promise<void>((resolve) => {
-        releaseTomorrow = resolve;
-      });
-    }
-    try {
-      await route.fulfill({
-        json: { forecast: { forecastday: forecastResponse.forecast.forecastday.slice(0, depth) } },
-      });
-    } catch {
-      // The request can be cancelled when the next day takes priority.
-    }
-  });
-  await page.route('https://api.open-meteo.com/**', async (route) => {
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/current.json?**',
+    async (route) => {
+      await route.fulfill({ json: currentResponse });
+    },
+  );
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/forecast.json?**',
+    async (route) => {
+      const depth = Number(new URL(route.request().url()).searchParams.get('days'));
+      requestedDays.push(depth);
+      if (depth === 1) {
+        await new Promise<void>((resolve) => {
+          releaseToday = resolve;
+        });
+      }
+      if (depth === 3) {
+        await new Promise<void>((resolve) => {
+          releaseTomorrow = resolve;
+        });
+      }
+      try {
+        await route.fulfill({
+          json: {
+            forecast: { forecastday: forecastResponse.forecast.forecastday.slice(0, depth) },
+          },
+        });
+      } catch {
+        // The request can be cancelled when the next day takes priority.
+      }
+    },
+  );
+  await page.route('https://gagarinbefree.clodocd.com/api/open-meteo/**', async (route) => {
     await route.fulfill({ status: 503, json: {} });
   });
-  await page.route('https://api.openweathermap.org/**', async (route) => {
+  await page.route('https://gagarinbefree.clodocd.com/api/openweathermap/**', async (route) => {
     await route.fulfill({ status: 503, json: {} });
   });
 
@@ -105,60 +113,69 @@ test('allows navigation to the last day returned by Open Meteo', async ({ page }
   test.slow();
   await page.clock.setFixedTime(new Date('2026-10-26T05:37:00Z'));
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
-    await route.fulfill({ json: currentResponse });
-  });
-  await page.route('https://api.weatherapi.com/v1/forecast.json?**', async (route) => {
-    const depth = Number(new URL(route.request().url()).searchParams.get('days'));
-    await route.fulfill({
-      json: { forecast: { forecastday: forecastResponse.forecast.forecastday.slice(0, depth) } },
-    });
-  });
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/current.json?**',
+    async (route) => {
+      await route.fulfill({ json: currentResponse });
+    },
+  );
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/forecast.json?**',
+    async (route) => {
+      const depth = Number(new URL(route.request().url()).searchParams.get('days'));
+      await route.fulfill({
+        json: { forecast: { forecastday: forecastResponse.forecast.forecastday.slice(0, depth) } },
+      });
+    },
+  );
   let extendedRequests = 0;
-  await page.route('https://api.open-meteo.com/v1/forecast?**', async (route) => {
-    const url = new URL(route.request().url());
-    if (url.searchParams.get('forecast_days') !== '16') {
-      await route.fulfill({ status: 503, json: {} });
-      return;
-    }
-    extendedRequests++;
-    const dates = Array.from({ length: 16 }, (_, index) => index);
-    const dailyTime = dates.map((index) => Date.UTC(2026, 9, 25 + index, 19) / 1000);
-    const hourlyTime = dates.map((index) => Date.UTC(2026, 9, 26 + index, 7) / 1000);
-    await route.fulfill({
-      json: {
-        timezone: 'Asia/Yekaterinburg',
-        utc_offset_seconds: 18000,
-        hourly: {
-          time: hourlyTime,
-          temperature_2m: dates.map(() => 9),
-          apparent_temperature: dates.map(() => 7),
-          relative_humidity_2m: dates.map(() => 70),
-          wind_speed_10m: dates.map(() => 12),
-          wind_direction_10m: dates.map(() => 225),
-          pressure_msl: dates.map(() => 1012),
-          visibility: dates.map(() => 10000),
-          uv_index: dates.map(() => 1),
-          weather_code: dates.map(() => 3),
-          is_day: dates.map(() => 1),
-          precipitation_probability: dates.map(() => 40),
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/open-meteo/v1/forecast?**',
+    async (route) => {
+      const url = new URL(route.request().url());
+      if (url.searchParams.get('forecast_days') !== '16') {
+        await route.fulfill({ status: 503, json: {} });
+        return;
+      }
+      extendedRequests++;
+      const dates = Array.from({ length: 16 }, (_, index) => index);
+      const dailyTime = dates.map((index) => Date.UTC(2026, 9, 25 + index, 19) / 1000);
+      const hourlyTime = dates.map((index) => Date.UTC(2026, 9, 26 + index, 7) / 1000);
+      await route.fulfill({
+        json: {
+          timezone: 'Asia/Yekaterinburg',
+          utc_offset_seconds: 18000,
+          hourly: {
+            time: hourlyTime,
+            temperature_2m: dates.map(() => 9),
+            apparent_temperature: dates.map(() => 7),
+            relative_humidity_2m: dates.map(() => 70),
+            wind_speed_10m: dates.map(() => 12),
+            wind_direction_10m: dates.map(() => 225),
+            pressure_msl: dates.map(() => 1012),
+            visibility: dates.map(() => 10000),
+            uv_index: dates.map(() => 1),
+            weather_code: dates.map(() => 3),
+            is_day: dates.map(() => 1),
+            precipitation_probability: dates.map(() => 40),
+          },
+          daily: {
+            time: dailyTime,
+            temperature_2m_max: dates.map(() => 12),
+            temperature_2m_min: dates.map(() => 4),
+            relative_humidity_2m_mean: dates.map(() => 75),
+            wind_speed_10m_max: dates.map(() => 18),
+            precipitation_probability_max: dates.map(() => 60),
+            uv_index_max: dates.map(() => 2),
+            weather_code: dates.map(() => 3),
+            sunrise: dates.map((index) => Date.UTC(2026, 9, 26 + index, 2, 45) / 1000),
+            sunset: dates.map((index) => Date.UTC(2026, 9, 26 + index, 12, 30) / 1000),
+          },
         },
-        daily: {
-          time: dailyTime,
-          temperature_2m_max: dates.map(() => 12),
-          temperature_2m_min: dates.map(() => 4),
-          relative_humidity_2m_mean: dates.map(() => 75),
-          wind_speed_10m_max: dates.map(() => 18),
-          precipitation_probability_max: dates.map(() => 60),
-          uv_index_max: dates.map(() => 2),
-          weather_code: dates.map(() => 3),
-          sunrise: dates.map((index) => Date.UTC(2026, 9, 26 + index, 2, 45) / 1000),
-          sunset: dates.map((index) => Date.UTC(2026, 9, 26 + index, 12, 30) / 1000),
-        },
-      },
-    });
-  });
-  await page.route('https://api.openweathermap.org/**', async (route) => {
+      });
+    },
+  );
+  await page.route('https://gagarinbefree.clodocd.com/api/openweathermap/**', async (route) => {
     await route.fulfill({ status: 503, json: {} });
   });
 

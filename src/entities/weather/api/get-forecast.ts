@@ -2,7 +2,8 @@ import {
   ApiError,
   numeric,
   record,
-  requestJson,
+  requestWeatherJson,
+  weatherEndpoint,
   text,
   validCoordinates,
   type LocationQuery,
@@ -11,7 +12,6 @@ import {
 import type { Forecast, ForecastDay, ForecastHour } from '@/entities/weather/model/forecast';
 
 interface ForecastOptions extends RequestOptions {
-  readonly apiKey: string;
   readonly location: LocationQuery;
   readonly locale: 'ru' | 'en';
   readonly timeZone: string;
@@ -139,7 +139,6 @@ function parseDay(
  * @returns Validated daily and hourly weather for the requested horizon.
  */
 export async function getForecast(options: ForecastOptions): Promise<Forecast> {
-  if (!options.apiKey.trim()) throw new ApiError('configuration');
   if (!Number.isInteger(options.days) || options.days < 1 || options.days > 14)
     throw new ApiError('invalidResponse');
   const position = options.location;
@@ -149,9 +148,8 @@ export async function getForecast(options: ForecastOptions): Promise<Forecast> {
     position.source === 'automatic'
       ? 'auto:ip'
       : `${position.latitude.toString()},${position.longitude.toString()}`;
-  const url = new URL('https://api.weatherapi.com/v1/forecast.json');
+  const url = weatherEndpoint('api/weatherapi/v1/forecast.json');
   url.search = new URLSearchParams({
-    key: options.apiKey.trim(),
     q: query,
     days: String(options.days),
     lang: options.locale,
@@ -169,14 +167,16 @@ export async function getForecast(options: ForecastOptions): Promise<Forecast> {
   } catch {
     throw new ApiError('invalidResponse');
   }
-  const payload = record(await requestJson(url.toString(), options));
+  const { payload: body, serverCachedAt } = await requestWeatherJson(url.toString(), options);
+  const payload = record(body);
   const forecast = record(payload['forecast']);
   const entries = forecast['forecastday'];
   if (!Array.isArray(entries) || entries.length === 0) throw new ApiError('invalidResponse');
-  const days = entries
-    .slice(0, options.days)
-    .map((entry: unknown) => parseDay(entry, formatter, options.locale));
+  const days = entries.slice(0, options.days).map((entry: unknown) => ({
+    ...parseDay(entry, formatter, options.locale),
+    ...(serverCachedAt === undefined ? {} : { serverCachedAt }),
+  }));
   if (new Set(days.map((day) => day.date)).size !== days.length)
     throw new ApiError('invalidResponse');
-  return { days };
+  return { days, ...(serverCachedAt === undefined ? {} : { serverCachedAt }) };
 }

@@ -6,7 +6,6 @@ import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 describe('CurrentWeatherCard', () => {
   it('renders localized measurements without an update time for live weather', async () => {
     const weather = await getCurrentWeather({
-      apiKey: 'example-only',
       locale: 'en',
       location: { source: 'automatic' },
       fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),
@@ -39,7 +38,6 @@ describe('CurrentWeatherCard', () => {
 
   it('adds today sun times when the background forecast arrives', async () => {
     const weather = await getCurrentWeather({
-      apiKey: 'example-only',
       locale: 'ru',
       location: { source: 'automatic' },
       fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),
@@ -61,7 +59,6 @@ describe('CurrentWeatherCard', () => {
 
   it('uses the night icon and never displays a raw provider error or unknown code', async () => {
     const weather = await getCurrentWeather({
-      apiKey: 'example-only',
       locale: 'en',
       location: { source: 'automatic' },
       fetcher: vi.fn<typeof fetch>().mockResolvedValue(
@@ -83,7 +80,6 @@ describe('CurrentWeatherCard', () => {
 
   it('shows the observation time only for saved weather in the location timezone', async () => {
     const weather = await getCurrentWeather({
-      apiKey: 'example-only',
       locale: 'ru',
       location: { source: 'automatic' },
       fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),

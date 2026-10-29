@@ -52,7 +52,6 @@ describe('OpenWeatherMap adapter', () => {
   it('normalizes current measurements without inventing UV data', async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse));
     const weather = await getOpenWeatherMapCurrent({
-      apiKey: 'example-only',
       location,
       locale: 'ru',
       fetcher,
@@ -60,7 +59,7 @@ describe('OpenWeatherMap adapter', () => {
     const requestUrl = fetcher.mock.calls[0]?.[0];
     if (typeof requestUrl !== 'string') throw new Error('Expected a URL');
     const url = new URL(requestUrl);
-    expect(url.pathname).toBe('/data/2.5/weather');
+    expect(url.pathname).toBe('/api/openweathermap/data/2.5/weather');
     expect(url.searchParams.get('lat')).toBe('58');
     expect(url.searchParams.get('units')).toBe('metric');
     expect(url.searchParams.get('lang')).toBe('ru');
@@ -86,7 +85,6 @@ describe('OpenWeatherMap adapter', () => {
       );
     });
     const forecast = await getOpenWeatherMapForecast({
-      apiKey: 'example-only',
       location,
       locale: 'ru',
       timeZone: 'Asia/Yekaterinburg',
@@ -127,7 +125,6 @@ describe('OpenWeatherMap adapter', () => {
     });
 
     const forecast = await getOpenWeatherMapForecast({
-      apiKey: 'example-only',
       location,
       locale: 'ru',
       timeZone: 'Asia/Yekaterinburg',
@@ -146,11 +143,13 @@ describe('OpenWeatherMap adapter', () => {
     ]);
   });
 
-  it('refuses a missing key before any request', async () => {
-    const fetcher = vi.fn<typeof fetch>();
-    await expect(
-      getOpenWeatherMapCurrent({ apiKey: '', location, locale: 'en', fetcher }),
-    ).rejects.toMatchObject({ kind: 'configuration' });
-    expect(fetcher).not.toHaveBeenCalled();
+  it('uses the backend without a client key', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse));
+    await getOpenWeatherMapCurrent({ location, locale: 'en', fetcher });
+    const requested = fetcher.mock.calls[0]?.[0];
+    if (typeof requested !== 'string') throw new Error('Expected a backend URL');
+    const url = new URL(requested);
+    expect(url.origin).toBe('https://gagarinbefree.clodocd.com');
+    expect(url.searchParams.has('appid')).toBe(false);
   });
 });

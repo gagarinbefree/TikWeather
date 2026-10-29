@@ -38,43 +38,55 @@ test('keeps detailed hours and unique days when the longer fallback arrives duri
 }) => {
   await page.clock.setFixedTime(new Date('2026-10-26T05:37:00Z'));
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
-    await route.fulfill({ json: currentResponse });
-  });
-  await page.route('https://api.weatherapi.com/v1/forecast.json?**', async (route) => {
-    const depth = Number(new URL(route.request().url()).searchParams.get('days'));
-    await route.fulfill({
-      json: { forecast: { forecastday: forecastResponse.forecast.forecastday.slice(0, depth) } },
-    });
-  });
-  await page.route('https://api.open-meteo.com/**', async (route) => {
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/current.json?**',
+    async (route) => {
+      await route.fulfill({ json: currentResponse });
+    },
+  );
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/forecast.json?**',
+    async (route) => {
+      const depth = Number(new URL(route.request().url()).searchParams.get('days'));
+      await route.fulfill({
+        json: { forecast: { forecastday: forecastResponse.forecast.forecastday.slice(0, depth) } },
+      });
+    },
+  );
+  await page.route('https://gagarinbefree.clodocd.com/api/open-meteo/**', async (route) => {
     await route.fulfill({ status: 503, json: {} });
   });
-  await page.route('https://api.openweathermap.org/data/2.5/weather?**', async (route) => {
-    await route.fulfill({
-      json: {
-        name: 'Perm',
-        dt: Date.UTC(2026, 9, 26, 7) / 1000,
-        timezone: 18000,
-        main: { temp: 8, feels_like: 6, humidity: 75, pressure: 1011 },
-        wind: { speed: 4, deg: 180 },
-        visibility: 9000,
-        weather: [{ id: 500, description: 'небольшой дождь', icon: '10d' }],
-        sys: {
-          country: 'RU',
-          sunrise: Date.UTC(2026, 9, 26, 2, 45) / 1000,
-          sunset: Date.UTC(2026, 9, 26, 12, 30) / 1000,
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/openweathermap/data/2.5/weather?**',
+    async (route) => {
+      await route.fulfill({
+        json: {
+          name: 'Perm',
+          dt: Date.UTC(2026, 9, 26, 7) / 1000,
+          timezone: 18000,
+          main: { temp: 8, feels_like: 6, humidity: 75, pressure: 1011 },
+          wind: { speed: 4, deg: 180 },
+          visibility: 9000,
+          weather: [{ id: 500, description: 'небольшой дождь', icon: '10d' }],
+          sys: {
+            country: 'RU',
+            sunrise: Date.UTC(2026, 9, 26, 2, 45) / 1000,
+            sunset: Date.UTC(2026, 9, 26, 12, 30) / 1000,
+          },
         },
-      },
-    });
-  });
+      });
+    },
+  );
   let fallbackRequests = 0;
-  await page.route('https://api.openweathermap.org/data/2.5/forecast?**', async (route) => {
-    fallbackRequests++;
-    await route.fulfill({
-      json: { list: Array.from({ length: 6 }, (_, index) => mapHour(index)) },
-    });
-  });
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/openweathermap/data/2.5/forecast?**',
+    async (route) => {
+      fallbackRequests++;
+      await route.fulfill({
+        json: { list: Array.from({ length: 6 }, (_, index) => mapHour(index)) },
+      });
+    },
+  );
 
   await page.goto('./');
   const viewport = page.getByRole('region', { name: 'Навигация по прогнозу' });

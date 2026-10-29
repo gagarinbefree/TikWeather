@@ -39,7 +39,10 @@ export async function requestJson(url: string, options: RequestOptions = {}): Pr
     if (!response.ok)
       throw new ApiError(
         response.status === 401 || response.status === 403 ? 'credentials' : 'unavailable',
+        response.status,
+        response.status === 429 && !response.headers.has('X-Weather-Provider'),
       );
+    options.onResponse?.(response);
     try {
       const payload: unknown = await Promise.race([response.json(), interrupted]);
       return payload;

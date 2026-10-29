@@ -22,13 +22,25 @@ export interface RequestOptions {
   readonly signal?: AbortSignal;
   readonly fetcher?: typeof fetch;
   readonly timeoutMs?: number;
+  readonly onResponse?: (response: Response) => void;
 }
 
 /**
  * ApiError. Represent a safe API failure without request URLs or provider details
  */
 export class ApiError extends Error {
-  constructor(readonly kind: FailureKind) {
+  /**
+   * constructor. Create a safe failure without response text or request URLs
+   *
+   * @param kind The localized failure category.
+   * @param status The optional HTTP status for transport decisions.
+   * @param sharedLimit Whether the backend entrance rejected all provider routes.
+   */
+  constructor(
+    readonly kind: FailureKind,
+    readonly status?: number,
+    readonly sharedLimit = false,
+  ) {
     super(kind);
     this.name = 'ApiError';
   }

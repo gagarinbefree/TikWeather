@@ -16,6 +16,7 @@ export interface ForecastHour {
 }
 
 export interface ForecastDay {
+  readonly serverCachedAt?: number;
   readonly date: string;
   readonly maximum: number;
   readonly minimum: number;
@@ -33,6 +34,7 @@ export interface ForecastDay {
 }
 
 export interface Forecast {
+  readonly serverCachedAt?: number;
   readonly days: readonly ForecastDay[];
   readonly intervalHours?: 2 | 3;
 }

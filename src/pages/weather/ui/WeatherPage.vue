@@ -140,7 +140,7 @@ watch(
           v-if="cell.kind === 'current' && state.status === 'ready'"
           :weather="state.weather"
           :locale="locale"
-          :cached-at="state.cachedAt"
+          :cached-at="state.weather.serverCachedAt ?? state.cachedAt"
           :sun-times="forecast.day(cell.date)"
           @retry="retry"
         />

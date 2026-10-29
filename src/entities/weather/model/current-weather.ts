@@ -1,4 +1,5 @@
 export interface CurrentWeather {
+  readonly serverCachedAt?: number;
   readonly city: string;
   readonly region: string;
   readonly country: string;

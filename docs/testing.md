@@ -106,3 +106,5 @@ npm run test:e2e:connected
 Сценарии используются совместно со стандартными `*.e2e.ts` тестами.
 Проверки создают и закрывают собственные изолированные контексты.
 Они не используют вкладки и пользовательские данные существующего браузера.
+
+Weather provider access now uses the shared VPS without client credentials. See [backend transport](backend.md).

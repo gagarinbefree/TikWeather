@@ -22,7 +22,6 @@ beforeEach(() => setActivePinia(createPinia()));
  */
 async function forecastFixture(): Promise<Forecast> {
   return getForecast({
-    apiKey: 'example-only',
     location,
     locale: 'ru',
     timeZone: 'Asia/Yekaterinburg',

@@ -22,6 +22,7 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
   }
   return {
     base: isAndroid ? './' : '/TikWeather/',
+    envPrefix: ['VITE_WEATHER_SERVER_URL', 'VITE_APP_VERSION'],
     publicDir: fileURLToPath(new URL('./shared/assets/branding', import.meta.url)),
     plugins: [
       vue(),
@@ -64,14 +65,6 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
           ]
         : []),
     ],
-    ...(isBrowserTest
-      ? {
-          define: {
-            'import.meta.env.VITE_WEATHER_API_KEY': JSON.stringify('browser-test-only'),
-            'import.meta.env.VITE_OPENWEATHERMAP_API_KEY': JSON.stringify('browser-test-only'),
-          },
-        }
-      : {}),
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),

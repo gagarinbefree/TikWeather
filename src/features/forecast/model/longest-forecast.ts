@@ -1,5 +1,5 @@
-import type { Forecast } from '@/entities/weather';
-import { ApiError } from '@/shared/api';
+import type { Forecast, ForecastDay } from '@/entities/weather';
+import { ApiError, serverSnapshotTime } from '@/shared/api';
 
 /**
  * throwIfCancelled. Stop when the request has been cancelled
@@ -21,19 +21,35 @@ export function mergeForecast(first: Forecast, second: Forecast): Forecast {
   const firstDays = new Map(first.days.map((day) => [day.date, day]));
   const secondDays = new Map(second.days.map((day) => [day.date, day]));
   const dates = [...new Set([...firstDays.keys(), ...secondDays.keys()])].sort();
+  const days = dates.map((date): ForecastDay => {
+    const earlier = firstDays.get(date);
+    const later = secondDays.get(date);
+    const earlierTime = serverSnapshotTime(earlier);
+    const laterTime = serverSnapshotTime(later);
+    const keepEarlier =
+      earlier &&
+      (!later ||
+        (earlierTime === null && laterTime !== null) ||
+        (earlierTime !== null && laterTime !== null && earlierTime > laterTime) ||
+        (earlierTime === laterTime && earlier.hours.length >= later.hours.length));
+    const selected = keepEarlier ? earlier : later;
+    const source = keepEarlier ? first : second;
+    if (!selected) throw new ApiError('invalidResponse');
+    const retainedAt = serverSnapshotTime(selected);
+    return {
+      ...selected,
+      intervalHours: selected.intervalHours ?? source.intervalHours ?? 2,
+      ...(retainedAt === null ? {} : { serverCachedAt: retainedAt }),
+    };
+  });
+  const times = days.map(serverSnapshotTime).filter((value): value is number => value !== null);
   return {
-    days: dates.map((date) => {
-      const earlier = firstDays.get(date);
-      const later = secondDays.get(date);
-      if (earlier && (!later || earlier.hours.length >= later.hours.length))
-        return { ...earlier, intervalHours: earlier.intervalHours ?? first.intervalHours ?? 2 };
-      if (!later) throw new ApiError('invalidResponse');
-      return { ...later, intervalHours: later.intervalHours ?? second.intervalHours ?? 2 };
-    }),
+    days,
     intervalHours:
       first.days.length >= second.days.length
         ? (first.intervalHours ?? 2)
         : (second.intervalHours ?? 2),
+    ...(times.length ? { serverCachedAt: Math.min(...times) } : {}),
   };
 }
 
@@ -58,12 +74,16 @@ export async function longestForecast(
       const forecast = await source();
       throwIfCancelled(signal);
       best = best ? mergeForecast(best, forecast) : forecast;
-      if (best.days.length >= maximum) return best;
+      if (best.days.length >= maximum && serverSnapshotTime(best) === null) return best;
     } catch (error) {
       throwIfCancelled(signal);
       if (error instanceof ApiError && error.kind === 'cancelled') throw error;
       if (!(error instanceof ApiError)) throw error;
       firstError ??= error;
+      if (error.sharedLimit) {
+        firstError = error;
+        break;
+      }
     }
   }
   if (best) return best;

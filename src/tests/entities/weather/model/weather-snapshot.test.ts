@@ -16,13 +16,11 @@ beforeEach(() => {
 async function snapshot(): Promise<WeatherSnapshot> {
   const location = { source: 'automatic' } as const;
   const weather = await getCurrentWeather({
-    apiKey: 'example-only',
     location,
     locale: 'ru',
     fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),
   });
   const forecast = await getForecast({
-    apiKey: 'example-only',
     location,
     locale: 'ru',
     timeZone: weather.timeZone,

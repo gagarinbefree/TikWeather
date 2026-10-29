@@ -40,6 +40,8 @@ function isNumber(value: unknown): value is number {
  */
 function isCondition(value: Record<string, unknown>): boolean {
   return (
+    (value['serverCachedAt'] === undefined ||
+      (isNumber(value['serverCachedAt']) && value['serverCachedAt'] > 0)) &&
     isNumber(value['conditionCode']) &&
     typeof value['conditionText'] === 'string' &&
     (value['conditionLocale'] === 'ru' || value['conditionLocale'] === 'en')

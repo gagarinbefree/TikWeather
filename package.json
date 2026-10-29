@@ -23,7 +23,9 @@
     "test:watch": "vitest --configLoader native",
     "test:e2e": "npm run build:e2e && playwright test",
     "test:e2e:connected": "node src/tests/run-connected-chrome.ts",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e"
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e",
+    "postbuild": "node tools/audit-weather-bundle.mjs dist",
+    "postbuild:android": "node tools/audit-weather-bundle.mjs dist-android"
   },
   "dependencies": {
     "@capacitor/android": "8.5.3",

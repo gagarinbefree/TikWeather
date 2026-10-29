@@ -18,7 +18,10 @@ async function holdCurrentRequest(page: Page): Promise<void> {
     });
     Object.defineProperty(navigator, 'language', { configurable: true, value: 'ru' });
   });
-  await page.route('https://api.weatherapi.com/v1/current.json?**', () => undefined);
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/current.json?**',
+    () => undefined,
+  );
 }
 
 /**

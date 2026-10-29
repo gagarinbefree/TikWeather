@@ -3,10 +3,10 @@ import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 
 test.use({ permissions: ['geolocation'], geolocation: { latitude: 58.0047, longitude: 56.2514 } });
 test.beforeEach(async ({ page }) => {
-  await page.route('https://api.open-meteo.com/**', async (route) => {
+  await page.route('https://gagarinbefree.clodocd.com/api/open-meteo/**', async (route) => {
     await route.fulfill({ status: 503, json: {} });
   });
-  await page.route('https://api.openweathermap.org/**', async (route) => {
+  await page.route('https://gagarinbefree.clodocd.com/api/openweathermap/**', async (route) => {
     await route.fulfill({ status: 503, json: {} });
   });
 });
@@ -20,7 +20,7 @@ test('shows device weather directly with local icons and translated measurements
     ipRequests++;
     await route.fulfill({ json: {} });
   });
-  await page.route('https://api.weatherapi.com/v1/**', async (route) => {
+  await page.route('https://gagarinbefree.clodocd.com/api/weatherapi/v1/**', async (route) => {
     apiCalls.push(route.request().url());
     await route.fulfill({ json: currentResponse });
   });
@@ -39,7 +39,9 @@ test('shows device weather directly with local icons and translated measurements
   await expect(card.locator('[data-weather-icon]')).not.toHaveCSS('mask-image', 'none');
   await expect(card.locator('.current-weather-card__temperature')).toHaveCSS('font-weight', '700');
   expect(ipRequests).toBe(0);
-  const currentCalls = apiCalls.filter((url) => new URL(url).pathname === '/v1/current.json');
+  const currentCalls = apiCalls.filter(
+    (url) => new URL(url).pathname === '/api/weatherapi/v1/current.json',
+  );
   expect(currentCalls).toHaveLength(1);
   expect(new URL(currentCalls[0] ?? '').searchParams.get('q')).toBe('58.0047,56.2514');
   const dimensions = await card.evaluate((element) => ({
@@ -72,11 +74,14 @@ test('falls back to GeoJS after permission denial and retries below the error te
     });
   });
   let attempts = 0;
-  await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
-    attempts++;
-    if (attempts === 1) await route.abort('failed');
-    else await route.fulfill({ json: currentResponse });
-  });
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/current.json?**',
+    async (route) => {
+      attempts++;
+      if (attempts === 1) await route.abort('failed');
+      else await route.fulfill({ json: currentResponse });
+    },
+  );
   await page.goto('./');
   const alert = page.getByRole('alert');
   await expect(alert).toContainText('Не удалось подключиться');
@@ -107,19 +112,22 @@ test('keeps a short portrait screen readable with long place names', async ({ pa
       },
     });
   });
-  await page.route('https://api.weatherapi.com/v1/current.json?**', async (route) => {
-    await route.fulfill({
-      json: {
-        ...currentResponse,
-        location: {
-          ...currentResponse.location,
-          name: 'Petropavlovsk-Kamchatsky',
-          country: 'United States of America',
-          tz_id: 'America/New_York',
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/current.json?**',
+    async (route) => {
+      await route.fulfill({
+        json: {
+          ...currentResponse,
+          location: {
+            ...currentResponse.location,
+            name: 'Petropavlovsk-Kamchatsky',
+            country: 'United States of America',
+            tz_id: 'America/New_York',
+          },
         },
-      },
-    });
-  });
+      });
+    },
+  );
   await page.goto('./');
   const card = page.getByRole('article', { name: 'Current weather' });
   await expect(card).toBeVisible();
