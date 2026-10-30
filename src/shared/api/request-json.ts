@@ -1,3 +1,4 @@
+import { recordApiRequest } from '@/shared/diagnostics';
 import { ApiError, type RequestOptions } from './types';
 
 /**
@@ -8,6 +9,8 @@ import { ApiError, type RequestOptions } from './types';
  * @returns A validated transport response awaiting provider schema validation.
  */
 export async function requestJson(url: string, options: RequestOptions = {}): Promise<unknown> {
+  const started = Date.now();
+  let status: number | undefined;
   const controller = new AbortController();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let rejectAbort: (reason: ApiError) => void = () => undefined;
@@ -36,6 +39,7 @@ export async function requestJson(url: string, options: RequestOptions = {}): Pr
       }),
       interrupted,
     ]);
+    status = response.status;
     if (!response.ok)
       throw new ApiError(
         response.status === 401 || response.status === 403 ? 'credentials' : 'unavailable',
@@ -45,17 +49,23 @@ export async function requestJson(url: string, options: RequestOptions = {}): Pr
     options.onResponse?.(response);
     try {
       const payload: unknown = await Promise.race([response.json(), interrupted]);
+      recordApiRequest(url, Date.now() - started, status);
       return payload;
     } catch (error) {
       if (error instanceof ApiError) throw error;
       throw new ApiError('invalidResponse');
     }
   } catch (error) {
-    if (options.signal?.aborted) throw new ApiError('cancelled');
     const reason: unknown = controller.signal.reason;
-    if (controller.signal.aborted && reason instanceof ApiError) throw reason;
-    if (error instanceof ApiError) throw error;
-    throw new ApiError('connection');
+    const failure = options.signal?.aborted
+      ? new ApiError('cancelled')
+      : controller.signal.aborted && reason instanceof ApiError
+        ? reason
+        : error instanceof ApiError
+          ? error
+          : new ApiError('connection');
+    recordApiRequest(url, Date.now() - started, status, failure.kind);
+    throw failure;
   } finally {
     clearTimeout(timer);
     options.signal?.removeEventListener('abort', cancel);

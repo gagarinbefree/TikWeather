@@ -1,3 +1,4 @@
+import { reportFailure } from '@/shared/diagnostics';
 import { onBeforeUnmount, onMounted, shallowRef, watch, type ShallowRef } from 'vue';
 import type { Direction, Position } from 'tikitaki';
 import { createSwipeEngine, type SwipeEngine } from 'tikitaki/dom';
@@ -76,6 +77,7 @@ export function useWeatherSwipe(
     if (disposed || failed.value) return;
     stop();
     failed.value = true;
+    reportFailure(error, 'navigation');
     onError(error instanceof Error ? error : new Error(messages.en.navigationFailed));
   }
 

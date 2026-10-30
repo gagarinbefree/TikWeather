@@ -32,6 +32,7 @@
     "@capacitor/core": "8.5.3",
     "@capacitor/geolocation": "8.2.4",
     "@photostructure/tz-lookup": "11.6.1",
+    "@sentry/vue": "11.10.0",
     "@tikitaki_gagarinbefree/vue": "0.1.14",
     "@vue/devtools-api": "8.2.1",
     "bootstrap": "6.0.0-alpha.1",

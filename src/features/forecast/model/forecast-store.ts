@@ -1,3 +1,4 @@
+import { reportFailure } from '@/shared/diagnostics';
 import { defineStore } from 'pinia';
 import { shallowRef } from 'vue';
 import {
@@ -151,6 +152,7 @@ export const useForecastStore = defineStore('forecast', () => {
           nextDepth = depth === 1 && days.value.length < 3 ? 3 : 16;
       } catch (error) {
         if (token !== revision || attempt !== current) return;
+        reportFailure(error, 'forecast', days.value.length > 0);
         failure.value = error instanceof ApiError ? error.kind : 'connection';
         failedDepth = depth;
       } finally {

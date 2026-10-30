@@ -29,7 +29,15 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - name: Validate Hawk collector configuration
+        env:
+          HAWK_DSN: ${{ secrets.HAWK_DSN }}
+          REQUIRE_HAWK_DSN: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        run: python3 tools/validate-hawk-dsn.py
       - run: npm run build
+        env:
+          HAWK_DSN: ${{ secrets.HAWK_DSN }}
+          VITE_APP_VERSION: 0.1.${{ github.run_number }}
       - run: cmp shared/assets/branding/app-icon-512.png dist/app-icon-512.png
       - run: npx playwright install --with-deps chrome
       - run: npm run test:e2e
@@ -55,6 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
+      contents: read
       pages: write
       id-token: write
     environment:
@@ -63,6 +72,17 @@ jobs:
     steps:
       - uses: actions/deploy-pages@v4
         id: deployment
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - name: Verify Hawk collector
+        continue-on-error: true
+        env:
+          HAWK_DSN: ${{ secrets.HAWK_DSN }}
+          HAWK_APPLICATION: ZoomWeather
+          APP_VERSION: 0.1.${{ github.run_number }}
+        run: node tools/send-hawk-check.mjs
 
   android:
     name: Android APK
@@ -95,6 +115,7 @@ jobs:
       - run: npm run build:android
         env:
           VITE_APP_VERSION: ${{ steps.version.outputs.name }}
+          HAWK_DSN: ${{ secrets.HAWK_DSN }}
       - name: Check Android web bundle
         run: |
           test ! -e dist-android/sw.js

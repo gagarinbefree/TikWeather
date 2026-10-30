@@ -138,3 +138,17 @@ Bootstrap подключается через Sass `@use`. Импортирую�
 JavaScript плагины Bootstrap стартовому экрану не нужны.
 
 Weather provider access now uses the shared VPS without client credentials. See [backend transport](backend.md).
+
+## Diagnostics
+
+Weather loading failures, API transport warnings, navigation errors and unexpected Vue or browser exceptions are sent to the ZoomWeather project in Hawk.
+The shared integration works in the website, installed PWA and Android WebView.
+Events include the app version, runtime platform, safe failure category and the thirty most recent API request summaries.
+Summaries contain fixed API names, elapsed time and HTTP status. They exclude URLs, coordinates, city names, client IP addresses, headers, cookies, response bodies and weather provider credentials.
+Repeated failures are limited to one event per minute and collector failures never change weather or Retry behavior.
+
+The `HAWK_DSN` Actions secret must contain the Sentry compatible HTTPS DSN from the ZoomWeather project in Hawk.
+It is inserted into website and Android builds as a public collector identifier. Local development can use the ignored `.env.local` file with `HAWK_DSN=YOUR_SENTRY_COMPATIBLE_DSN`.
+An absent or invalid local DSN disables reporting. Published main builds require a valid repository secret.
+After Pages publication Actions sends an informational collector verification event. Its result is shown in the workflow log.
+Browser test fixtures use a simulated collector and are excluded from production builds.

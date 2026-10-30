@@ -1,3 +1,4 @@
+import { initializeDiagnostics } from '@/shared/diagnostics';
 import { createApp, type Component } from 'vue';
 import { createPinia } from 'pinia';
 import { currentWeatherServicesKey, type CurrentWeatherServices } from '@/features/current-weather';
@@ -39,7 +40,17 @@ export function mountWeatherApp(root: Component, device?: DeviceGeolocation): vo
   };
 
   const forecastServices: ForecastServices = createForecastServices();
-  createApp(root)
+  const app = createApp(root);
+  initializeDiagnostics(
+    app,
+    device
+      ? 'Android'
+      : typeof window.matchMedia === 'function' &&
+          window.matchMedia('(display-mode: standalone)').matches
+        ? 'PWA'
+        : 'Browser',
+  );
+  app
     .use(createPinia())
     .provide(currentWeatherServicesKey, services)
     .provide(forecastServicesKey, forecastServices)

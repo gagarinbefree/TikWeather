@@ -1,3 +1,4 @@
+import { reportFailure } from '@/shared/diagnostics';
 import { defineStore } from 'pinia';
 import { shallowRef } from 'vue';
 import { useWeatherGridStore, type CurrentWeather, type WeatherSnapshot } from '@/entities/weather';
@@ -96,6 +97,7 @@ export const useCurrentWeatherStore = defineStore('current-weather', () => {
       state.value = { status: 'ready', weather, location, now, cachedAt: null };
     } catch (error) {
       if (token !== revision) return;
+      reportFailure(error, 'current', cached);
       if (!cached)
         state.value = {
           status: 'error',

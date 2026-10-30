@@ -1,7 +1,8 @@
+import process from 'node:process';
 import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 import { VitePWA } from 'vite-plugin-pwa';
-import { defineConfig, type ConfigEnv, type UserConfig } from 'vite';
+import { defineConfig, loadEnv, type ConfigEnv, type UserConfig } from 'vite';
 
 /**
  * createViteConfig. Configure the web and Android builds
@@ -16,6 +17,9 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
   const isBrowserTest = environment.mode === 'e2e';
   const isAndroid = environment.mode === 'android';
   if (isBrowserTest) {
+    input['diagnostics-fixture'] = fileURLToPath(
+      new URL('./src/tests/shared/diagnostics/fixtures/index.html', import.meta.url),
+    );
     input['update-fixture'] = fileURLToPath(
       new URL('./src/tests/app/ui/fixtures/index.html', import.meta.url),
     );
@@ -25,6 +29,15 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
   }
   return {
     base: isAndroid ? './' : '/ZoomWeather/',
+    define: {
+      'import.meta.env.VITE_HAWK_DSN': JSON.stringify(
+        isBrowserTest
+          ? ''
+          : (process.env['HAWK_DSN'] ??
+              loadEnv(environment.mode, process.cwd(), 'HAWK_')['HAWK_DSN'] ??
+              ''),
+      ),
+    },
     envPrefix: ['VITE_WEATHER_SERVER_URL', 'VITE_APP_VERSION'],
     publicDir: fileURLToPath(new URL('./shared/assets/branding', import.meta.url)),
     plugins: [
