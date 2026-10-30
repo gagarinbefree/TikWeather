@@ -80,7 +80,7 @@ test('uses Open Meteo for current daily and hourly weather while healthy backups
           pressure_msl: hours.map(() => 1012),
           visibility: hours.map(() => 10000),
           uv_index: hours.map(() => 1),
-          weather_code: hours.map(() => 0),
+          weather_code: hours.map(() => 1),
           is_day: hours.map(() => 1),
           precipitation_probability: hours.map(() => 10),
         },
@@ -114,6 +114,11 @@ test('uses Open Meteo for current daily and hourly weather while healthy backups
   await viewport.focus();
   await viewport.press('ArrowRight');
   await expect(page.getByRole('article', { name: 'Почасовой прогноз' })).toContainText('13,4°C');
+  const hourly = page.getByRole('article', { name: 'Почасовой прогноз' });
+  await expect(hourly).toContainText('Преимущественно ясно');
+  await expect
+    .poll(() => hourly.evaluate((card) => getComputedStyle(card, '::before').backgroundImage))
+    .toMatch(/\/clear-[^/]+\.webp/);
   await viewport.press('ArrowDown');
   await expect(page.getByRole('article', { name: 'Прогноз на день' })).toContainText('15°C');
   expect(backupRequests).toBe(0);

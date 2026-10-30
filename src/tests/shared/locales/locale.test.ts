@@ -36,3 +36,8 @@ it.each([
 ])('shows the full country name for %s', (code, name) => {
   expect(countryLabel(code, 'en')).toBe(name);
 });
+
+it('translates the heavy thunderstorm reported by Open Meteo', () => {
+  expect(conditionLabel(97, true, 'ru')).toBe('Сильная гроза');
+  expect(conditionLabel(97, false, 'en')).toBe('Heavy thunderstorm');
+});

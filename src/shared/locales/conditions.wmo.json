@@ -26,5 +26,6 @@
   "86": { "ru": "Сильный снежный заряд", "en": "Heavy snow showers" },
   "95": { "ru": "Гроза", "en": "Thunderstorm" },
   "96": { "ru": "Гроза с градом", "en": "Thunderstorm with hail" },
+  "97": { "ru": "Сильная гроза", "en": "Heavy thunderstorm" },
   "99": { "ru": "Сильная гроза с градом", "en": "Thunderstorm with heavy hail" }
 }
