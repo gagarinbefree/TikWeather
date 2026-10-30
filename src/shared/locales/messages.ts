@@ -1,6 +1,6 @@
 export const messages = {
   ru: {
-    appName: 'TikWeather',
+    appName: 'ZoomWeather',
     loadingWeather: 'Загружаем погоду...',
     weather: 'Погода',
     currentWeather: 'Текущая погода',
@@ -28,7 +28,7 @@ export const messages = {
     updateAvailable: 'Доступна новая версия',
     updateNow: 'Обновить',
     updateCancel: 'Отмена',
-    updateDescription: 'Обновите TikWeather до последней версии.',
+    updateDescription: 'Обновите ZoomWeather до последней версии.',
     updateSwipeHint: 'Свайп в любую сторону вернёт к текущей погоде.',
     windSpeedUnit: 'м/с',
     kilometers: 'км',
@@ -75,7 +75,7 @@ export const messages = {
     incompleteForecastCalendar: 'Не удалось построить дни прогноза',
   },
   en: {
-    appName: 'TikWeather',
+    appName: 'ZoomWeather',
     loadingWeather: 'Loading weather...',
     weather: 'Weather',
     currentWeather: 'Current weather',
@@ -103,7 +103,7 @@ export const messages = {
     updateAvailable: 'A new version is available',
     updateNow: 'Update',
     updateCancel: 'Cancel',
-    updateDescription: 'Update TikWeather to the latest version.',
+    updateDescription: 'Update ZoomWeather to the latest version.',
     updateSwipeHint: 'Swipe in any direction to return to current weather.',
     windSpeedUnit: 'mph',
     kilometers: 'km',

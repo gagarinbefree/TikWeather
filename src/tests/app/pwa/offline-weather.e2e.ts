@@ -83,7 +83,7 @@ test('shows the last forecast immediately after an offline restart', async ({ pa
     .poll(
       async () => {
         const raw: unknown = await page.evaluate(() =>
-          localStorage.getItem('tikweather.weather.v1'),
+          localStorage.getItem('zoomweather.weather.v1'),
         );
         return typeof raw === 'string' ? [...raw.matchAll(/"date"/g)].length : 0;
       },

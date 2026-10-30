@@ -34,7 +34,7 @@ describe('WeatherPage', () => {
     await nextTick();
 
     expect(wrapper.find('main').exists()).toBe(true);
-    expect(wrapper.find('h1').text()).toBe('TikWeather');
+    expect(wrapper.find('h1').text()).toBe('ZoomWeather');
     expect(wrapper.find('[role="status"]').text()).toContain('Detecting location...');
     expect(wrapper.find('.spinner-border').exists()).toBe(true);
     wrapper.unmount();

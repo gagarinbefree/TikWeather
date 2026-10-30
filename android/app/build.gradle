@@ -8,13 +8,14 @@ def signingStorePassword = System.getenv('ANDROID_KEYSTORE_PASSWORD')
 def generateSharedIcon = tasks.register('generateSharedIcon', Copy) {
     from("$rootDir/../shared/assets/branding/app-icon-512.png")
     into(file("$generatedSharedIcon/drawable-nodpi"))
-    rename 'app-icon-512.png', 'tikweather_icon.png'
+    rename 'app-icon-512.png', 'zoomweather_icon.png'
 }
 
 android {
-    namespace = "com.gagarinbefree.tikweather"
+    namespace = "com.gagarinbefree.zoomweather"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
+        // Keep the installed package identity so existing Android apps can update.
         applicationId "com.gagarinbefree.tikweather"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -32,7 +33,13 @@ android {
             if (signingStorePath && signingStorePassword) {
                 storeFile file(signingStorePath)
                 storePassword signingStorePassword
-                keyAlias 'tikweather'
+                // Read the existing signing key without changing repository secrets.
+                def signingStore = java.security.KeyStore.getInstance(file(signingStorePath), signingStorePassword.toCharArray())
+                def keyAliases = signingStore.aliases().toList().findAll { signingStore.isKeyEntry(it) }
+                if (keyAliases.size() != 1) {
+                    throw new GradleException('The Android signing store must contain exactly one private key')
+                }
+                keyAlias keyAliases.first()
                 keyPassword signingStorePassword
             }
         }

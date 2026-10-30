@@ -103,10 +103,10 @@ jobs:
       - run: npx cap sync android
       - run: chmod +x android/gradlew
       - run: ./android/gradlew -p android assembleDebug --no-daemon
-      - run: cmp shared/assets/branding/app-icon-512.png android/app/build/generated/shared-icon/drawable-nodpi/tikweather_icon.png
+      - run: cmp shared/assets/branding/app-icon-512.png android/app/build/generated/shared-icon/drawable-nodpi/zoomweather_icon.png
       - uses: actions/upload-artifact@v4
         with:
-          name: TikWeather-Android-debug
+          name: ZoomWeather-Android-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
       - name: Prepare Android signing
@@ -117,8 +117,8 @@ jobs:
         run: |
           test -n "$ANDROID_KEYSTORE_BASE64"
           test -n "$ANDROID_KEYSTORE_PASSWORD"
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/tikweather-signing.jks"
-          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/tikweather-signing.jks" >> "$GITHUB_ENV"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/zoomweather-signing.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/zoomweather-signing.jks" >> "$GITHUB_ENV"
       - name: Build signed Android release
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
@@ -130,16 +130,20 @@ jobs:
           apk=android/app/build/outputs/apk/release/app-release.apk
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify "$apk"
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" | grep -F "versionCode='${{ github.run_number }}' versionName='${{ steps.version.outputs.name }}'"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" | grep -F "application-label:'ZoomWeather'"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" | grep -F "launchable-activity: name='com.gagarinbefree.zoomweather.MainActivity'"
       - name: Publish GitHub Release
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_VERSION: ${{ steps.version.outputs.name }}
         run: |
-          cp android/app/build/outputs/apk/release/app-release.apk TikWeather-Android.apk
+          cp android/app/build/outputs/apk/release/app-release.apk ZoomWeather-Android.apk
+          # Older installed apps still request this asset name.
+          cp ZoomWeather-Android.apk TikWeather-Android.apk
           tag="v$RELEASE_VERSION"
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" TikWeather-Android.apk --clobber
+            gh release upload "$tag" ZoomWeather-Android.apk "TikWeather-Android.apk#Compatibility update for older installations" --clobber
           else
-            gh release create "$tag" TikWeather-Android.apk --target "$GITHUB_SHA" --title "TikWeather $RELEASE_VERSION" --generate-notes --latest
+            gh release create "$tag" ZoomWeather-Android.apk "TikWeather-Android.apk#Compatibility update for older installations" --target "$GITHUB_SHA" --title "ZoomWeather $RELEASE_VERSION" --generate-notes --latest
           fi

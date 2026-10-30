@@ -30,7 +30,7 @@ async function runConnectedChrome(): Promise<void> {
     for (const configuration of configurations) {
       const context = await browser.newContext({
         ...configuration.options,
-        baseURL: 'http://127.0.0.1:4183/TikWeather/',
+        baseURL: 'http://127.0.0.1:4183/ZoomWeather/',
       });
       try {
         const page = await context.newPage();

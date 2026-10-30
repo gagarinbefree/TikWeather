@@ -24,7 +24,7 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
     );
   }
   return {
-    base: isAndroid ? './' : '/TikWeather/',
+    base: isAndroid ? './' : '/ZoomWeather/',
     envPrefix: ['VITE_WEATHER_SERVER_URL', 'VITE_APP_VERSION'],
     publicDir: fileURLToPath(new URL('./shared/assets/branding', import.meta.url)),
     plugins: [
@@ -44,12 +44,12 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
               registerType: 'prompt',
               includeAssets: ['app-icon-180.png'],
               manifest: {
-                name: 'TikWeather',
-                short_name: 'TikWeather',
+                name: 'ZoomWeather',
+                short_name: 'ZoomWeather',
                 description: 'Weather now and in the days ahead.',
-                id: '/TikWeather/',
-                start_url: '/TikWeather/',
-                scope: '/TikWeather/',
+                id: '/ZoomWeather/',
+                start_url: '/ZoomWeather/',
+                scope: '/ZoomWeather/',
                 display: 'standalone',
                 background_color: '#F5F7FA',
                 theme_color: '#F5F7FA',
@@ -60,8 +60,8 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
               },
               workbox: {
                 globPatterns: ['**/*.{js,css,html,png,svg,ttf,webmanifest}'],
-                navigateFallback: '/TikWeather/index.html',
-                navigateFallbackAllowlist: [/^\/TikWeather\/?$/],
+                navigateFallback: '/ZoomWeather/index.html',
+                navigateFallbackAllowlist: [/^\/ZoomWeather\/?$/],
                 cleanupOutdatedCaches: true,
               },
             }),

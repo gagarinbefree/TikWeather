@@ -1,4 +1,4 @@
-package com.gagarinbefree.tikweather;
+package com.gagarinbefree.zoomweather;
 
 import com.getcapacitor.BridgeActivity;
 

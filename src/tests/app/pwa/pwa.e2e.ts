@@ -2,16 +2,18 @@ import { expect, test } from '@playwright/test';
 
 test('exposes an installable manifest scoped to GitHub Pages', async ({ page }) => {
   await page.goto('./');
+  await expect(page).toHaveTitle('ZoomWeather');
   const manifestUrl = await page.locator('link[rel="manifest"]').getAttribute('href');
   expect(manifestUrl).toBeTruthy();
   const response = await page.request.get(new URL(manifestUrl ?? '', page.url()).toString());
   expect(response.ok()).toBe(true);
   const manifest: unknown = await response.json();
   expect(manifest).toMatchObject({
-    name: 'TikWeather',
-    id: '/TikWeather/',
-    start_url: '/TikWeather/',
-    scope: '/TikWeather/',
+    name: 'ZoomWeather',
+    short_name: 'ZoomWeather',
+    id: '/ZoomWeather/',
+    start_url: '/ZoomWeather/',
+    scope: '/ZoomWeather/',
     display: 'standalone',
   });
   const icons = (manifest as { icons: { sizes: string }[] }).icons;

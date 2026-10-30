@@ -3,9 +3,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/tikweather_icon"
+        android:icon="@drawable/zoomweather_icon"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/tikweather_icon"
+        android:roundIcon="@drawable/zoomweather_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 

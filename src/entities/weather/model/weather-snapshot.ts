@@ -2,7 +2,7 @@ import type { Locale } from '@/shared/locales';
 import type { CurrentWeather } from './current-weather';
 import type { Forecast, ForecastDay, ForecastHour } from './forecast';
 
-const storageKey = 'tikweather.weather.v1';
+const storageKey = 'zoomweather.weather.v1';
 
 export interface WeatherSnapshot {
   readonly version: 1;

@@ -73,11 +73,11 @@ describe('PWA update prompt', () => {
       props: {
         locale: 'en',
         updateUrl:
-          'https://github.com/gagarinbefree/TikWeather/releases/latest/download/TikWeather-Android.apk',
+          'https://github.com/gagarinbefree/ZoomWeather/releases/latest/download/ZoomWeather-Android.apk',
       },
     });
     expect(wrapper.get('[data-action="update"]').attributes('href')).toContain(
-      'TikWeather-Android.apk',
+      'ZoomWeather-Android.apk',
     );
     expect(wrapper.get('[data-action="update"]').attributes('target')).toBe('_blank');
     expect(wrapper.get('[data-action="dismiss"]').text()).toBe('Cancel');

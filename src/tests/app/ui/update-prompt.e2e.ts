@@ -35,7 +35,7 @@ for (const direction of ['left', 'right', 'up', 'down'] as const satisfies reado
   }) => {
     let releaseUpdate: (() => void) | undefined;
     await page.route(
-      'https://api.github.com/repos/gagarinbefree/TikWeather/releases/latest',
+      'https://api.github.com/repos/gagarinbefree/ZoomWeather/releases/latest',
       async (route) => {
         await new Promise<void>((resolve) => {
           releaseUpdate = resolve;
@@ -81,7 +81,7 @@ test('fits a small phone and traps keyboard focus until Cancel returns to curren
 }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.route(
-    'https://api.github.com/repos/gagarinbefree/TikWeather/releases/latest',
+    'https://api.github.com/repos/gagarinbefree/ZoomWeather/releases/latest',
     async (route) => {
       await route.fulfill({ json: { tag_name: 'v999.0.0' } });
     },

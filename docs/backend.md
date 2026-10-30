@@ -14,7 +14,7 @@ All weather requests use the VPS routes:
 - `/api/openweathermap/data/2.5/weather` and `/api/openweathermap/data/2.5/forecast`
 
 The client sends no WeatherAPI `key` or OpenWeatherMap `appid`. Provider credentials exist only in
-WeatherServer secret mounts and repository secrets. TikWeather builds do not receive provider
+WeatherServer secret mounts and repository secrets. ZoomWeather builds do not receive provider
 secrets. Production site and Android bundle audits reject direct provider URLs and obsolete key
 wiring after each build. This includes the Android web assets copied by Capacitor.
 

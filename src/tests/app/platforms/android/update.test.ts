@@ -1,7 +1,28 @@
-import { describe, expect, it, vi } from 'vitest';
-import { hasAndroidUpdate } from '@/app/platforms/android/update';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { androidApkUrl, hasAndroidUpdate } from '@/app/platforms/android/update';
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe('hasAndroidUpdate', () => {
+  it('checks ZoomWeather releases and downloads the branded Android APK', async () => {
+    const fetchRelease = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ tag_name: 'v0.1.43' }),
+    });
+    vi.stubGlobal('fetch', fetchRelease);
+
+    expect(await hasAndroidUpdate('0.1.42')).toBe(true);
+    expect(fetchRelease).toHaveBeenCalledWith(
+      'https://api.github.com/repos/gagarinbefree/ZoomWeather/releases/latest',
+      expect.objectContaining({ headers: { Accept: 'application/vnd.github+json' } }),
+    );
+    expect(androidApkUrl).toBe(
+      'https://github.com/gagarinbefree/ZoomWeather/releases/latest/download/ZoomWeather-Android.apk',
+    );
+  });
+
   it('offers a newer Android release', async () => {
     const loadLatest = vi.fn().mockResolvedValue({ tag_name: 'v0.1.43' });
 

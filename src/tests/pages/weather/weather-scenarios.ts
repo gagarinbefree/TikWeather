@@ -40,7 +40,7 @@ export async function verifyApplicationShell(page: Page): Promise<void> {
   await holdCurrentRequest(page);
   await page.goto('./');
 
-  await expect(page.getByRole('heading', { name: 'TikWeather' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ZoomWeather' })).toBeVisible();
   await expect(page.getByRole('status')).toHaveAccessibleName('Загружаем погоду...');
   await expect(page.getByRole('status')).toBeVisible();
   await expect(page.getByRole('main')).toBeVisible();

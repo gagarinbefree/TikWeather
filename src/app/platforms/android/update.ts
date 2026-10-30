@@ -1,7 +1,7 @@
-const latestReleaseUrl = 'https://api.github.com/repos/gagarinbefree/TikWeather/releases/latest';
+const latestReleaseUrl = 'https://api.github.com/repos/gagarinbefree/ZoomWeather/releases/latest';
 
 export const androidApkUrl =
-  'https://github.com/gagarinbefree/TikWeather/releases/latest/download/TikWeather-Android.apk';
+  'https://github.com/gagarinbefree/ZoomWeather/releases/latest/download/ZoomWeather-Android.apk';
 
 /**
  * loadLatestRelease. Fetch the latest public release from GitHub
