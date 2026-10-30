@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { themeRgbColor } from '@/tests/shared/themes/theme-color';
 import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 
 test.use({ permissions: ['geolocation'], geolocation: { latitude: 58.0047, longitude: 56.2514 } });
@@ -50,7 +51,7 @@ test('shows device weather directly with local icons and translated measurements
   }));
   expect(dimensions.contentWidth).toBeLessThanOrEqual(dimensions.width + 1);
   expect(await card.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe(
-    'rgb(241, 245, 248)',
+    themeRgbColor('Weather.Cloudy.Forecast'),
   );
 });
 

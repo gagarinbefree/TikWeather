@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils';
+import theme from '@assets/themes/default.json';
 import { describe, expect, it, vi } from 'vitest';
 import { ForecastWeatherCard, getForecast } from '@/entities/weather';
 import sunHorizonIcon from '@assets/icons/weather_sunny_low_20_regular.svg?url';
@@ -30,7 +31,9 @@ describe('ForecastWeatherCard', () => {
     expect(wrapper.get('.forecast-weather-card__date time').attributes('datetime')).toBe(
       '2026-10-27',
     );
-    expect(wrapper.get('article').attributes('style')).toContain('--card-background: #E6EDF3');
+    expect(wrapper.get('article').attributes('style')).toContain(
+      `--card-background: ${theme.colors['Weather.Cloudy.Forecast']}`,
+    );
     expect(wrapper.text()).toContain('10°C');
     expect(wrapper.text()).toContain('5°C');
     expect(wrapper.text()).toContain('Пасмурно');

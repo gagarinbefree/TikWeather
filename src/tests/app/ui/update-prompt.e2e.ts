@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { themeRgbColor } from '@/tests/shared/themes/theme-color';
 import type { Direction } from 'tikitaki';
 import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 import { forecastResponse } from '@/tests/entities/weather/api/forecast-fixture';
@@ -63,7 +64,7 @@ for (const direction of ['left', 'right', 'up', 'down'] as const satisfies reado
     });
     await expect(dialog.locator('.pwa-update__card')).toHaveCSS(
       'background-color',
-      'rgb(255, 248, 223)',
+      themeRgbColor('Weather.ClearDay.Forecast'),
     );
     await expect(dialog.locator('.pwa-update__logo')).toHaveCSS('opacity', '0.055');
     await expect(dialog.locator('[data-action="update"]')).toBeFocused();
