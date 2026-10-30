@@ -5,6 +5,7 @@ import {
   type LocationQuery,
   type RequestOptions,
 } from '@/shared/api';
+import { serverReverseGeocode } from './server-reverse-geocode';
 
 import {
   isResolvedLocation,
@@ -22,13 +23,13 @@ function placeName(value: unknown): string | null {
 }
 
 /**
- * reverseGeocode. Find the local city and country for device coordinates
+ * cloudReverseGeocode. Find the local city and country through BigDataCloud
  *
  * @param location The current coordinates obtained from this device.
  * @param options The cancellable client request dependencies.
  * @returns The same coordinates enriched with a local city and country.
  */
-export async function reverseGeocode(
+async function cloudReverseGeocode(
   location: Exclude<LocationQuery, { source: 'automatic' }>,
   options: RequestOptions,
 ): Promise<ResolvedLocation> {
@@ -62,4 +63,32 @@ export async function reverseGeocode(
   };
   if (!isResolvedLocation(resolved)) throw new ApiError('location');
   return resolved;
+}
+
+/**
+ * reverseGeocode. Resolve a GPS point through BigDataCloud and then two independent server reserves
+ *
+ * @param location The original GPS position that must remain unchanged.
+ * @param options The cancellable transport dependencies.
+ * @returns The city and country from the first usable source.
+ */
+export async function reverseGeocode(
+  location: Exclude<LocationQuery, { source: 'automatic' }>,
+  options: RequestOptions,
+): Promise<ResolvedLocation> {
+  const attempts = [
+    (): Promise<ResolvedLocation> => cloudReverseGeocode(location, options),
+    (): Promise<ResolvedLocation> => serverReverseGeocode('openweathermap', location, options),
+    (): Promise<ResolvedLocation> => serverReverseGeocode('weatherapi', location, options),
+  ];
+  for (const [index, attempt] of attempts.entries()) {
+    try {
+      return await attempt();
+    } catch (error) {
+      if (options.signal?.aborted || (error instanceof ApiError && error.kind === 'cancelled'))
+        throw new ApiError('cancelled');
+      if (index > 0 && error instanceof ApiError && error.sharedLimit) throw error;
+    }
+  }
+  throw new ApiError('location');
 }

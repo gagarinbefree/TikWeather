@@ -86,6 +86,8 @@ function requestName(address: string): string {
     const url = new URL(address);
     if (url.hostname === 'get.geojs.io') return 'GeoJS location';
     if (url.hostname === 'api.bigdatacloud.net') return 'Reverse geocoding';
+    if (url.pathname.startsWith('/api/location/openweathermap/')) return 'OpenWeatherMap geocoding';
+    if (url.pathname.startsWith('/api/location/weatherapi/')) return 'WeatherAPI geocoding';
     if (url.pathname.startsWith('/api/open-meteo/')) return 'Open-Meteo weather';
     if (url.pathname.startsWith('/api/openweathermap/')) return 'OpenWeatherMap weather';
     if (url.pathname.startsWith('/api/weatherapi/'))
@@ -114,7 +116,7 @@ export function sanitizeEvent(event: ErrorEvent): ErrorEvent | null {
   const rawEndpoint = event.tags?.['endpoint'];
   const endpoint =
     typeof rawEndpoint === 'string' &&
-    /^(GeoJS location|Reverse geocoding|Open-Meteo weather|OpenWeatherMap weather|WeatherAPI current|WeatherAPI forecast|Other API)$/.test(
+    /^(GeoJS location|Reverse geocoding|Open-Meteo weather|OpenWeatherMap weather|WeatherAPI current|WeatherAPI forecast|OpenWeatherMap geocoding|WeatherAPI geocoding|Other API)$/.test(
       rawEndpoint,
     )
       ? rawEndpoint

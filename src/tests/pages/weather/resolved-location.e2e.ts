@@ -56,6 +56,10 @@ test('shows a location error instead of weather when the city cannot be identifi
 }) => {
   let weatherRequests = 0;
   await page.route('https://gagarinbefree.clodocd.com/**', async (route) => {
+    if (new URL(route.request().url()).pathname.startsWith('/api/location/')) {
+      await route.fulfill({ status: 503, json: {} });
+      return;
+    }
     weatherRequests++;
     await route.fulfill({ json: currentResponse });
   });

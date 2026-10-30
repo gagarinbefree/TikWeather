@@ -154,3 +154,13 @@ After Pages publication Actions sends an informational collector verification ev
 Browser test fixtures use a simulated collector and are excluded from production builds.
 
 Actions also accepts the existing `HAWK_DS` secret name when `HAWK_DSN` is absent. `HAWK_DSN` takes precedence.
+
+## GPS city lookup reserves
+
+The client first tries BigDataCloud directly. On a failed incomplete or timed out response it calls `api/location/openweathermap/reverse` and then `api/location/weatherapi/reverse` on WeatherServer.
+These are separate server methods using existing server credentials. BigDataCloud is not proxied from the VPS.
+Every attempt uses the original GPS coordinates. The client never replaces a valid GPS point with an IP location because a name lookup failed.
+The server caches successful names in its existing bounded HybridCache and Redis storage.
+The client selects available localized names using the country policy and waits for both city and country before loading fresh weather.
+Cancellation stops the chain. A shared VPS rate limit also stops further reserve requests.
+Diagnostics distinguish direct reverse geocoding and each server reserve without recording coordinates or request URLs.

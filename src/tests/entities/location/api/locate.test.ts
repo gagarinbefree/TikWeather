@@ -42,7 +42,7 @@ describe('locate', () => {
     };
     const fetcher = vi.fn<typeof fetch>().mockRejectedValue(new TypeError('network'));
     await expect(locate({ device, fetcher })).rejects.toMatchObject({ kind: 'location' });
-    expect(fetcher).toHaveBeenCalledOnce();
+    expect(fetcher).toHaveBeenCalledTimes(3);
   });
 
   it('does not replace device location with a different IP based place', async () => {
