@@ -16,6 +16,10 @@ import { LoadingIndicator } from '@/shared/ui/loading-indicator';
 import { baseThemeStyle } from '@/shared/themes';
 import { WeatherGrid } from '@/widgets/weather-grid';
 
+const props = withDefaults(defineProps<{ readonly navigationReset?: number }>(), {
+  navigationReset: 0,
+});
+
 const { grid } = storeToRefs(useWeatherGridStore());
 const weather = useCurrentWeatherStore();
 const forecast = useForecastStore();
@@ -134,7 +138,12 @@ watch(
 <template>
   <main class="weather-page" :style="baseThemeStyle" :aria-label="text.weather">
     <h1 class="visually-hidden">{{ text.appName }}</h1>
-    <WeatherGrid :grid="grid" :locale="locale" @position-change="onPositionChange">
+    <WeatherGrid
+      :key="props.navigationReset"
+      :grid="grid"
+      :locale="locale"
+      @position-change="onPositionChange"
+    >
       <template #default="{ cell }">
         <CurrentWeatherCard
           v-if="cell.kind === 'current' && state.status === 'ready'"

@@ -16,6 +16,9 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
   const isBrowserTest = environment.mode === 'e2e';
   const isAndroid = environment.mode === 'android';
   if (isBrowserTest) {
+    input['update-fixture'] = fileURLToPath(
+      new URL('./src/tests/app/ui/fixtures/index.html', import.meta.url),
+    );
     input['swipe-fixture'] = fileURLToPath(
       new URL('./src/tests/widgets/weather-grid/fixtures/index.html', import.meta.url),
     );
