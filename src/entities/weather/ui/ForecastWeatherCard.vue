@@ -5,7 +5,7 @@ import humidityIcon from '@assets/icons/weather_humidity_20_regular.svg?url';
 import windIcon from '@assets/icons/weather_squalls_20_regular.svg?url';
 import rainIcon from '@assets/icons/drop_20_regular.svg?url';
 import uvIcon from '@assets/icons/weather_sunny_high_20_regular.svg?url';
-import clockIcon from '@assets/icons/clock_20_regular.svg?url';
+import sunHorizonIcon from '@assets/icons/weather_sunny_low_20_regular.svg?url';
 import temperatureIcon from '@assets/icons/temperature_20_regular.svg?url';
 import visibilityIcon from '@assets/icons/eye_20_regular.svg?url';
 import { conditionLabel, messages, type Locale } from '@/shared/locales';
@@ -107,12 +107,12 @@ const measurements = computed(() => {
         name: text.value.sunrise,
         value:
           day.sunrise === undefined ? text.value.noData : (day.sunrise ?? text.value.noSunrise),
-        icon: clockIcon,
+        icon: sunHorizonIcon,
       },
       {
         name: text.value.sunset,
         value: day.sunset === undefined ? text.value.noData : (day.sunset ?? text.value.noSunset),
-        icon: clockIcon,
+        icon: sunHorizonIcon,
       },
     ];
   const hour = hourly.value;

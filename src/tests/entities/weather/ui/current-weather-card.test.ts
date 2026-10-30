@@ -43,8 +43,8 @@ describe('CurrentWeatherCard', () => {
       'weather_sunny_high_20_regular',
       'gauge_20_regular',
       'eye_20_regular',
-      'clock_20_regular',
-      'clock_20_regular',
+      'weather_sunny_low_20_regular',
+      'weather_sunny_low_20_regular',
     ]);
     for (const icon of metricIcons) {
       expect(icon.attributes('aria-hidden')).toBe('true');

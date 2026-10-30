@@ -8,7 +8,7 @@ import windIcon from '@assets/icons/weather_squalls_20_regular.svg?url';
 import uvIcon from '@assets/icons/weather_sunny_high_20_regular.svg?url';
 import pressureIcon from '@assets/icons/gauge_20_regular.svg?url';
 import visibilityIcon from '@assets/icons/eye_20_regular.svg?url';
-import clockIcon from '@assets/icons/clock_20_regular.svg?url';
+import sunHorizonIcon from '@assets/icons/weather_sunny_low_20_regular.svg?url';
 import { conditionLabel, countryLabel, messages, type Locale } from '@/shared/locales';
 import { formatWindSpeed, weatherPresentation } from '@/shared/weather';
 import WeatherCacheStatus from './WeatherCacheStatus.vue';
@@ -89,8 +89,8 @@ const measurements = computed(() => [
       props.sunTimes?.sunrise === undefined
         ? text.value.noData
         : (props.sunTimes.sunrise ?? text.value.noSunrise),
-    icon: 'clock_20_regular',
-    iconUrl: clockIcon,
+    icon: 'weather_sunny_low_20_regular',
+    iconUrl: sunHorizonIcon,
   },
   {
     name: text.value.sunset,
@@ -98,8 +98,8 @@ const measurements = computed(() => [
       props.sunTimes?.sunset === undefined
         ? text.value.noData
         : (props.sunTimes.sunset ?? text.value.noSunset),
-    icon: 'clock_20_regular',
-    iconUrl: clockIcon,
+    icon: 'weather_sunny_low_20_regular',
+    iconUrl: sunHorizonIcon,
   },
 ]);
 </script>
