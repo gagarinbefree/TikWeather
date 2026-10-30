@@ -152,3 +152,5 @@ It is inserted into website and Android builds as a public collector identifier.
 An absent or invalid local DSN disables reporting. Published main builds require a valid repository secret.
 After Pages publication Actions sends an informational collector verification event. Its result is shown in the workflow log.
 Browser test fixtures use a simulated collector and are excluded from production builds.
+
+Actions also accepts the existing `HAWK_DS` secret name when `HAWK_DSN` is absent. `HAWK_DSN` takes precedence.
