@@ -265,7 +265,7 @@ test('tiles subtle weather drawings at their natural size on every card', async 
       height: 275,
       repeat: 'repeat',
       size: 'auto',
-      opacity: '0.06',
+      opacity: '0.03',
       pointerEvents: 'none',
       blendMode: 'multiply',
     });

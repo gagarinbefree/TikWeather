@@ -62,6 +62,6 @@
     "Weather.Thunder.HeaderEnd": "#DFD5F0"
   },
   "weatherPattern": {
-    "opacity": 0.06
+    "opacity": 0.03
   }
 }
