@@ -30,7 +30,7 @@ describe('ForecastWeatherCard', () => {
     expect(wrapper.get('.forecast-weather-card__date time').attributes('datetime')).toBe(
       '2026-10-27',
     );
-    expect(wrapper.get('article').attributes('style')).toContain('--card-background: #F1F5F8');
+    expect(wrapper.get('article').attributes('style')).toContain('--card-background: #E6EDF3');
     expect(wrapper.text()).toContain('10°C');
     expect(wrapper.text()).toContain('5°C');
     expect(wrapper.text()).toContain('Пасмурно');
