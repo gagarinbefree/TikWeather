@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@/tests/shared/lib/browser-test';
 import { verifyApplicationShell, verifyPortraitViewport } from './weather-scenarios.ts';
 
 test('opens the application shell at the GitHub Pages path', async ({ page }) => {

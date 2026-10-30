@@ -28,3 +28,11 @@ describe('weather localization', () => {
     expect(Object.keys(messages.ru).sort()).toEqual(Object.keys(messages.en).sort());
   });
 });
+
+it.each([
+  ['GB', 'United Kingdom'],
+  ['FI', 'Finland'],
+  ['US', 'United States'],
+])('shows the full country name for %s', (code, name) => {
+  expect(countryLabel(code, 'en')).toBe(name);
+});

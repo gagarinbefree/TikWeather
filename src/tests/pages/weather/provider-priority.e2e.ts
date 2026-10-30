@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@/tests/shared/lib/browser-test';
 import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 import { forecastResponse } from '@/tests/entities/weather/api/forecast-fixture';
 

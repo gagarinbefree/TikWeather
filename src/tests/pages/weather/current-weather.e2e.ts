@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@/tests/shared/lib/browser-test';
 import { themeRgbColor } from '@/tests/shared/themes/theme-color';
 import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 

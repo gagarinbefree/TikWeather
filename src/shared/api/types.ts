@@ -1,4 +1,5 @@
 export type FailureKind =
+  | 'location'
   | 'connection'
   | 'timeout'
   | 'credentials'

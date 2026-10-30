@@ -42,9 +42,9 @@ export function localeForCountry(country: string): Locale {
  */
 export function countryLabel(country: string, locale: Locale): string {
   const normalized = country.trim().toLowerCase();
-  const code = countries.find((names) =>
-    names.some((name) => name.toLowerCase() === normalized),
-  )?.[0];
+  const code = /^[a-z]{2}$/.test(normalized)
+    ? normalized.toUpperCase()
+    : countries.find((names) => names.some((name) => name.toLowerCase() === normalized))?.[0];
   return code ? (new Intl.DisplayNames(locale, { type: 'region' }).of(code) ?? country) : country;
 }
 

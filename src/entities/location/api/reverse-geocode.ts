@@ -1,4 +1,15 @@
-import { record, requestJson, type LocationQuery, type RequestOptions } from '@/shared/api';
+import {
+  ApiError,
+  record,
+  requestJson,
+  type LocationQuery,
+  type RequestOptions,
+} from '@/shared/api';
+
+import {
+  isResolvedLocation,
+  type ResolvedLocation,
+} from '@/entities/location/model/resolved-location';
 
 /**
  * placeName. Read a place name and ignore empty values
@@ -20,14 +31,16 @@ function placeName(value: unknown): string | null {
 export async function reverseGeocode(
   location: Exclude<LocationQuery, { source: 'automatic' }>,
   options: RequestOptions,
-): Promise<LocationQuery> {
+): Promise<ResolvedLocation> {
   const url = new URL('https://api.bigdatacloud.net/data/reverse-geocode-client');
   url.search = new URLSearchParams({
     latitude: String(location.latitude),
     longitude: String(location.longitude),
     localityLanguage: 'default',
   }).toString();
-  const payload = record(await requestJson(url.toString(), { ...options, timeoutMs: 1800 }));
+  const payload = record(
+    await requestJson(url.toString(), { ...options, timeoutMs: options.timeoutMs ?? 8000 }),
+  );
   const latitude = payload['latitude'];
   const longitude = payload['longitude'];
   if (
@@ -37,14 +50,16 @@ export async function reverseGeocode(
     Math.abs(latitude - location.latitude) > 0.5 ||
     Math.abs(longitude - location.longitude) > 0.5
   )
-    return location;
+    throw new ApiError('location');
   const countryCode = placeName(payload['countryCode']);
   const city = placeName(payload['city']) ?? placeName(payload['locality']);
   const region = placeName(payload['principalSubdivision']);
-  return {
+  const resolved = {
     ...location,
     countryCode,
     ...(city ? { city } : {}),
     ...(region ? { region } : {}),
   };
+  if (!isResolvedLocation(resolved)) throw new ApiError('location');
+  return resolved;
 }

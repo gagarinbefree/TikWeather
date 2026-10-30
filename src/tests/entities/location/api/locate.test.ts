@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { locate, type DeviceGeolocation } from '@/entities/location';
 
-const ip = { latitude: '58.0047', longitude: '56.2514', country_code: 'RU' };
+const ip = { latitude: '58.0047', longitude: '56.2514', country_code: 'RU', city: 'Perm' };
 afterEach(() => vi.useRealTimers());
 
 describe('locate', () => {
@@ -34,19 +34,14 @@ describe('locate', () => {
     expect(fetcher.mock.calls[0]?.[0]).toContain('localityLanguage=default');
   });
 
-  it('keeps device coordinates if reverse geocoding is unavailable', async () => {
+  it('reports a location failure when device coordinates have no city or country', async () => {
     const device: DeviceGeolocation = {
       getCurrentPosition: (success) => {
         success({ coords: { latitude: 60.1, longitude: 24.9 } });
       },
     };
     const fetcher = vi.fn<typeof fetch>().mockRejectedValue(new TypeError('network'));
-    await expect(locate({ device, fetcher })).resolves.toEqual({
-      source: 'device',
-      latitude: 60.1,
-      longitude: 24.9,
-      countryCode: null,
-    });
+    await expect(locate({ device, fetcher })).rejects.toMatchObject({ kind: 'location' });
     expect(fetcher).toHaveBeenCalledOnce();
   });
 
@@ -65,10 +60,7 @@ describe('locate', () => {
         city: 'Helsinki',
       }),
     );
-    await expect(locate({ device, fetcher })).resolves.toMatchObject({
-      source: 'device',
-      countryCode: null,
-    });
+    await expect(locate({ device, fetcher })).rejects.toMatchObject({ kind: 'location' });
   });
 
   it('ignores an IP fallback reported by the reverse geocoder', async () => {
@@ -86,10 +78,7 @@ describe('locate', () => {
         city: 'Turku',
       }),
     );
-    await expect(locate({ device, fetcher })).resolves.toMatchObject({
-      source: 'device',
-      countryCode: null,
-    });
+    await expect(locate({ device, fetcher })).rejects.toMatchObject({ kind: 'location' });
   });
 
   it('falls back immediately when permission is denied', async () => {
@@ -104,6 +93,7 @@ describe('locate', () => {
       latitude: 58.0047,
       longitude: 56.2514,
       countryCode: 'RU',
+      city: 'Perm',
     });
   });
 
@@ -137,7 +127,7 @@ describe('locate', () => {
     ).resolves.toMatchObject({ source: 'ip' });
   });
 
-  it('keeps valid zero coordinates and falls back to provider IP detection if GeoJS fails', async () => {
+  it('keeps valid zero coordinates and reports failed IP detection', async () => {
     await expect(
       locate({
         device: {
@@ -145,7 +135,15 @@ describe('locate', () => {
             success({ coords: { latitude: 0, longitude: 0 } });
           },
         },
-        fetcher: vi.fn<typeof fetch>().mockRejectedValue(new TypeError('network')),
+        fetcher: vi.fn<typeof fetch>().mockResolvedValue(
+          Response.json({
+            latitude: 0,
+            longitude: 0,
+            lookupSource: 'coordinates',
+            countryCode: 'GH',
+            city: 'Test place',
+          }),
+        ),
       }),
     ).resolves.toMatchObject({ source: 'device', latitude: 0 });
     await expect(
@@ -153,7 +151,7 @@ describe('locate', () => {
         device: null,
         fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json({ latitude: '' })),
       }),
-    ).resolves.toEqual({ source: 'automatic' });
+    ).rejects.toMatchObject({ kind: 'location' });
   });
 
   it('never starts the IP fallback after cancellation', async () => {
@@ -168,4 +166,49 @@ describe('locate', () => {
     await expect(result).rejects.toMatchObject({ kind: 'cancelled' });
     expect(fetcher).not.toHaveBeenCalled();
   });
+});
+
+it('waits for city and country longer than the former short geocoding timeout', async () => {
+  vi.useFakeTimers();
+  const device: DeviceGeolocation = {
+    getCurrentPosition: (success) => {
+      success({ coords: { latitude: 58, longitude: 56.25 } });
+    },
+  };
+  const fetcher = vi.fn<typeof fetch>(
+    () =>
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(
+            Response.json({
+              latitude: 58,
+              longitude: 56.25,
+              lookupSource: 'coordinates',
+              countryCode: 'RU',
+              city: 'Perm',
+            }),
+          );
+        }, 2500);
+      }),
+  );
+  const result = locate({ device, fetcher });
+  const check = expect(result).resolves.toMatchObject({ city: 'Perm', countryCode: 'RU' });
+  await Promise.all([vi.advanceTimersByTimeAsync(2600), check]);
+});
+
+it('rejects a location with no city instead of publishing coordinates as its name', async () => {
+  const device: DeviceGeolocation = {
+    getCurrentPosition: (success) => {
+      success({ coords: { latitude: 58, longitude: 56.25 } });
+    },
+  };
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+    Response.json({
+      latitude: 58,
+      longitude: 56.25,
+      lookupSource: 'coordinates',
+      countryCode: 'RU',
+    }),
+  );
+  await expect(locate({ device, fetcher })).rejects.toMatchObject({ kind: 'location' });
 });

@@ -35,6 +35,7 @@ export const messages = {
     millibars: 'мбар',
     unknownCondition: 'Нет описания погоды',
     failures: {
+      location: 'Не удалось определить город и страну. Разрешите геолокацию и повторите попытку.',
       connection:
         'Не удалось подключиться к сервису погоды. Проверьте соединение и попробуйте ещё раз.',
       timeout: 'Сервис погоды не ответил вовремя. Попробуйте ещё раз.',
@@ -110,6 +111,7 @@ export const messages = {
     millibars: 'mb',
     unknownCondition: 'Weather description unavailable',
     failures: {
+      location: 'Unable to identify the city and country. Allow location access and try again.',
       connection: 'Unable to connect to the weather service. Check your connection and try again.',
       timeout: 'The weather service did not respond in time. Please try again.',
       credentials: 'The weather service rejected the access key.',

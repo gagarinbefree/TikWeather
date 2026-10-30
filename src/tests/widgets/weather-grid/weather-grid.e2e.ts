@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test } from '@/tests/shared/lib/browser-test';
 import {
   verifyCancelledTouch,
   verifyForecastUpdates,

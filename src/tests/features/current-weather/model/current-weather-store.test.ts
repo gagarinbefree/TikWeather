@@ -14,7 +14,13 @@ beforeEach(() => setActivePinia(createPinia()));
  */
 function services(): CurrentWeatherServices {
   return {
-    locate: vi.fn().mockResolvedValue({ source: 'automatic' }),
+    locate: vi.fn().mockResolvedValue({
+      source: 'device',
+      latitude: 58,
+      longitude: 56.25,
+      countryCode: 'RU',
+      city: 'Perm',
+    }),
     current: (location, locale, signal) =>
       getCurrentWeather({
         location,
@@ -33,7 +39,9 @@ describe('current weather flow', () => {
     await store.load(dependencies);
     expect(dependencies.locate).toHaveBeenCalledTimes(1);
     expect(store.state).toMatchObject({ status: 'ready', weather: { temperature: 8.9 } });
-    expect(store.state).toMatchObject({ location: { source: 'automatic' } });
+    expect(store.state).toMatchObject({
+      location: { source: 'device', city: 'Perm', countryCode: 'RU' },
+    });
     expect(store.locale).toBe('ru');
     expect(useWeatherGridStore().grid).toHaveLength(1);
     expect(useWeatherGridStore().grid[0]).toHaveLength(1);
@@ -50,7 +58,7 @@ describe('current weather flow', () => {
     expect(store.state.status).toBe('ready');
   });
 
-  it('shows saved weather during refresh and keeps it if the network fails', async () => {
+  it('keeps saved weather after the same place is resolved and the weather request fails', async () => {
     const store = useCurrentWeatherStore();
     await store.load(services());
     if (store.state.status !== 'ready') throw new Error('Missing weather fixture');
@@ -82,6 +90,7 @@ describe('current weather flow', () => {
           latitude: 58,
           longitude: 56.25,
           countryCode: 'RU',
+          city: 'Perm',
         }),
       current: async (): Promise<CurrentWeather> => ({
         ...(await services().current({ source: 'automatic' }, 'ru', new AbortController().signal)),
@@ -89,6 +98,7 @@ describe('current weather flow', () => {
       }),
     });
     expect(store.locale).toBe('ru');
+    expect(store.state).toMatchObject({ weather: { country: 'RU' } });
   });
 
   it('requests Russian weather for a resolved Russian device location', async () => {
@@ -137,4 +147,93 @@ describe('current weather flow', () => {
     await pending;
     expect(current).not.toHaveBeenCalled();
   });
+});
+
+it('does not request weather until coordinates city and country are resolved', async () => {
+  const store = useCurrentWeatherStore();
+  const current = vi.fn(services().current);
+  await store.load({
+    ...services(),
+    current,
+    locate: (): Promise<LocationQuery> =>
+      Promise.resolve({ source: 'device', latitude: 58, longitude: 56.25, countryCode: null }),
+  });
+  expect(current).not.toHaveBeenCalled();
+  expect(store.state).toEqual({ status: 'error', failure: 'location' });
+});
+
+it('shows saved weather while the current place is still being resolved', async () => {
+  const store = useCurrentWeatherStore();
+  await store.load(services());
+  if (store.state.status !== 'ready') throw new Error('Missing weather fixture');
+  store.restore({
+    version: 1,
+    savedAt: store.state.now,
+    locale: store.locale,
+    weather: store.state.weather,
+    forecast: { days: [] },
+  });
+  let release: (() => void) | undefined;
+  const pending = store.load({
+    ...services(),
+    locate: () =>
+      new Promise((resolve) => {
+        release = (): void => {
+          resolve({
+            source: 'device',
+            latitude: 58,
+            longitude: 56.25,
+            countryCode: 'RU',
+            city: 'Perm',
+          });
+        };
+      }),
+  });
+  expect(store.state).toMatchObject({ status: 'ready', weather: { city: 'Perm' } });
+  release?.();
+  await pending;
+  expect(store.state.status).toBe('ready');
+});
+
+it('keeps the saved forecast when weather for a newly resolved city cannot be loaded', async () => {
+  const store = useCurrentWeatherStore();
+  await store.load(services());
+  if (store.state.status !== 'ready') throw new Error('Missing weather fixture');
+  store.restore({
+    version: 1,
+    savedAt: store.state.now,
+    locale: store.locale,
+    weather: store.state.weather,
+    forecast: { days: [] },
+  });
+  await store.load({
+    ...services(),
+    locate: (): Promise<LocationQuery> =>
+      Promise.resolve({
+        source: 'device',
+        latitude: 51.5,
+        longitude: -0.1,
+        countryCode: 'GB',
+        city: 'London',
+      }),
+    current: (): Promise<CurrentWeather> => Promise.reject(new ApiError('timeout')),
+  });
+  expect(store.state).toMatchObject({ status: 'ready', weather: { city: 'Perm' } });
+});
+
+it('restores a saved forecast even if its old place names are incomplete', async () => {
+  const weather = await services().current(
+    { source: 'automatic' },
+    'ru',
+    new AbortController().signal,
+  );
+  const store = useCurrentWeatherStore();
+  store.restore({
+    version: 1,
+    savedAt: 100,
+    locale: 'en',
+    weather: { ...weather, city: '58.00, 56.25', country: '' },
+    forecast: { days: [] },
+  });
+  expect(store.state).toMatchObject({ status: 'ready', cachedAt: 100 });
 });

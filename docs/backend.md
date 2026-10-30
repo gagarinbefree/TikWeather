@@ -20,8 +20,14 @@ wiring after each build. This includes the Android web assets copied by Capacito
 
 Native provider parsing, units, localization, progressive loading and forecast horizons remain in
 the existing shared adapters. Device location and public GeoJS and reverse geocoding requests keep
-their existing flow. If device and GeoJS detection fail, WeatherAPI `auto:ip` resolves the real client
-address on the backend after trusted forwarding, rather than locating the VPS.
+their existing flow. Before requesting weather the client requires valid coordinates, a city and a
+country code. Device coordinates wait up to eight seconds for reverse geocoding. Incomplete or
+mismatched place results produce a localized location error and a retry button. The app does not
+replace valid GPS coordinates with an unrelated IP city when reverse geocoding fails.
+The last saved forecast is shown immediately for its original location. It stays visible while
+coordinates, city and country are resolved and fresh weather is requested. Only a successful weather
+response replaces it. Failed location or weather requests leave the saved forecast available,
+including when the newly detected location is different.
 
 Current weather and daily and hourly forecasts use Open-Meteo first, WeatherAPI second and
 OpenWeatherMap third. A fresh complete response stops fallback requests. The extended forecast can

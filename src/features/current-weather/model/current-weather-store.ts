@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { shallowRef } from 'vue';
 import { useWeatherGridStore, type CurrentWeather, type WeatherSnapshot } from '@/entities/weather';
+import { isResolvedLocation } from '@/entities/location';
 import { ApiError, type FailureKind, type LocationQuery } from '@/shared/api';
 import { localeForCountry, browserLocale } from '@/shared/locales';
 import type { CurrentWeatherServices } from './services';
@@ -79,10 +80,15 @@ export const useCurrentWeatherStore = defineStore('current-weather', () => {
     try {
       const location = await services.locate(active.signal);
       if (token !== revision) return;
-      if (location.source !== 'automatic' && location.countryCode)
-        locale.value = localeForCountry(location.countryCode);
+      if (!isResolvedLocation(location)) throw new ApiError('location');
+      locale.value = localeForCountry(location.countryCode);
       if (!cached) state.value = { status: 'loading', phase: 'weather' };
-      const weather = await services.current(location, locale.value, active.signal);
+      const reading = await services.current(location, locale.value, active.signal);
+      const weather = {
+        ...reading,
+        city: location.city,
+        country: reading.country.trim() || location.countryCode,
+      };
       if (token !== revision) return;
       if (weather.country.trim()) locale.value = localeForCountry(weather.country);
       const now = services.now();

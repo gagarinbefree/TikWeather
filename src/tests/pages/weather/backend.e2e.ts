@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@/tests/shared/lib/browser-test';
 import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 import { forecastResponse } from '@/tests/entities/weather/api/forecast-fixture';
 
@@ -26,6 +26,8 @@ async function prepareLocation(page: Page): Promise<void> {
     await route.fulfill({
       json: {
         lookupSource: 'coordinates',
+        latitude: 58,
+        longitude: 56.25,
         city: 'Perm',
         countryCode: 'RU',
         principalSubdivision: 'Perm Region',

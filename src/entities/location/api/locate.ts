@@ -8,6 +8,10 @@ import {
   type RequestOptions,
 } from '@/shared/api';
 import type { DeviceGeolocation } from '@/entities/location/model/types';
+import {
+  isResolvedLocation,
+  type ResolvedLocation,
+} from '@/entities/location/model/resolved-location';
 import { reverseGeocode } from './reverse-geocode';
 
 interface LocateOptions extends RequestOptions {
@@ -93,9 +97,9 @@ function coordinate(value: unknown, bound: number): number {
  * locate. Find the device location or fall back to IP detection
  *
  * @param options The optional browser API and network dependencies.
- * @returns The device location with IP detection as a bounded fallback.
+ * @returns Validated coordinates with a city and country from device or IP detection.
  */
-export async function locate(options: LocateOptions = {}): Promise<LocationQuery> {
+export async function locate(options: LocateOptions = {}): Promise<ResolvedLocation> {
   const device =
     options.device === undefined
       ? globalThis.isSecureContext && typeof navigator !== 'undefined'
@@ -110,7 +114,7 @@ export async function locate(options: LocateOptions = {}): Promise<LocationQuery
     } catch (error) {
       if (options.signal?.aborted || (error instanceof ApiError && error.kind === 'cancelled'))
         throw new ApiError('cancelled');
-      return found;
+      throw new ApiError('location');
     }
   }
   try {
@@ -120,7 +124,7 @@ export async function locate(options: LocateOptions = {}): Promise<LocationQuery
         timeoutMs: options.timeoutMs ?? 6000,
       }),
     );
-    return {
+    const location: LocationQuery = {
       source: 'ip',
       latitude: coordinate(payload['latitude'], 90),
       longitude: coordinate(payload['longitude'], 180),
@@ -132,9 +136,10 @@ export async function locate(options: LocateOptions = {}): Promise<LocationQuery
         ? { region: payload['region'].trim() }
         : {}),
     };
+    return isResolvedLocation(location) ? location : await reverseGeocode(location, options);
   } catch (error) {
     if (options.signal?.aborted || (error instanceof ApiError && error.kind === 'cancelled'))
       throw new ApiError('cancelled');
-    return { source: 'automatic' };
+    throw new ApiError('location');
   }
 }

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@/tests/shared/lib/browser-test';
 
 test('exposes an installable manifest scoped to GitHub Pages', async ({ page }) => {
   await page.goto('./');
