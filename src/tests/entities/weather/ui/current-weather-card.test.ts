@@ -50,6 +50,10 @@ describe('CurrentWeatherCard', () => {
       expect(icon.attributes('aria-hidden')).toBe('true');
       expect(icon.attributes('style')).toContain('mask-image: url(');
     }
+    for (const label of wrapper.findAll('dt')) {
+      expect(label.element.firstChild?.textContent?.trim()).toBe(label.text());
+      expect(label.element.lastElementChild?.hasAttribute('data-metric-icon')).toBe(true);
+    }
     expect(wrapper.find('img').exists()).toBe(false);
     wrapper.unmount();
   });

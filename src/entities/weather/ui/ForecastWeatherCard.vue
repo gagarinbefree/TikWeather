@@ -195,13 +195,13 @@ const measurements = computed(() => {
     <dl class="forecast-weather-card__details">
       <div v-for="measurement in measurements" :key="measurement.name">
         <dt>
+          {{ measurement.name }}
           <span
             class="forecast-weather-card__metric-icon"
             data-metric-icon
             :style="{ maskImage: `url(${JSON.stringify(measurement.icon)})` }"
             aria-hidden="true"
           />
-          {{ measurement.name }}
         </dt>
         <dd>{{ measurement.value }}</dd>
       </div>

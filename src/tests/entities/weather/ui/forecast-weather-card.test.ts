@@ -40,6 +40,10 @@ describe('ForecastWeatherCard', () => {
     expect(wrapper.text()).toContain('11.2 mph');
     expect(day.windSpeed).toBe(18);
     expect(wrapper.findAll('[data-metric-icon]')).toHaveLength(6);
+    for (const label of wrapper.findAll('dt')) {
+      expect(label.element.firstChild?.textContent?.trim()).toBe(label.text());
+      expect(label.element.lastElementChild?.hasAttribute('data-metric-icon')).toBe(true);
+    }
     wrapper.unmount();
   });
 
@@ -99,6 +103,10 @@ describe('ForecastWeatherCard', () => {
     await wrapper.setProps({ locale: 'ru' });
     expect(wrapper.text()).toContain('3,1 м/с ЮЗ');
     expect(hour.windSpeed).toBe(11);
+    for (const label of wrapper.findAll('dt')) {
+      expect(label.element.firstChild?.textContent?.trim()).toBe(label.text());
+      expect(label.element.lastElementChild?.hasAttribute('data-metric-icon')).toBe(true);
+    }
     expect(wrapper.get('time').attributes('datetime')).toBe(new Date(hour.timestamp).toISOString());
     wrapper.unmount();
   });
