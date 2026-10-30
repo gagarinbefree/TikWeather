@@ -155,7 +155,9 @@ const measurements = computed(() => [
   </article>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@assets/styles/weather-card-layout' as layout;
+
 @layer custom {
   .current-weather-card {
     inline-size: 100%;
@@ -189,11 +191,7 @@ const measurements = computed(() => [
     color: var(--weather-muted);
   }
   .current-weather-card__summary {
-    flex: 1;
-    display: grid;
-    justify-items: center;
-    align-content: center;
-    padding: var(--spacer);
+    @include layout.summary;
   }
   .current-weather-card__icon {
     inline-size: clamp(3rem, 10dvh, 6rem);
@@ -209,16 +207,13 @@ const measurements = computed(() => [
     font-variant-numeric: tabular-nums;
   }
   .current-weather-card__condition {
+    grid-row: 4;
     margin-block-start: var(--spacer-2);
     text-align: center;
     overflow-wrap: anywhere;
   }
   .current-weather-card__details {
-    margin: 0;
-    padding: var(--spacer);
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(0.75rem, 2dvh, 1.5rem) var(--spacer);
+    @include layout.details;
   }
   dt {
     display: flex;

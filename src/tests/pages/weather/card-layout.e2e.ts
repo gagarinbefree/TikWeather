@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 import { forecastResponse } from '@/tests/entities/weather/api/forecast-fixture';
 
@@ -92,3 +92,128 @@ test('keeps current daily and hourly cards fully visible at the Android viewport
   await expect(viewport).toHaveAttribute('data-column', '1');
   await expectCardInsideCell(page.getByRole('article', { name: 'Почасовой прогноз' }));
 });
+
+/**
+ * readCardAnchors. Measure the main vertical positions inside a weather card
+ *
+ * @param card The visible current or forecast card
+ * @returns The icon temperature condition and first measurement positions
+ */
+async function readCardAnchors(card: Locator): Promise<readonly number[]> {
+  return card.evaluate((article) => {
+    const selectors = [
+      '[data-weather-icon]',
+      '[class$="__temperature"]',
+      '[class$="__condition"]',
+      'dt',
+    ];
+    return selectors.map((selector) => {
+      const element = article.querySelector(selector);
+      if (!element) throw new Error('Missing card anchor ' + selector);
+      return element.getBoundingClientRect().top;
+    });
+  });
+}
+
+/**
+ * mockAlignedWeather. Provide cards with different measurement counts and description lengths
+ *
+ * @param page The browser page receiving deterministic weather
+ * @param english Whether the location selects the English interface
+ * @returns A promise that resolves when the weather routes are ready
+ */
+async function mockAlignedWeather(page: Page, english: boolean): Promise<void> {
+  const city = english ? 'London' : 'Пермь';
+  await page.route('https://api.bigdatacloud.net/**', async (route) => {
+    await route.fulfill({
+      json: {
+        lookupSource: 'coordinates',
+        latitude: 58,
+        longitude: 56.25,
+        countryCode: english ? 'GB' : 'RU',
+        city,
+      },
+    });
+  });
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/current.json?**',
+    async (route) => {
+      await route.fulfill({
+        json: {
+          ...currentResponse,
+          location: {
+            ...currentResponse.location,
+            name: city,
+            country: english ? 'United Kingdom' : 'Russia',
+          },
+        },
+      });
+    },
+  );
+  await page.route(
+    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/forecast.json?**',
+    async (route) => {
+      await route.fulfill({
+        json: {
+          forecast: {
+            forecastday: forecastResponse.forecast.forecastday.map((day) => ({
+              ...day,
+              hour: day.hour.flatMap((hour) => [
+                hour,
+                {
+                  ...hour,
+                  time_epoch: hour.time_epoch + 7200,
+                  condition: { code: 1276, text: 'Moderate or heavy rain with thunder' },
+                },
+              ]),
+            })),
+          },
+        },
+      });
+    },
+  );
+  await page.route('https://gagarinbefree.clodocd.com/api/open-meteo/**', async (route) => {
+    await route.fulfill({ status: 503, json: {} });
+  });
+  await page.route('https://gagarinbefree.clodocd.com/api/openweathermap/**', async (route) => {
+    await route.fulfill({ status: 503, json: {} });
+  });
+}
+
+for (const scenario of [
+  { width: 320, height: 662, english: false },
+  { width: 393, height: 851, english: true },
+  { width: 320, height: 568, english: false },
+]) {
+  test(`keeps vertical anchors aligned across current daily and hourly cards at ${String(scenario.width)} by ${String(scenario.height)}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: scenario.width, height: scenario.height });
+    await page.clock.setFixedTime(new Date('2026-10-26T05:37:00Z'));
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await mockAlignedWeather(page, scenario.english);
+    await page.goto('./');
+    await page.evaluate(async () => document.fonts.ready);
+    const current = page.locator('[data-tikitaki-role="current"] article');
+    await expect(current.locator('dd')).toHaveCount(8);
+    await expect(current).toContainText('07:45');
+    const anchors = await readCardAnchors(current);
+    const viewport = page.locator('.weather-viewport');
+    await expect(viewport).toHaveAttribute('data-grid-rows', '3');
+    await viewport.focus();
+    for (const [key, row, column] of [
+      ['ArrowRight', '0', '1'],
+      ['ArrowRight', '0', '2'],
+      ['ArrowDown', '1', '0'],
+      ['ArrowRight', '1', '1'],
+    ] as const) {
+      await viewport.press(key);
+      await expect(viewport).toHaveAttribute('data-row', row);
+      await expect(viewport).toHaveAttribute('data-column', column);
+      await expect(current.locator('dd')).toHaveCount(6);
+      const next = await readCardAnchors(current);
+      for (const [index, top] of next.entries())
+        expect(Math.abs(top - (anchors[index] ?? NaN))).toBeLessThanOrEqual(1);
+    }
+  });
+}
