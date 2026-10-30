@@ -1,3 +1,4 @@
+import { weatherProviderPriority } from './weather-provider';
 import type { Locale } from '@/shared/locales';
 import type { CurrentWeather } from './current-weather';
 import type { Forecast, ForecastDay, ForecastHour } from './forecast';
@@ -81,6 +82,9 @@ function isHour(value: unknown): value is ForecastHour {
 function isDay(value: unknown): value is ForecastDay {
   if (!isRecord(value)) return false;
   return (
+    (value['provider'] === undefined ||
+      (typeof value['provider'] === 'string' &&
+        Object.hasOwn(weatherProviderPriority, value['provider']))) &&
     typeof value['date'] === 'string' &&
     /^\d{4}-\d{2}-\d{2}$/.test(value['date']) &&
     isNumber(value['maximum']) &&

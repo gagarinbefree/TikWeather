@@ -299,6 +299,7 @@ export async function getOpenMeteoForecast(options: MeteoForecastOptions): Promi
     const dayHours = hours.get(date);
     if (!dayHours?.length) throw new ApiError('invalidResponse');
     days.push({
+      provider: 'open-meteo',
       ...(serverCachedAt === undefined ? {} : { serverCachedAt }),
       date,
       maximum: arrayAt(daily, 'temperature_2m_max', index),

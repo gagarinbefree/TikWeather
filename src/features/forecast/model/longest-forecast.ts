@@ -1,4 +1,4 @@
-import type { Forecast, ForecastDay } from '@/entities/weather';
+import { weatherProviderPriority, type Forecast, type ForecastDay } from '@/entities/weather';
 import { ApiError, serverSnapshotTime } from '@/shared/api';
 
 /**
@@ -11,11 +11,11 @@ function throwIfCancelled(signal: AbortSignal): void {
 }
 
 /**
- * mergeForecast. Combine forecast days while keeping the most detailed readings
+ * mergeForecast. Combine forecast days while keeping fresh readings from preferred sources
  *
  * @param first An already loaded provider forecast.
  * @param second A newer provider forecast that may reach more days.
- * @returns Unique calendar days with the richest available hourly readings.
+ * @returns Unique calendar days with fresh readings from the preferred available source.
  */
 export function mergeForecast(first: Forecast, second: Forecast): Forecast {
   const firstDays = new Map(first.days.map((day) => [day.date, day]));
@@ -26,12 +26,22 @@ export function mergeForecast(first: Forecast, second: Forecast): Forecast {
     const later = secondDays.get(date);
     const earlierTime = serverSnapshotTime(earlier);
     const laterTime = serverSnapshotTime(later);
+    const earlierPriority =
+      earlier?.provider === undefined
+        ? Number.POSITIVE_INFINITY
+        : weatherProviderPriority[earlier.provider];
+    const laterPriority =
+      later?.provider === undefined
+        ? Number.POSITIVE_INFINITY
+        : weatherProviderPriority[later.provider];
     const keepEarlier =
       earlier &&
       (!later ||
         (earlierTime === null && laterTime !== null) ||
         (earlierTime !== null && laterTime !== null && earlierTime > laterTime) ||
-        (earlierTime === laterTime && earlier.hours.length >= later.hours.length));
+        (earlierTime === laterTime &&
+          (earlierPriority < laterPriority ||
+            (earlierPriority === laterPriority && earlier.hours.length >= later.hours.length))));
     const selected = keepEarlier ? earlier : later;
     const source = keepEarlier ? first : second;
     if (!selected) throw new ApiError('invalidResponse');
@@ -59,7 +69,7 @@ export function mergeForecast(first: Forecast, second: Forecast): Forecast {
  * @param sources The forecast providers in preferred order.
  * @param signal The cancellation signal for the location session.
  * @param maximum The largest supported number of calendar days.
- * @returns The available calendar days with the richest readings for shared dates.
+ * @returns The available calendar days with fresh readings from preferred sources.
  */
 export async function longestForecast(
   sources: readonly (() => Promise<Forecast>)[],

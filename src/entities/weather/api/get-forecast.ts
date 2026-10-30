@@ -116,6 +116,7 @@ function parseDay(
   const hours = source['hour'];
   if (!Array.isArray(hours) || hours.length === 0) throw new ApiError('invalidResponse');
   return {
+    provider: 'weatherapi',
     date,
     maximum: numeric(day['maxtemp_c'], -150, 100),
     minimum: numeric(day['mintemp_c'], -150, 100),

@@ -47,6 +47,7 @@ for (const direction of ['left', 'right', 'up', 'down'] as const satisfies reado
     await page.goto('./src/tests/app/ui/fixtures/index.html');
     const viewport = page.locator('.weather-viewport');
     await expect(page.getByRole('article', { name: 'Текущая погода' })).toBeVisible();
+    await expect(viewport).toHaveAttribute('data-grid-rows', '3');
     await viewport.focus();
     await viewport.press('ArrowDown');
     await expect(viewport).toHaveAttribute('data-row', '1');

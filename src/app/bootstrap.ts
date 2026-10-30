@@ -27,9 +27,9 @@ export function mountWeatherApp(root: Component, device?: DeviceGeolocation): vo
       withFallback(
         [
           (): ReturnType<CurrentWeatherServices['current']> =>
-            getCurrentWeather({ location, locale, signal }),
-          (): ReturnType<CurrentWeatherServices['current']> =>
             getOpenMeteoCurrent({ location, locale, signal }),
+          (): ReturnType<CurrentWeatherServices['current']> =>
+            getCurrentWeather({ location, locale, signal }),
           (): ReturnType<CurrentWeatherServices['current']> =>
             getOpenWeatherMapCurrent({ location, locale, signal }),
         ],
@@ -106,6 +106,11 @@ function createForecastServices(): ForecastServices {
             [
               (): Promise<Forecast> =>
                 requireDays(
+                  getOpenMeteoForecast({ location, locale, timeZone, days, signal }),
+                  days,
+                ),
+              (): Promise<Forecast> =>
+                requireDays(
                   getForecast({
                     location,
                     locale,
@@ -113,11 +118,6 @@ function createForecastServices(): ForecastServices {
                     days,
                     signal,
                   }),
-                  days,
-                ),
-              (): Promise<Forecast> =>
-                requireDays(
-                  getOpenMeteoForecast({ location, locale, timeZone, days, signal }),
                   days,
                 ),
               (): Promise<Forecast> =>

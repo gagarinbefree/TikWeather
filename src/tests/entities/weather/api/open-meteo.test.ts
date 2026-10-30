@@ -66,6 +66,7 @@ describe('Open Meteo adapter', () => {
     });
 
     expect(forecast.days).toHaveLength(1);
+    expect(forecast.days[0]?.provider).toBe('open-meteo');
     const requestUrl = fetcher.mock.calls[0]?.[0];
     if (typeof requestUrl !== 'string') throw new Error('Expected a URL');
     expect(new URL(requestUrl).searchParams.get('forecast_days')).toBe('16');

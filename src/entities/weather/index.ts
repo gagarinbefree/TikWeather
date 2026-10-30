@@ -21,3 +21,5 @@ export type {
   WeatherGrid,
   WeatherGridOptions,
 } from './model/types';
+export { weatherProviderPriority } from './model/weather-provider';
+export type { WeatherProvider } from './model/weather-provider';

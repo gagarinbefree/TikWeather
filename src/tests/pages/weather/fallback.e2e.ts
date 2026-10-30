@@ -4,7 +4,7 @@ import { forecastResponse } from '@/tests/entities/weather/api/forecast-fixture'
 
 test.use({ permissions: ['geolocation'], geolocation: { latitude: 58, longitude: 56.25 } });
 
-test('shows Open Meteo current weather when WeatherAPI cannot connect', async ({ page }) => {
+test('shows Open Meteo current weather as the primary source', async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'language', { configurable: true, value: 'ru' });
   });

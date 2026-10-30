@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { Forecast, ForecastDay } from '@/entities/weather';
 import { longestForecast } from '@/features/forecast';
+import { mergeForecast } from '@/features/forecast/model/longest-forecast';
 import { ApiError } from '@/shared/api';
 
 const day: ForecastDay = {
@@ -139,5 +140,27 @@ describe('longestForecast', () => {
     expect(result.days).toHaveLength(16);
     expect(result.days[0]?.serverCachedAt).toBeUndefined();
     expect(result.days[3]?.serverCachedAt).toBe(100);
+  });
+});
+
+describe('forecast source priority', () => {
+  it.each([false, true])('keeps Open Meteo on shared dates in either merge order %s', (reverse) => {
+    const primary = { ...day, provider: 'open-meteo' as const, maximum: 15 };
+    const backup = { ...day, provider: 'weatherapi' as const, maximum: 8 };
+    const first = { days: [reverse ? backup : primary] };
+    const second = { days: [reverse ? primary : backup] };
+    expect(mergeForecast(first, second).days[0]?.maximum).toBe(15);
+  });
+
+  it('prefers fresh backup weather over a retained primary day', () => {
+    const primary = { ...day, provider: 'open-meteo' as const, serverCachedAt: 100, maximum: 15 };
+    const backup = { ...day, provider: 'weatherapi' as const, maximum: 8 };
+    expect(mergeForecast({ days: [primary] }, { days: [backup] }).days[0]?.maximum).toBe(8);
+  });
+
+  it('prefers the newer retained backup over an older primary snapshot', () => {
+    const primary = { ...day, provider: 'open-meteo' as const, serverCachedAt: 100, maximum: 15 };
+    const backup = { ...day, provider: 'openweathermap' as const, serverCachedAt: 200, maximum: 8 };
+    expect(mergeForecast({ days: [primary] }, { days: [backup] }).days[0]?.maximum).toBe(8);
   });
 });

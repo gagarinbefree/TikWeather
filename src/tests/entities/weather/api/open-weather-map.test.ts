@@ -99,6 +99,7 @@ describe('OpenWeatherMap adapter', () => {
       '2026-10-28',
     ]);
     expect(forecast.days[0]).toMatchObject({
+      provider: 'openweathermap',
       sunrise: '07:45',
       sunset: '17:30',
       uv: null,

@@ -19,7 +19,7 @@ async function holdCurrentRequest(page: Page): Promise<void> {
     Object.defineProperty(navigator, 'language', { configurable: true, value: 'ru' });
   });
   await page.route(
-    'https://gagarinbefree.clodocd.com/api/weatherapi/v1/current.json?**',
+    'https://gagarinbefree.clodocd.com/api/open-meteo/v1/forecast?**',
     () => undefined,
   );
 }

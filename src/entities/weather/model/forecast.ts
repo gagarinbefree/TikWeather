@@ -1,3 +1,5 @@
+import type { WeatherProvider } from './weather-provider';
+
 export interface ForecastHour {
   readonly timestamp: number;
   readonly temperature: number;
@@ -17,6 +19,7 @@ export interface ForecastHour {
 }
 
 export interface ForecastDay {
+  readonly provider?: WeatherProvider;
   readonly serverCachedAt?: number;
   readonly date: string;
   readonly maximum: number;

@@ -56,3 +56,35 @@ describe('weather snapshot', () => {
     expect(readWeatherSnapshot()).toBeNull();
   });
 });
+
+describe('saved provider metadata', () => {
+  it('restores legacy forecasts without source metadata', async () => {
+    const value = await snapshot();
+    const days = value.forecast.days.map((day) =>
+      Object.fromEntries(Object.entries(day).filter(([name]) => name !== 'provider')),
+    );
+    writeWeatherSnapshot(value);
+    const key = localStorage.key(0);
+    if (!key) throw new Error('Missing snapshot key');
+    localStorage.setItem(key, JSON.stringify({ ...value, forecast: { ...value.forecast, days } }));
+    expect(readWeatherSnapshot()?.forecast.days).toHaveLength(3);
+  });
+
+  it('rejects unknown provider metadata in a saved forecast', async () => {
+    const value = await snapshot();
+    writeWeatherSnapshot(value);
+    const key = localStorage.key(0);
+    if (!key) throw new Error('Missing snapshot key');
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        ...value,
+        forecast: {
+          ...value.forecast,
+          days: value.forecast.days.map((day) => ({ ...day, provider: 'unknown' })),
+        },
+      }),
+    );
+    expect(readWeatherSnapshot()).toBeNull();
+  });
+});

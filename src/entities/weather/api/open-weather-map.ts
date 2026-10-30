@@ -347,6 +347,7 @@ export async function getOpenWeatherMapForecast(options: MapForecastOptions): Pr
     if (!representative) throw new ApiError('invalidResponse');
     const retainedAt = offset === 0 ? serverCachedAt : forecastCachedAt;
     days.push({
+      provider: 'openweathermap',
       ...(retainedAt === undefined ? {} : { serverCachedAt: retainedAt }),
       date,
       maximum: Math.max(...temperatures),

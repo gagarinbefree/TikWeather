@@ -42,6 +42,7 @@ describe('getForecast', () => {
     expect(url.searchParams.get('lang')).toBe('ru');
     expect(forecast.days).toHaveLength(2);
     expect(forecast.days[0]).toMatchObject({
+      provider: 'weatherapi',
       date: '2026-10-26',
       maximum: 12,
       minimum: 5,

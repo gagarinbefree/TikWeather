@@ -309,3 +309,25 @@ describe('forecast loading', () => {
     expect(store.hour('2026-10-26', currentHour ?? NaN)).toBeDefined();
   });
 });
+
+it('replaces loaded backup days when the primary source becomes available during expansion', async () => {
+  const fixture = await forecastFixture();
+  const primary = fixture.days.map((day) => ({
+    ...day,
+    provider: 'open-meteo' as const,
+    maximum: 15,
+  }));
+  const request = vi.fn<ForecastServices['forecast']>((_location, _locale, _timeZone, depth) =>
+    Promise.resolve({ days: depth === 16 ? primary : fixture.days.slice(0, depth) }),
+  );
+  const store = useForecastStore();
+  store.start(
+    { location, locale: 'ru', timeZone: 'Asia/Yekaterinburg', now },
+    { forecast: request },
+  );
+  await vi.waitFor(() => {
+    expect(request).toHaveBeenCalledTimes(3);
+    expect(store.days.every((day) => day.provider === 'open-meteo')).toBe(true);
+  });
+  expect(store.day('2026-10-26')?.maximum).toBe(15);
+});

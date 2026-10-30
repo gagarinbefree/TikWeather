@@ -5,7 +5,7 @@ import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 test.use({ permissions: ['geolocation'], geolocation: { latitude: 58.0047, longitude: 56.2514 } });
 test.beforeEach(async ({ page }) => {
   await page.route('https://gagarinbefree.clodocd.com/api/open-meteo/**', async (route) => {
-    await route.fulfill({ status: 503, json: {} });
+    await route.abort('failed');
   });
   await page.route('https://gagarinbefree.clodocd.com/api/openweathermap/**', async (route) => {
     await route.fulfill({ status: 503, json: {} });

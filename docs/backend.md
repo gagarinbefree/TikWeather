@@ -23,6 +23,12 @@ the existing shared adapters. Device location and public GeoJS and reverse geoco
 their existing flow. If device and GeoJS detection fail, WeatherAPI `auto:ip` resolves the real client
 address on the backend after trusted forwarding, rather than locating the VPS.
 
+Current weather and daily and hourly forecasts use Open-Meteo first, WeatherAPI second and
+OpenWeatherMap third. A fresh complete response stops fallback requests. The extended forecast can
+combine available calendar days up to 16 days. On shared dates it keeps the preferred source;
+backups fill missing later days. Each day keeps its provider and actual display interval, including
+the three hour OpenWeatherMap forecast. Legacy device snapshots without provider metadata still load.
+
 Fresh weather is preferred over server snapshots. If every live source fails, the newest retained
 response is shown with its original server fetch time. Forecast merging prefers fresh readings for
 shared dates and can retain saved later days with their own saved markers. Local offline snapshots
