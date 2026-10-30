@@ -3,6 +3,7 @@ export interface ForecastHour {
   readonly temperature: number;
   readonly feelsLike: number;
   readonly humidity: number;
+  /** Wind speed in kilometers per hour before display conversion. */
   readonly windSpeed: number;
   readonly windDirection: string;
   readonly rainChance: number;
@@ -21,6 +22,7 @@ export interface ForecastDay {
   readonly maximum: number;
   readonly minimum: number;
   readonly humidity: number;
+  /** Wind speed in kilometers per hour before display conversion. */
   readonly windSpeed: number;
   readonly rainChance: number | null;
   readonly uv: number | null;

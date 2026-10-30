@@ -35,6 +35,10 @@ describe('ForecastWeatherCard', () => {
     expect(wrapper.text()).toContain('Пасмурно');
     expect(wrapper.text()).toContain('07:47');
     expect(wrapper.text()).toContain('17:26');
+    expect(wrapper.text()).toContain('5 м/с');
+    await wrapper.setProps({ locale: 'en' });
+    expect(wrapper.text()).toContain('11.2 mph');
+    expect(day.windSpeed).toBe(18);
     expect(wrapper.findAll('[data-metric-icon]')).toHaveLength(6);
     wrapper.unmount();
   });
@@ -91,6 +95,10 @@ describe('ForecastWeatherCard', () => {
     expect(wrapper.get('h2').text()).toBe('12:00');
     expect(wrapper.text()).toContain('9.5°C');
     expect(wrapper.text()).toContain('35%');
+    expect(wrapper.text()).toContain('6.8 mph SW');
+    await wrapper.setProps({ locale: 'ru' });
+    expect(wrapper.text()).toContain('3,1 м/с ЮЗ');
+    expect(hour.windSpeed).toBe(11);
     expect(wrapper.get('time').attributes('datetime')).toBe(new Date(hour.timestamp).toISOString());
     wrapper.unmount();
   });

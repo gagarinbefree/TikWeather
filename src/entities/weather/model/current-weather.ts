@@ -8,6 +8,7 @@ export interface CurrentWeather {
   readonly temperature: number;
   readonly feelsLike: number;
   readonly humidity: number;
+  /** Wind speed in kilometers per hour before display conversion. */
   readonly windSpeed: number;
   readonly windDirection: string;
   readonly uv: number | null;

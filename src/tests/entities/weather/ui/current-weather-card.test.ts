@@ -4,6 +4,24 @@ import { CurrentWeatherCard, getCurrentWeather } from '@/entities/weather';
 import { currentResponse } from '@/tests/entities/weather/api/current-fixture';
 
 describe('CurrentWeatherCard', () => {
+  it('changes wind units with the interface language for saved weather without changing stored values', async () => {
+    const weather = await getCurrentWeather({
+      locale: 'ru',
+      location: { source: 'automatic' },
+      fetcher: vi.fn<typeof fetch>().mockResolvedValue(Response.json(currentResponse)),
+    });
+    const wrapper = mount(CurrentWeatherCard, {
+      props: { weather, locale: 'ru', cachedAt: weather.observedAt },
+    });
+    expect(wrapper.text()).toContain('2,5 м/с ЗЮЗ');
+    await wrapper.setProps({ locale: 'en' });
+    expect(wrapper.text()).toContain('5.6 mph WSW');
+    await wrapper.setProps({ locale: 'ru' });
+    expect(wrapper.text()).toContain('2,5 м/с ЗЮЗ');
+    expect(weather.windSpeed).toBe(9);
+    wrapper.unmount();
+  });
+
   it('renders localized measurements without an update time for live weather', async () => {
     const weather = await getCurrentWeather({
       locale: 'en',
@@ -14,7 +32,7 @@ describe('CurrentWeatherCard', () => {
     expect(wrapper.text()).toContain('8,9°C');
     expect(wrapper.get('dt').text()).toBe('Ощущается');
     expect(wrapper.text()).toContain('Пасмурно');
-    expect(wrapper.text()).toContain('9 км/ч ЗЮЗ');
+    expect(wrapper.text()).toContain('2,5 м/с ЗЮЗ');
     expect(wrapper.text()).toContain('1021 мбар');
     expect(wrapper.find('.weather-cache-status').exists()).toBe(false);
     const metricIcons = wrapper.findAll('.current-weather-card__metric-icon');

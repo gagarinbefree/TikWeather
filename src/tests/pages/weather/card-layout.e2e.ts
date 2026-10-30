@@ -197,6 +197,9 @@ for (const scenario of [
     const current = page.locator('[data-tikitaki-role="current"] article');
     await expect(current.locator('dd')).toHaveCount(8);
     await expect(current).toContainText('07:45');
+    await expect(current.locator('dd').nth(2)).toContainText(
+      scenario.english ? '5.6 mph' : '2,5 м/с',
+    );
     const anchors = await readCardAnchors(current);
     const viewport = page.locator('.weather-viewport');
     await expect(viewport).toHaveAttribute('data-grid-rows', '3');
@@ -211,6 +214,10 @@ for (const scenario of [
       await expect(viewport).toHaveAttribute('data-row', row);
       await expect(viewport).toHaveAttribute('data-column', column);
       await expect(current.locator('dd')).toHaveCount(6);
+      const daily = column === '0';
+      await expect(current.locator('dd').nth(daily ? 1 : 2)).toContainText(
+        scenario.english ? (daily ? '11.2 mph' : '6.8 mph') : daily ? '5 м/с' : '3,1 м/с',
+      );
       const next = await readCardAnchors(current);
       for (const [index, top] of next.entries())
         expect(Math.abs(top - (anchors[index] ?? NaN))).toBeLessThanOrEqual(1);

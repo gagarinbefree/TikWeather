@@ -10,7 +10,7 @@ import pressureIcon from '@assets/icons/gauge_20_regular.svg?url';
 import visibilityIcon from '@assets/icons/eye_20_regular.svg?url';
 import clockIcon from '@assets/icons/clock_20_regular.svg?url';
 import { conditionLabel, countryLabel, messages, type Locale } from '@/shared/locales';
-import { weatherPresentation } from '@/shared/weather';
+import { formatWindSpeed, weatherPresentation } from '@/shared/weather';
 import WeatherCacheStatus from './WeatherCacheStatus.vue';
 
 const props = defineProps<{
@@ -43,7 +43,6 @@ const dateLabel = computed(() =>
     month: 'short',
   }).format(props.weather.observedAt),
 );
-const directions = computed<Readonly<Record<string, string>>>(() => text.value.directions);
 const measurements = computed(() => [
   {
     name: text.value.feelsLike,
@@ -59,8 +58,7 @@ const measurements = computed(() => [
   },
   {
     name: text.value.wind,
-    value:
-      `${number.value.format(props.weather.windSpeed)} ${text.value.kilometersPerHour} ${directions.value[props.weather.windDirection] ?? ''}`.trim(),
+    value: formatWindSpeed(props.weather.windSpeed, props.locale, props.weather.windDirection),
     icon: 'weather_squalls_20_regular',
     iconUrl: windIcon,
   },

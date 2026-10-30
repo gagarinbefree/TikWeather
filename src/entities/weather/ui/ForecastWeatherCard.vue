@@ -9,7 +9,7 @@ import clockIcon from '@assets/icons/clock_20_regular.svg?url';
 import temperatureIcon from '@assets/icons/temperature_20_regular.svg?url';
 import visibilityIcon from '@assets/icons/eye_20_regular.svg?url';
 import { conditionLabel, messages, type Locale } from '@/shared/locales';
-import { weatherPresentation } from '@/shared/weather';
+import { formatWindSpeed, weatherPresentation } from '@/shared/weather';
 import WeatherCacheStatus from './WeatherCacheStatus.vue';
 
 const props = defineProps<{
@@ -26,7 +26,6 @@ const text = computed(() => messages[props.locale]);
 const number = computed(
   () => new Intl.NumberFormat(props.locale, { maximumFractionDigits: 1, useGrouping: false }),
 );
-const directions = computed<Readonly<Record<string, string>>>(() => text.value.directions);
 const daily = computed(() => ('date' in props.forecast ? props.forecast : null));
 const hourly = computed(() => ('timestamp' in props.forecast ? props.forecast : null));
 const presentation = computed(() =>
@@ -90,7 +89,7 @@ const measurements = computed(() => {
       },
       {
         name: text.value.wind,
-        value: `${number.value.format(day.windSpeed)} ${text.value.kilometersPerHour}`,
+        value: formatWindSpeed(day.windSpeed, props.locale),
         icon: windIcon,
       },
       {
@@ -131,8 +130,7 @@ const measurements = computed(() => {
     },
     {
       name: text.value.wind,
-      value:
-        `${number.value.format(hour.windSpeed)} ${text.value.kilometersPerHour} ${directions.value[hour.windDirection] ?? ''}`.trim(),
+      value: formatWindSpeed(hour.windSpeed, props.locale, hour.windDirection),
       icon: windIcon,
     },
     {
