@@ -4,38 +4,50 @@
     "nightKind": "ClearNight",
     "icon": "WeatherSunny",
     "widgetSymbol": "sun.max.fill",
-    "codes": [0, 1000, 800]
+    "codes": [0, 1000, 800],
+    "background": "clear.webp"
   },
   {
     "kind": "ClearNight",
     "icon": "WeatherMoon",
     "widgetSymbol": "moon.stars.fill",
-    "codes": []
+    "codes": [],
+    "background": "clear.webp"
   },
   {
     "kind": "PartlyCloudy",
     "nightKind": "PartlyCloudyNight",
     "icon": "WeatherPartlyCloudyDay",
     "widgetSymbol": "cloud.sun.fill",
-    "codes": [1, 2, 1003, 801, 802]
+    "codes": [1, 2, 1003, 801, 802],
+    "background": "partly_cloudy.webp"
   },
   {
     "kind": "PartlyCloudyNight",
     "icon": "WeatherPartlyCloudyNight",
     "widgetSymbol": "cloud.moon.fill",
-    "codes": []
+    "codes": [],
+    "background": "partly_cloudy.webp"
   },
   {
     "kind": "Cloudy",
     "icon": "WeatherCloudy",
     "widgetSymbol": "cloud.fill",
-    "codes": [3, 1006, 1009, 803, 804]
+    "codes": [3, 1006, 1009, 803, 804],
+    "background": "cloudy.webp",
+    "backgrounds": [
+      {
+        "image": "overcast.webp",
+        "codes": [3, 1009, 804]
+      }
+    ]
   },
   {
     "kind": "Fog",
     "icon": "WeatherFog",
     "widgetSymbol": "cloud.fog.fill",
-    "codes": [45, 48, 1030, 1135, 1147, 701, 711, 721, 731, 741, 751, 761, 762, 771, 781]
+    "codes": [45, 48, 1030, 1135, 1147, 701, 711, 721, 731, 741, 751, 761, 762, 771, 781],
+    "background": "fog.webp"
   },
   {
     "kind": "Rain",
@@ -45,6 +57,20 @@
       51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 1063, 1150, 1153, 1168, 1171, 1180, 1183,
       1186, 1189, 1192, 1195, 1198, 1201, 1240, 1243, 1246, 300, 301, 302, 310, 311, 312, 313, 314,
       321, 500, 501, 502, 503, 504, 520, 521, 522, 531
+    ],
+    "background": "rain.webp",
+    "backgrounds": [
+      {
+        "image": "light_rain.webp",
+        "codes": [
+          51, 53, 55, 56, 57, 61, 66, 80, 1063, 1150, 1153, 1168, 1171, 1180, 1183, 1198, 1240, 300,
+          301, 310, 311, 313, 321, 500, 520
+        ]
+      },
+      {
+        "image": "heavy_rain.webp",
+        "codes": [65, 67, 82, 1192, 1195, 1201, 1246, 302, 312, 314, 502, 503, 504, 522, 531]
+      }
     ]
   },
   {
@@ -55,6 +81,17 @@
       71, 73, 75, 77, 85, 86, 1066, 1069, 1072, 1114, 1117, 1204, 1207, 1210, 1213, 1216, 1219,
       1222, 1225, 1237, 1249, 1252, 1255, 1258, 1261, 1264, 511, 600, 601, 602, 611, 612, 613, 615,
       616, 620, 621, 622
+    ],
+    "background": "snow.webp",
+    "backgrounds": [
+      {
+        "image": "light_snow.webp",
+        "codes": [71, 85, 1066, 1069, 1072, 1204, 1210, 1213, 1249, 1255, 600, 611, 612, 615, 620]
+      },
+      {
+        "image": "heavy_snow.webp",
+        "codes": [75, 86, 1114, 1117, 1207, 1222, 1225, 1252, 1258, 1264, 602, 616, 622]
+      }
     ]
   },
   {
@@ -63,6 +100,7 @@
     "widgetSymbol": "cloud.bolt.rain.fill",
     "codes": [
       95, 96, 97, 99, 1087, 1273, 1276, 1279, 1282, 200, 201, 202, 210, 211, 212, 221, 230, 231, 232
-    ]
+    ],
+    "background": "thunderstorm.webp"
   }
 ]

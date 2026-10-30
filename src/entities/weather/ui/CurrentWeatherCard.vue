@@ -158,6 +158,8 @@ const measurements = computed(() => [
 
 @layer custom {
   .current-weather-card {
+    @include layout.pattern;
+
     inline-size: 100%;
     max-inline-size: 30rem;
     min-block-size: 100%;

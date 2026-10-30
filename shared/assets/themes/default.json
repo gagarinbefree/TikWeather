@@ -60,5 +60,8 @@
     "Weather.Thunder.Accent": "#5A4F78",
     "Weather.Thunder.HeaderStart": "#D9CDEE",
     "Weather.Thunder.HeaderEnd": "#DFD5F0"
+  },
+  "weatherPattern": {
+    "opacity": 0.06
   }
 }

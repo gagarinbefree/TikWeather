@@ -224,3 +224,52 @@ for (const scenario of [
     }
   });
 }
+
+test('tiles subtle weather drawings at their natural size on every card', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-10-26T05:37:00Z'));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await mockAlignedWeather(page, false);
+  await page.goto('./');
+  const current = page.locator('[data-tikitaki-role="current"] article');
+  await expect(current.locator('dd')).toHaveCount(8);
+  const viewport = page.locator('.weather-viewport');
+  await expect(viewport).toHaveAttribute('data-grid-rows', '3');
+  await viewport.focus();
+  for (const [key, drawing] of [
+    [null, 'overcast'],
+    ['ArrowRight', 'partly_cloudy'],
+    ['ArrowDown', 'overcast'],
+  ] as const) {
+    if (key) await viewport.press(key);
+    await expect
+      .poll(() =>
+        current.evaluate((article) => getComputedStyle(article, '::before').backgroundImage),
+      )
+      .toContain(drawing);
+    const pattern = await current.evaluate(async (article) => {
+      const style = getComputedStyle(article, '::before');
+      const url = style.backgroundImage.slice(5, -2);
+      const image = await createImageBitmap(await (await fetch(url)).blob());
+      return {
+        width: image.width,
+        height: image.height,
+        repeat: style.backgroundRepeat,
+        size: style.backgroundSize,
+        opacity: style.opacity,
+        pointerEvents: style.pointerEvents,
+        blendMode: style.mixBlendMode,
+      };
+    });
+    expect(pattern).toEqual({
+      width: 338,
+      height: 275,
+      repeat: 'repeat',
+      size: 'auto',
+      opacity: '0.06',
+      pointerEvents: 'none',
+      blendMode: 'multiply',
+    });
+    await expectCardInsideCell(current);
+    await page.screenshot({ path: test.info().outputPath(`${drawing}-${key ?? 'current'}.png`) });
+  }
+});

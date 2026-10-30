@@ -59,7 +59,7 @@ function createViteConfig(environment: ConfigEnv): UserConfig {
                 ],
               },
               workbox: {
-                globPatterns: ['**/*.{js,css,html,png,svg,ttf,webmanifest}'],
+                globPatterns: ['**/*.{js,css,html,png,webp,svg,ttf,webmanifest}'],
                 navigateFallback: '/ZoomWeather/index.html',
                 navigateFallbackAllowlist: [/^\/ZoomWeather\/?$/],
                 cleanupOutdatedCaches: true,

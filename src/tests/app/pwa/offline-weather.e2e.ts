@@ -122,6 +122,12 @@ test('shows the last forecast immediately after an offline restart', async ({ pa
   await page.reload();
   await expect(current).toContainText('8,9°C');
   await page.evaluate(async () => document.fonts.ready);
+  const offlinePattern = await current.evaluate(async (article) => {
+    const background = getComputedStyle(article, '::before').backgroundImage;
+    const image = await createImageBitmap(await (await fetch(background.slice(5, -2))).blob());
+    return { width: image.width, height: image.height };
+  });
+  expect(offlinePattern).toEqual({ width: 338, height: 275 });
   expect(await cardAppearance(current)).toEqual(liveCurrent);
   await expect(current.locator('.weather-cache-status__icon')).toBeVisible();
   const toggleBounds = await current.locator('summary').boundingBox();
